@@ -1,4 +1,4 @@
-# How I Memorize Rails Default Routes
+# How I Memorized Rails Routes
 
 We are asked to memorize the 7 default routes created when we define a single entry in the routing file, for example `resources :posts`.
 
