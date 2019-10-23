@@ -39,3 +39,16 @@ Answer from StackOverflow: https://stackoverflow.com/a/52915296
 `add_reference`: a shortcut for creating a column, index and foreign key at the same time.
 
 Foreign keys enforce the relationships between tables. For instance, if you have a `user_id` in a table `posts` that refers to the table `users`, you cannot had a value in `user_id` that does not exist as the primary key in `users`.
+
+# TODO: Should I enforce delete cascade at the model level and at the database level? What are the pros and cons of each approach?
+https://stackoverflow.com/questions/12556614/rails-delete-cascade-vs-dependent-destroy/31104268
+
+`has_many :orders, dependent: :destroy`
+- Safest option for automatically maintaining data integrity.
+- You have polymorphic associations, and do not want to use triggers.
+
+`add_foreign_key :orders, :users, on_delete: :cascade` (in database migration)
+- You are not using any polymorphic associations or you want to use triggers for each polymorphic association.
+
+`has_many :orders, dependent: :delete_all`
+- Only use when the has_many is a leaf node on your association tree (i.e. the child does not have another has_many association with foreign key references)

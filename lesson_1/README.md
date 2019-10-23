@@ -8,147 +8,142 @@ Change the association name between posts and user to posts and creator, so we h
 
 # Create new application
 - `rails new postit`
-- check: `cd postit`, `rails server`, `http://localhost:3000` in browser
+- Run `cd postit`
+- Run `rails server`
+- Navigate to `http://localhost:3000` in browser and verify that a welcome page is shown.
 
 # Create tables
-## Create users table
-- `rails generate migration CreateUsers`
-- In the generated file, put:
-  ```
-  def change
-    create_table :users do |t|
-      t.string :username
- 
-      t.timestamps
-    end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
+After creating each migration file and modifying its contents:
+1. Run `rails db:migrate`.
+2. Run `cat db/schema.rb` to inspect the schema. We want to check if the migration had the intended effects.
 
-## Create comments table
-- `rails generate migration CreateComments`
-- In the generated file, put:
-  ```
-  def change
-    create_table :comments do |t|
-      t.text :body
- 
-      t.timestamps
-    end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
+## Users
+`rails g migration CreateUsers`
 
-## Create posts table
-- `rails generate migration CreatePosts`
-- In the generated file, put:
-  ```
-  def change
-    create_table :comments do |t|
-      t.string :title
-      t.string :url
-      t.text :description
- 
-      t.timestamps
-    end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
+```
+def change
+  create_table :users do |t|
+    t.string :username
 
-## Create categories table
-- `rails generate migration CreateCategories`
-- In the generated file, put:
-  ```
-  def change
-    create_table :categories do |t|
-      t.string :name
- 
-      t.timestamps
-    end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
-
-## Create post_categories join table
-- `rails generate migration CreateJoinTablePostCategory post category`
-- The generated file should have:
-  ```
-  def change
-    create_join_table :posts, :categories do |t|
-      # t.index [:post_id, :category_id]
-      # t.index [:category_id, :post_id]
-    end
+    t.timestamps
   end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
+```
 
-# Create Active Record models 
+## Posts
+`rails g migration CreatePosts`
+
+```
+def change
+  create_table :posts do |t|
+    t.string :title
+    t.string :url
+    t.text :description
+    t.belongs_to :user
+
+    t.timestamps
+  end
+```
+
+## Comments
+`rails g migration CreateComments`
+
+```
+def change
+  create_table :comments do |t|
+    t.text :body
+    t.belongs_to :user
+    t.belongs_to :post
+
+    t.timestamps
+  end
+```
+
+## Categories
+`rails generate migration CreateCategories`
+
+```
+def change
+  create_table :categories do |t|
+    t.string :name
+
+    t.timestamps
+  end
+```
+
+## PostCategories 
+`rails generate migration CreatePostCategories`
+
+```
+def change
+  create_table :post_categories do |t|
+    t.belongs_to :post
+    t.belongs_to :category
+
+    t.timestamps
+  end
+end
+```
+
+# Create models
+- Run `rails console` to open up the rails console.
+- After creating each model file, run `reload!` to reload the console.
+- Run `[ModelName].all` to verify that a SQL query is executed to select all rows from the appropriate table. We want to check that each model is hooked up with the appropriate table.
+
 ## User
-- `app/models/user.rb`
-  ```
-  class User < ActiveRecord::Base
-    has_many :comments
-  end
-  ```
+`app/models/user.rb`
+
+```
+class User < ActiveRecord::Base
+  has_many :comments, dependent: :destroy
+end
+```
+
 ## Post
-- `app/models/post.rb`
-  ```
-  class Post < ActiveRecord::Base
-    belongs_to :user
-    has_many :comments
-    has_many :categories, through :post_categories
-  end
-  ```
+`app/models/post.rb`
+
+```
+class Post < ActiveRecord::Base
+  belongs_to :user
+  has_many :comments, dependent: :destroy
+  has_many :categories, through: :post_categories, dependent: :destroy
+end
+```
+
 ## Comment
-- `app/models/comment.rb`
-  ```
-  class Comment < ActiveRecord::Base
-    belongs_to :user
-    belongs_to :post
-  end
-  ```
+`app/models/comment.rb`
+
+```
+class Comment < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :post
+end
+```
+
 ## Category
-- `app/models/category.rb`
-  ```
-  class Category < ActiveRecord::Base
-    has_many :posts , through :post_categories
-  end
-  ```
+`app/models/category.rb`
+
+```
+class Category < ActiveRecord::Base
+  has_many :posts , through :post_categories, dependent: :destroy
+end
+```
+
 ## PostCategory
-- `app/models/post_category.rb`
-  ```
-  class Category < ActiveRecord::Base
-    belongs_to :post
-    belongs_to :category
-  end
-  ```
+`app/models/post_category.rb`
 
-## Add user reference to post 
-- `rails generate migration AddUserRefToPost user:references`
-- The generated file should have:
-  ```
-  def change
-    add_column :posts, :user_id, :integer
-    add_foreign_key :posts, :users
-  end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
+```
+class PostCategory < ActiveRecord::Base
+  belongs_to :post
+  belongs_to :category
+end
+```
 
-# Add user and post reference to comment 
-- `rails generate migration AddUserAndPostRefToComment user:references post:references`
-- The generated file should have:
-  ```
-  def change
-    add_reference :comments, :user, null: false, foreign_key: true
-    add_reference :comments, :post, null: false, foreign_key: true
-  end
-  ```
-- `rails db:migrate`
-- check: `cat db/schema.rb`
+# Check Associations
+TODO: sample code to create rows and check their associations in the db
 
-## Create User ActiveRecord Model
-- create a new file `app/models/user.rb` with contents `class User < ApplicationRecord; end`
-- check in rails console: `User` should return 
+# Create routes for posts and categories. Prevent the delete route from being accessed.
+ 
+# Create controllers and views to view all posts, all categories, and the post-category relationship. 
 
+# Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
+ 
