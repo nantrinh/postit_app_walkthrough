@@ -17,3 +17,25 @@ Ian:
 I added foreign key constraints throughout that course because I couldn’t handle leaving them out. You can add this to your migrations, and Rails also supports specifying the delete cascade in your models (which is a good idea if you’re enforcing foreign keys at the dB level)
 
 https://guides.rubyonrails.org/active_record_migrations.html#foreign-keys
+
+# I encounter a SQLite3 exception "Cannot add a NOT NULL column with default value NULL" when I try to run a migration that adds a new column with a foreign key constraint to an existing table. The existing table does not have any rows in it. Why am I getting this error?
+
+Answer from StackOverflow: https://stackoverflow.com/a/6710280
+
+This is poor design choice of SQLite. When creating a new table, you can specify NOT NULL, but you cannot do this when adding a column. A workaround is to do the following:
+```
+  def change
+    add_column :posts, :user_id, :integer
+    add_foreign_key :posts, :users
+  end
+```
+
+# What is the difference between `add_foreign_key` and `add_reference` in Rails?
+
+Answer from StackOverflow: https://stackoverflow.com/a/52915296
+
+`add_foreign_key`: adds a new foreign key. `from_table` is the table with the key column, `to_table` contains the referenced primary key.
+
+`add_reference`: a shortcut for creating a column, index and foreign key at the same time.
+
+Foreign keys enforce the relationships between tables. For instance, if you have a `user_id` in a table `posts` that refers to the table `users`, you cannot had a value in `user_id` that does not exist as the primary key in `users`.
