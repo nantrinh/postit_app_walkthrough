@@ -198,7 +198,16 @@ chili.categories.map {|x| x.name} # ["recipes", "food"]
 bok_choy.categories.map {|x| x.name} # ["food", "cat"]
 ```
 
-# Create routes for posts and categories. Prevent the delete route from being accessed.
+# Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
+`config/routes.db`
+
+```
+Rails.application.routes.draw do
+  resources :posts, :categories, except: :destroy
+end
+```
+
+Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
  
 # Create controllers and views to view all posts, all categories, and the post-category relationship. 
 
