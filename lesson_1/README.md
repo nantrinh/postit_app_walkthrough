@@ -4,7 +4,7 @@ I wrote down the instructions first and went through the entire exercise again f
 I used Rails 6 and Ruby 2.5.3.
 
 # Instructions
-Create an app called PostIt based on the entity relationship diagram ![ERD](../flashcards/images/ERD_part1.jpg).
+Create an app called PostIt based on the entity relationship diagram ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg).
 
 Create routes for posts and categories. Prevent the delete route from being accessed.
 
