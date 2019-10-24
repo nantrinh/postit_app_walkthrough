@@ -1,0 +1,7 @@
+<h1>Categories</h1>
+
+<ul>
+<% @categories.each do |category| %>
+  <li><%= link_to category.name.capitalize, category %></li>
+<% end %>
+</ul>
