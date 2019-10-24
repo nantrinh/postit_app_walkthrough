@@ -99,7 +99,7 @@ end
 `app/models/user.rb`
 
 ```
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
 end
@@ -109,7 +109,7 @@ end
 `app/models/post.rb`
 
 ```
-class Post < ActiveRecord::Base
+class Post < ApplicationRecord
   belongs_to :user
   has_many :comments, dependent: :destroy
   has_many :categories, through: :post_categories, dependent: :destroy
@@ -120,7 +120,7 @@ end
 `app/models/comment.rb`
 
 ```
-class Comment < ActiveRecord::Base
+class Comment < ApplicationRecord
   belongs_to :user
   belongs_to :post
 end
@@ -130,7 +130,7 @@ end
 `app/models/category.rb`
 
 ```
-class Category < ActiveRecord::Base
+class Category < ApplicationRecord
   has_many :posts , through: :post_categories, dependent: :destroy
 end
 ```
@@ -139,7 +139,7 @@ end
 `app/models/post_category.rb`
 
 ```
-class PostCategory < ActiveRecord::Base
+class PostCategory < ApplicationRecord
   belongs_to :post
   belongs_to :category
 end
