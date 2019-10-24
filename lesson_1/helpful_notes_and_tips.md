@@ -55,3 +55,36 @@ https://stackoverflow.com/questions/12556614/rails-delete-cascade-vs-dependent-d
 
 ### It's difficult to remember what to name the files. Is there a cheatsheet that I could use?
 https://gist.github.com/alexpchin/f5d2be2ef3735889d315
+
+## The output in rails console is difficult to read. How can I print it in a nicer way?
+Use `pp` to pretty print an object. (Source: Faazil)
+
+Example:
+`pp Post.all` prints:
+
+```
+[#<Post:0x000055607718cdb0
+  id: 1,
+  title: "How to make chili oil",
+  url: "woksoflife.com",
+  description: "great recipe on how to make chili oil",
+  user_id: 1,
+  created_at: Wed, 23 Oct 2019 22:08:19 UTC +00:00,
+  updated_at: Wed, 23 Oct 2019 22:08:19 UTC +00:00>,
+ #<Post:0x00005560771600d0
+  id: 2,
+  title: "How to make compost",
+  url: "urbangardening.com",
+  description: "compost recipe using coffee grounds",
+  user_id: 1,
+  created_at: Wed, 23 Oct 2019 22:08:45 UTC +00:00,
+  updated_at: Wed, 23 Oct 2019 22:08:45 UTC +00:00>,
+ #<Post:0x0000556077160008
+  id: 3,
+  title: "Why bok choy is great for cats",
+  url: "loveyourcats.com",
+  description: "argument for more greens in your cat's diet",
+  user_id: 2,
+  created_at: Wed, 23 Oct 2019 22:08:50 UTC +00:00,
+  updated_at: Wed, 23 Oct 2019 22:08:50 UTC +00:00>]
+```
