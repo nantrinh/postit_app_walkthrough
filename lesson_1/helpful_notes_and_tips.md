@@ -1,4 +1,4 @@
-# The Active Record way says to keep intelligence out of the databases. [link](https://guides.rubyonrails.org/active_record_migrations.html#active-record-and-referential-integrity). Is it best practice to do this?
+### The [Active Record way](https://guides.rubyonrails.org/active_record_migrations.html#active-record-and-referential-integrity) says to keep intelligence out of the databases. Is it best practice to do this?
 
 Chris:
 No, but Railsy companies would be ok with this.
@@ -18,7 +18,7 @@ I added foreign key constraints throughout that course because I couldn’t hand
 
 https://guides.rubyonrails.org/active_record_migrations.html#foreign-keys
 
-# I encounter a SQLite3 exception "Cannot add a NOT NULL column with default value NULL" when I try to run a migration that adds a new column with a foreign key constraint to an existing table. The existing table does not have any rows in it. Why am I getting this error?
+### I encounter a SQLite3 exception "Cannot add a NOT NULL column with default value NULL" when I try to run a migration that adds a new column with a foreign key constraint to an existing table. The existing table does not have any rows in it. Why am I getting this error?
 
 Answer from StackOverflow: https://stackoverflow.com/a/6710280
 
@@ -30,7 +30,7 @@ This is poor design choice of SQLite. When creating a new table, you can specify
   end
 ```
 
-# What is the difference between `add_foreign_key` and `add_reference` in Rails?
+### What is the difference between `add_foreign_key` and `add_reference` in Rails?
 
 Answer from StackOverflow: https://stackoverflow.com/a/52915296
 
@@ -40,7 +40,7 @@ Answer from StackOverflow: https://stackoverflow.com/a/52915296
 
 Foreign keys enforce the relationships between tables. For instance, if you have a `user_id` in a table `posts` that refers to the table `users`, you cannot had a value in `user_id` that does not exist as the primary key in `users`.
 
-# Should I enforce delete cascade at the model level and at the database level? What are the pros and cons of each approach?
+### Should I enforce delete cascade at the model level and at the database level? What are the pros and cons of each approach?
 https://stackoverflow.com/questions/12556614/rails-delete-cascade-vs-dependent-destroy/31104268
 
 `has_many :orders, dependent: :destroy`
@@ -53,5 +53,5 @@ https://stackoverflow.com/questions/12556614/rails-delete-cascade-vs-dependent-d
 `has_many :orders, dependent: :delete_all`
 - Only use when the has_many is a leaf node on your association tree (i.e. the child does not have another has_many association with foreign key references)
 
-# It's difficult to remember what to name the files. Is there a cheatsheet that I could use?
+### It's difficult to remember what to name the files. Is there a cheatsheet that I could use?
 https://gist.github.com/alexpchin/f5d2be2ef3735889d315
