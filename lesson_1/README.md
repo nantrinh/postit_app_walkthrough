@@ -221,7 +221,7 @@ Create controllers and views to view:
 `app/controllers/posts.rb`
 
 ```
-class PostController < ApplicationController
+class PostsController < ApplicationController
   def index
     @posts = Post.all
   end
@@ -235,7 +235,7 @@ end
 `app/controllers/categories.rb`
 
 ```
-class CategoryController < ApplicationController
+class CategoriesController < ApplicationController
   def index
     @categories = Category.all
   end
@@ -284,17 +284,62 @@ Make sure your server is running before checking the URLs (run `rails server`).
 
 ```
 <h1><%= @post.title %></h1>
-<p>Tags: <%= @post.categories.map {|x| x.name}.join(", ") %></p>
+
+<p> Tags: 
+<% @post.categories.each do |category| %>
+  <%= link_to category.name, category_path %>
+<% end %>
+</p>
 
 <p>URL: <%= @post.url %></p>
 <p>Description: <%= @post.description %></p>
-<%= link_to "Index", posts_path %>
+<%= link_to "All Posts", posts_path %>
 ```
 
 ### categories#index
+`app/views/categories/index.html.erb`
+`localhost:3000/categories`
 
+```
+<h1>Categories</h1>
+
+<ul>
+<% @categories.each do |category| %>
+  <li><%= link_to category.name.capitalize, category %></li>
+<% end %>
+</ul>
+```
 
 ### categories#show
+`app/views/categories/show.html.erb`
+`localhost:3000/categories/:id`
+
+```
+<h1>Posts Tagged "<%= @category.name.capitalize %>"</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>URL</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+ 
+  <tbody>
+    <% @category.posts.each do |post| %>
+      <tr>
+        <td><%= post.title %></td>
+        <td><%= post.url %></td>
+        <td><%= post.description %></td>
+        <td><%= link_to "Show", post %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to "All Categories", categories_path %>
+```
 
 # Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
  
