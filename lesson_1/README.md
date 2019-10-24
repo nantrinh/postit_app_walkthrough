@@ -8,7 +8,7 @@ Create an app called PostIt based on the entity relationship diagram ![ERD](../f
 
 Create routes for posts and categories. Prevent the delete route from being accessed.
 
-Create controllers and views to view all posts, all categories, and the post-category relationship. 
+Create controllers and views to view all posts and all categories. 
 
 Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
 
@@ -198,7 +198,8 @@ chili.categories.map {|x| x.name} # ["recipes", "food"]
 bok_choy.categories.map {|x| x.name} # ["food", "cat"]
 ```
 
-# Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
+# Create routes.
+Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
 `config/routes.db`
 
 ```
@@ -209,7 +210,91 @@ end
 
 Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
  
-# Create controllers and views to view all posts, all categories, and the post-category relationship. 
+# Create controllers and views.
+Create controllers and views to view:
+- all posts
+- a specific post and its associated categories
+- all categories
+- a specific category and its associated posts
+
+## Create controllers.
+`app/controllers/posts.rb`
+
+```
+class PostController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+
+  def show
+    @post = Post.find(params[:id])
+  end
+end
+```
+
+`app/controllers/categories.rb`
+
+```
+class CategoryController < ApplicationController
+  def index
+    @categories = Category.all
+  end
+
+  def show
+    @category = Category.find(params[:id])
+  end
+end
+```
+
+## Create views.
+After each view is created, navigate to the appropriate URL in the browser to verify that the response is as expected.
+Make sure your server is running before checking the URLs (run `rails server`).
+### posts#index
+`app/views/posts/index.html.erb`
+`localhost:3000/posts`
+
+```
+<h1>Posts</h1>
+ 
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>URL</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+ 
+  <tbody>
+    <% @posts.each do |post| %>
+      <tr>
+        <td><%= post.title %></td>
+        <td><%= post.url %></td>
+        <td><%= post.description %></td>
+        <td><%= link_to "Show", post %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+```
+
+### posts#show
+`app/views/posts/show.html.erb`
+`localhost:3000/posts/:id`
+
+```
+<h1><%= @post.title %></h1>
+<p>Tags: <%= @post.categories.map {|x| x.name}.join(", ") %></p>
+
+<p>URL: <%= @post.url %></p>
+<p>Description: <%= @post.description %></p>
+<%= link_to "Index", posts_path %>
+```
+
+### categories#index
+
+
+### categories#show
 
 # Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
  
