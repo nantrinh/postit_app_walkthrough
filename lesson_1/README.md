@@ -342,4 +342,6 @@ Make sure your server is running before checking the URLs (run `rails server`).
 ```
 
 # Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
- 
+
+- In `app/models/post.rb`, change the line `belongs_to :user` to `belongs_to :creator, class_name: "User", foreign_key: "user_id"`.
+- Open rails console and check that `Post.first.creator` returns the first user object, and `Post.first.user` now throws a `NoMethodError`. 
