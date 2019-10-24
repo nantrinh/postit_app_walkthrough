@@ -1,5 +1,5 @@
 # Introduction
-This article summarizes what I learned in Lesson 1 of the Launch School 5301 Rails Course. I used Rails 6 and Ruby 2.5.3.
+I condensed what I learned in Lesson 1 of the Launch School 5301 Rails Course into this document. I used Rails 6 and Ruby 2.5.3.
 
 # Instructions
 Create an app called PostIt based on the entity relationship diagram. ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
