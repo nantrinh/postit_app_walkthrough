@@ -1,14 +1,16 @@
 # Introduction
-This is my attempt to condense what I learned in Lesson 1 of the 5301 Rails Course.
-I wrote down the instructions first and went through the entire exercise again from scratch without watching the videos.
-I used Rails 6 and Ruby 2.5.3.
+This article summarizes what I learned in Lesson 1 of the Launch School 5301 Rails Course. I used Rails 6 and Ruby 2.5.3.
 
 # Instructions
 Create an app called PostIt based on the entity relationship diagram. ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
 
 Create routes for posts and categories. Prevent the delete route from being accessed.
 
-Create controllers and views to view all posts and all categories. 
+Create controllers and views to view:
+- all posts
+- a specific post and its associated categories
+- all categories
+- a specific category and its associated posts
 
 Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
 
@@ -341,7 +343,7 @@ Make sure your server is running before checking the URLs (run `rails server`).
 <%= link_to "All Categories", categories_path %>
 ```
 
-# Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
+# Change the association name.
 
 - In `app/models/post.rb`, change the line `belongs_to :user` to `belongs_to :creator, class_name: "User", foreign_key: "user_id"`.
 - Open rails console and check that `Post.first.creator` returns the first user object, and `Post.first.user` now throws a `NoMethodError`. 
