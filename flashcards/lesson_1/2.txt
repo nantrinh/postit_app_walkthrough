@@ -1,0 +1,40 @@
+# Draw a diagram showing how the rails mvc handles processing a request and issuing a response.
+---
+images/request_response_mvc.jpg
+
+# By default, an ActiveRecord model will look for a table with the _____________ name of the model. So a "User" model would look for a "____" table.
+---
+lowercase plural; users
+
+# An ActiveRecord object wraps a __________ in the database table.
+---
+row of data
+
+# Suppose you have the ActiveRecord model `class User < ActiveRecord::Base; end`, how do you (1) create in-memory User objects, (2) save it to the database, and (3) retrieve column values?
+---
+(1) user = User.new(username: 'victor', email: 'victor@wisdom.com')
+(2) user.save OR create a new user AND save it: `User.create(username: 'vicky')`
+(3) user = User.find_by username: 'victor'; user.email
+
+# The ActiveRecord Pattern maps classes to ______, objects to __________, getters/setters to ________________.
+---
+tables; rows of data within that table; columns in that table
+
+# ActiveRecord is an implementation of the ________ pattern which itself is a description of an __________________ system.
+---
+Active Record; Object Relational Mapping
+
+# How do you create an Active Record model?
+---
+Subclass the ApplicationRecord class.
+Example:
+```
+class Product < ApplicationRecord
+end
+```
+
+# Is it a good idea to roll back migrations vs. adding new ones?
+---
+It is best practice to just add new migrations.
+
+If you rollback after you have pushed your code, you will have to tell your teammates to rollback then run db:migrate again, which creates more work for your team and should be avoided.
