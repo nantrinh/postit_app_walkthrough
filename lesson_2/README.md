@@ -1,15 +1,93 @@
 # Instructions
 
 ## Lecture 1
-Add actions and views to allow a user to create a new post and edit existing posts. Use model-backed forms.
+- Add actions and views to allow a user to create a new post and edit existing posts. Use model-backed forms.
+- Add the following validations for Post.
+    - 
+- Display validation errors on the template.
+- Extract the template used for the new, create, edit, and update actions to a partial.
+- Add actions and views to allow a user to create a new category. Use a model-backed form.
+- Extract the part of the category and post forms that displays validation errors to a partial.
 
-Extract the template used for the new, create, edit, and update actions to a partial.
+### Create a test user.
+In rails console, run `User.create(username: "Test")`
 
-Add a validation. Display validation errors on the template.
+### Allow a user to create a new post. 
 
-Add actions and views to allow a user to create a new category. Use a model-backed form.
+#### Edit PostsController. For now, set the default user to "Test".
+```
+# app/controllers/posts/controller.rb
 
-Extract the part of the category and post forms that displays validation errors to a partial.
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+
+  def show
+    @post = Post.find(params[:id])
+  end
+
+  def new
+    @post = Post.new
+  end
+
+  def create
+    @post = Post.new(post_params)
+
+    # TODO: change to logged in user
+    @post.creator = User.find_by username: "Test"  
+
+    if @post.save
+      flash[:notice] = "Your post was created."
+      redirect_to posts_path
+    else
+      render :new
+    end
+  end
+
+  private
+
+  def post_params
+    params.require(:post).permit!
+  end
+end
+```
+
+#### Create a form.
+```
+# app/views/posts/new.html.erb
+
+<h4>Rails model-backed form example</h4>
+
+<%= form_with model: @post do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div>
+    <%= f.label :url %>
+    <%= f.text_field :url %>
+  </div>
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description, rows: 5 %>
+  </div>
+  <%= f.submit "Create Post" %>
+<% end %>
+```
+
+#### Add flash notice display to `/posts` route
+```
+<% if flash[:notice] %>
+  <div><%= flash[:notice] %></div>
+<% end %>
+```
+
+#### Test your changes
+- Create a new post.
+- Check in rails console to see if the post was created. (`pp (User.find_by username: "Test").posts.all`)
+
+### Add a validation.
 
 ## Lecture 2
 ### New comment

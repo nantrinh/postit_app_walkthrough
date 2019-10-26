@@ -115,3 +115,5 @@ The request URL is what's showing up in the address bar, not the response. The r
 In the case of a new post form submission, the request URL is /posts. This has nothing to do with the response sent back. The URL only changes on successful post creation because in that case the response is a redirect, and your browser issues a new request, which changes the address bar.
 
 ### TODO: Content from Quiz 2 
+
+ 
