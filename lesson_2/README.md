@@ -52,7 +52,7 @@ end
 ```
 
 #### Add `new` view
-[Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_with` was introduced in Rails 5.1. `form_for` is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that you can still use `form_for` for now: your code will not break and no deprecation warning will be displayed, but `form_for` will be removed in the future.
+[Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_with` was introduced in Rails 5.1. `form_for` is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that you can still use `form_for` for now; your code will not break and no deprecation warning will be displayed, but `form_for` will be removed in the future.
 
 `app/views/posts/new.html.erb`
 ```
