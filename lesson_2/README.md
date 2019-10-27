@@ -179,12 +179,7 @@ class PostsController < ApplicationController
 end
 ```
 
-### Edit `index` view: add link to `edit` view
-`app/views/posts/index.html.erb` 
-
-`<td><%= link_to "Edit", edit_post_path(post) %></td>` inside the `@posts.each` block.
-
-### Add `edit` view
+#### Add `edit` view
 `app/views/posts/edit.html.erb` 
 ```
 <h4>Edit this post</h4>
@@ -214,6 +209,13 @@ end
   <%= f.submit "Update Post" %>
 <% end %>
 ```
+
+#### Edit posts `index` view
+Add link to `edit` view.
+
+`app/views/posts/index.html.erb` 
+
+`<td><%= link_to "Edit", edit_post_path(post) %></td>` inside the `@posts.each` block.
 
 #### Test your changes
 - Try to update a post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
