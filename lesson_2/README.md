@@ -105,7 +105,7 @@ end
 ### Display validation errors
 
 #### Edit `new` view
-Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. ([source](https://guides.rubyonrails.org/v6.0/working_with_javascript_in_rails.html#form-with))
+[Note](https://guides.rubyonrails.org/v6.0/working_with_javascript_in_rails.html#form-with): `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`.
 
 `app/views/posts/new.html.erb`
 ```
