@@ -8,6 +8,7 @@
   - `url` must be unique.
 - Display validation errors on the template.
 - Allow a user to update a post. Use a model-backed form.
+- Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
 - Extract the template used for the new, create, edit, and update actions to a partial.
 - Add actions and views to allow a user to create a new category. Use a model-backed form.
 - Extract the part of the category and post forms that displays validation errors to a partial.
@@ -218,6 +219,41 @@ end
 - Try to update a post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
 - Check that the error messages show up in the view as intended.
 - Check that the post is updated successfully if all validations are satisfied.
+
+### Simplify posts controller using `before_action`
+`app/controllers/posts_controller.rb`
+```
+class PostsController < ApplicationController
+  before_action :set_post, only: [:show, :edit, :update]
+
+  # code omitted for brevity
+
+  def show
+  end
+
+  # code omitted for brevity
+
+  def edit
+  end
+
+  def update
+    if @post.update(post_params)
+      flash[:notice] = "This post was updated."
+      redirect_to post_path(@post)
+    else
+      render :edit
+    end
+  end
+
+  private
+
+  # code omitted for brevity
+
+  def set_post
+    @post = Post.find(params[:id])
+  end
+end
+```
 
 ## Lecture 2
 ### New comment
