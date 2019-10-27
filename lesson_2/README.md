@@ -251,9 +251,9 @@ end
 ```
 
 ### Extract common code in the `new` and `edit` views to a partial
-Notes:
-- In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post" ([source](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit)) The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
-- Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore. ([source](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials)) 
+[Note](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit): In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post". The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
+
+[Note](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials): Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore.
 
 `app/views/posts/_form.html.erb`
 ```
