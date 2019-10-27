@@ -75,17 +75,17 @@ end
 <% end %>
 ```
 
-#### Add flash notice display to `index` view
+#### Edit posts `index` view 
+- Add link to `new` view.
+- Add flash notice display.
+
 `app/views/posts/index.html.erb`
 ```
+<%= link_to "New Post", new_post_path %>
+
 <% if flash[:notice] %>
   <div><%= flash[:notice] %></div>
 <% end %>
-```
-
-#### Add link to `new` to `index` view
-```
-<%= link_to "New Post", new_post_path %>
 ```
 
 #### Test your changes
