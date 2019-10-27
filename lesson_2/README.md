@@ -21,7 +21,6 @@ Create a test user: run `User.create(username: "Test")` in rails console.
 For now, set the default user to "Test".
 
 `app/controllers/posts_controller.rb`
-
 ```
 class PostsController < ApplicationController
   # code omitted for brevity 
@@ -54,7 +53,6 @@ end
 
 #### Add `new` view
 `app/views/posts/new.html.erb`
-
 ```
 <h4>Create a new post</h4>
 
@@ -77,7 +75,6 @@ end
 
 #### Add flash notice display to `index` view
 `app/views/posts/index.html.erb`
-
 ```
 <% if flash[:notice] %>
   <div><%= flash[:notice] %></div>
@@ -90,7 +87,6 @@ end
 
 ### Add validations
 `app/models/post.rb`
-
 ```
 class Post < ActiveRecord::Base
   belongs_to :creator, class_name: "User", foreign_key: "user_id"
@@ -110,7 +106,6 @@ end
 Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. 
 
 `app/views/posts/new.html.erb`
-
 ```
 <h4>Create a new post</h4>
 
@@ -149,7 +144,6 @@ Note: `form_with` submits forms using Ajax by default. To follow along with the 
 
 #### Add `edit` and `update` actions 
 `app/controllers/posts_controller.rb`
-
 ```
 class PostsController < ApplicationController
 
@@ -180,12 +174,10 @@ end
 
 ### Edit `index` view: add link to `edit` view
 `app/views/posts/index.html.erb` 
-
 `<td><%= link_to "Edit", edit_post_path(post) %></td>` inside the `@posts.each` block.
 
 ### Add `edit` view
 `app/views/posts/edit.html.erb` 
-
 ```
 <h4>Edit this post</h4>
 
