@@ -3,26 +3,32 @@
 ## Lecture 1
 - Allow a user to create a new post. Use a model-backed form.
 - Add the following validations for a new post.
-  - title is required. minimum length of 5. 
-  - url is required. must be unique.
-  - description is required.
+  - Require `title`, `url`, and `description`.
+  - `title` must be at least 5 characters.
+  - `url` must be unique.
 - Display validation errors on the template.
 - Allow a user to update a post. Use a model-backed form.
 - Extract the template used for the new, create, edit, and update actions to a partial.
 - Add actions and views to allow a user to create a new category. Use a model-backed form.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
-### Create a test user.
-In rails console, run `User.create(username: "Test")`
 
 ### Allow a user to create a new post. 
+Create a test user: run `User.create(username: "Test")` in rails console.
 
 #### Edit PostsController. For now, set the default user to "Test".
-```
-# app/controllers/posts/controller.rb
 
+`app/controllers/posts/controller.rb`
+
+```
 class PostsController < ApplicationController
-  # code omitted for brevity
+  def index
+    @posts = Post.all
+  end
+
+  def show
+    @post = Post.find(params[:id])
+  end
 
   def new
     @post = Post.new
@@ -32,7 +38,7 @@ class PostsController < ApplicationController
     @post = Post.new(post_params)
 
     # TODO: change to logged in user
-    @post.creator = User.find_by username: "Test"  
+    @post.creator = User.find_by username: "Test" 
 
     if @post.save
       flash[:notice] = "Your post was created."
@@ -51,9 +57,10 @@ end
 ```
 
 #### Create a form.
-```
-# app/views/posts/new.html.erb
 
+`app/views/posts/new.html.erb`
+
+```
 <h4>Create a new post</h4>
 
 <%= form_with model: @post do |f| %>
@@ -86,8 +93,9 @@ end
 
 ### Add validations.
 ```
-# app/models/post.rb
+`app/models/post.rb`
 
+```
 class Post < ActiveRecord::Base
   belongs_to :creator, class_name: "User", foreign_key: "user_id"
   has_many :comments, dependent: :destroy
@@ -102,9 +110,10 @@ end
 
 ### Display validation errors in the `new` template.
 Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. 
-```
-# app/views/posts/new.html.erb
 
+`app/views/posts/new.html.erb`
+
+```
 <h4>Create a new post</h4>
 
 <% if @post.errors.any? %>
@@ -137,7 +146,7 @@ Note: `form_with` submits forms using Ajax by default. To follow along with the 
 - Try to submit a new post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
 - Check that the error messages show up in the view as intended.
 
-### Allow a user to create a new post. 
+### Allow a user to edit a post. 
 
 #### Edit PostsController.
 ```
