@@ -9,7 +9,7 @@
 - Display validation errors on the template.
 - Allow a user to update a post. Use a model-backed form.
 - Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
-- Extract the template used for the new, create, edit, and update actions to a partial.
+- Extract common code used in the `new` and `edit` views to a partial.
 - Add actions and views to allow a user to create a new category. Use a model-backed form.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
@@ -52,6 +52,8 @@ end
 ```
 
 #### Add `new` view
+Note: `form_with` was introduced in Rails 5.1. `form_for` is now soft-deprecated ([source](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag), which means that you can still use `form_for` for now: your code will not break and no deprecation warning will be displayed, but `form_for` will be removed in the future. ([source for definition of soft-deprecation](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1)) 
+
 `app/views/posts/new.html.erb`
 ```
 <h4>Create a new post</h4>
@@ -103,7 +105,7 @@ end
 ### Display validation errors
 
 #### Edit `new` view
-Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. 
+Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. ([source](https://guides.rubyonrails.org/v6.0/working_with_javascript_in_rails.html#form-with))
 
 `app/views/posts/new.html.erb`
 ```
@@ -247,6 +249,56 @@ class PostsController < ApplicationController
   end
 end
 ```
+
+### Extract common code in the `new` and `edit` views to a partial
+Notes:
+- In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post" ([source](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit)) The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
+- Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore. ([source](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials)) 
+
+`app/views/posts/_form.html.erb`
+```
+<% if @post.errors.any? %>
+  <h5>Please fix the following errors:</h5>
+  <ul>
+    <% @post.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with(model: @post, local: true) do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div>
+    <%= f.label :url %>
+    <%= f.text_field :url %>
+  </div>
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description, rows: 5 %>
+  </div>
+  <%= f.submit %>
+<% end %>
+```
+
+`app/views/posts/new.html.erb`
+```
+<h4>Create a new post</h4>
+
+<%= render 'form' %>
+```
+
+`app/views/posts/edit.html.erb`
+```
+<h4>Edit this post</h4>
+
+<%= render 'form' %>
+```
+
+#### Test your changes
+Verify that the behavior of the `new` and `edit` views are unaffected.
 
 ## Lecture 2
 ### New comment
