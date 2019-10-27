@@ -75,7 +75,7 @@ end
 <% end %>
 ```
 
-#### Edit posts `index` view 
+#### Edit `index` view 
 - Add link to `new` view.
 - Add flash notice display.
 
@@ -210,7 +210,7 @@ end
 <% end %>
 ```
 
-#### Edit posts `index` view
+#### Edit `index` view
 Add link to `edit` view.
 
 `app/views/posts/index.html.erb` 
@@ -308,7 +308,7 @@ end
 Verify that the behavior of the `new` and `edit` views are unaffected.
 
 ### Allow a user to create a new category.
-- Add `new` and `create` actions to Category controller
+- Add `new` and `create` actions
 - Create view for `new`
 - Test it
 
