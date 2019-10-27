@@ -13,10 +13,11 @@
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
 
-### Allow a user to create a new post. 
+### Allow a user to create a new post
 Create a test user: run `User.create(username: "Test")` in rails console.
 
-#### Edit PostsController. For now, set the default user to "Test".
+#### Add `new` and `create` actions 
+For now, set the default user to "Test".
 
 `app/controllers/posts/controller.rb`
 
@@ -56,7 +57,7 @@ class PostsController < ApplicationController
 end
 ```
 
-#### Create a form.
+#### Add `new` view
 
 `app/views/posts/new.html.erb`
 
@@ -80,7 +81,9 @@ end
 <% end %>
 ```
 
-#### Add flash notice display to `/posts` route
+#### Add flash notice display to `index` view
+`app/views/posts/index.html.erb`
+
 ```
 <% if flash[:notice] %>
   <div><%= flash[:notice] %></div>
@@ -91,8 +94,7 @@ end
 - Create a new post.
 - Check in rails console to see if the post was created: `pp (User.find_by username: "Test").posts.all`
 
-### Add validations.
-```
+### Add validations
 `app/models/post.rb`
 
 ```
@@ -108,7 +110,9 @@ class Post < ActiveRecord::Base
 end
 ```
 
-### Display validation errors in the `new` template.
+### Display validation errors
+
+### Edit `new` view
 Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. 
 
 `app/views/posts/new.html.erb`
@@ -148,7 +152,7 @@ Note: `form_with` submits forms using Ajax by default. To follow along with the 
 
 ### Allow a user to edit a post. 
 
-#### Edit PostsController.
+#### Add `edit` and `update` actions 
 ```
 # 
 class PostsController < ApplicationController
