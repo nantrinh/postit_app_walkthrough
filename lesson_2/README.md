@@ -19,17 +19,11 @@ Create a test user: run `User.create(username: "Test")` in rails console.
 #### Add `new` and `create` actions 
 For now, set the default user to "Test".
 
-`app/controllers/posts/controller.rb`
+`app/controllers/posts_controller.rb`
 
 ```
 class PostsController < ApplicationController
-  def index
-    @posts = Post.all
-  end
-
-  def show
-    @post = Post.find(params[:id])
-  end
+  # code omitted for brevity 
 
   def new
     @post = Post.new
@@ -58,7 +52,6 @@ end
 ```
 
 #### Add `new` view
-
 `app/views/posts/new.html.erb`
 
 ```
@@ -112,7 +105,7 @@ end
 
 ### Display validation errors
 
-### Edit `new` view
+#### Edit `new` view
 Note: `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`. 
 
 `app/views/posts/new.html.erb`
@@ -149,15 +142,17 @@ Note: `form_with` submits forms using Ajax by default. To follow along with the 
 #### Test your changes
 - Try to submit a new post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
 - Check that the error messages show up in the view as intended.
+- Check that the post is created successfully if all validations are satisfied.
 
-### Allow a user to edit a post. 
+### Allow a user to edit a post
 
 #### Add `edit` and `update` actions 
+`app/controllers/posts_controller.rb`
+
 ```
-# 
 class PostsController < ApplicationController
 
-  # code omitted for brevity
+  # code omitted for brevity 
 
   def edit
     @post = Post.find(params[:id])
@@ -170,22 +165,59 @@ class PostsController < ApplicationController
       flash[:notice] = "This post was updated."
       redirect_to post_path(@post)
     else
-      render :show
+      render :edit
     end
   end
 
-  # code omitted for brevity
+  private
+
+  def post_params
+    params.require(:post).permit!
+  end
 end
 ```
 
-### Add a view for the `edit` action.
+### Edit `index` view: add link to `edit` view
+`app/views/posts/index.html.erb` 
+
+`<td><%= link_to "Edit", edit_post_path(post) %></td>` inside the `@posts.each` block.
+
+### Add `edit` view
+`app/views/posts/edit.html.erb` 
+
 ```
-# `app/views/posts/edit.html.erb` 
+<h4>Edit this post</h4>
 
+<% if @post.errors.any? %>
+  <h5>Please fix the following errors:</h5>
+  <ul>
+    <% @post.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
 
+<%= form_with(model: @post, local: true) do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div>
+    <%= f.label :url %>
+    <%= f.text_field :url %>
+  </div>
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description, rows: 5 %>
+  </div>
+  <%= f.submit "Update Post" %>
+<% end %>
 ```
 
-### Edit 
+#### Test your changes
+- Try to update a post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
+- Check that the error messages show up in the view as intended.
+- Check that the post is updated successfully if all validations are satisfied.
 
 ## Lecture 2
 ### New comment
