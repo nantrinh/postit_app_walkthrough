@@ -174,6 +174,7 @@ end
 
 ### Edit `index` view: add link to `edit` view
 `app/views/posts/index.html.erb` 
+
 `<td><%= link_to "Edit", edit_post_path(post) %></td>` inside the `@posts.each` block.
 
 ### Add `edit` view
