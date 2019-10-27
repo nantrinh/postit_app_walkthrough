@@ -10,7 +10,7 @@
 - Allow a user to update a post. Use a model-backed form.
 - Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
 - Extract common code used in the `new` and `edit` views to a partial.
-- Add actions and views to allow a user to create a new category. Use a model-backed form.
+- Allow a user to create a new category. Use a model-backed form.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
 
@@ -81,6 +81,11 @@ end
 <% if flash[:notice] %>
   <div><%= flash[:notice] %></div>
 <% end %>
+```
+
+#### Add link to `new` to `index` view
+```
+<%= link_to "New Post", new_post_path %>
 ```
 
 #### Test your changes
@@ -299,6 +304,11 @@ end
 
 #### Test your changes
 Verify that the behavior of the `new` and `edit` views are unaffected.
+
+### Allow a user to create a new category.
+- Add `new` and `create` actions to Category controller
+- Create view for `new`
+- Test it
 
 ## Lecture 2
 ### New comment
