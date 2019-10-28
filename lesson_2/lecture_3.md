@@ -1,4 +1,5 @@
 # Lecture 3 
+This document follows along with Lesson 2, Lecture 3 of the Launch School 5301 Rails Course. There are some differences in the implementations but the main ideas are the same. I used Rails 6 and Ruby 2.5.3. I did not use Twitter Bootstrap.
 
 ## Instructions
 - Allow a user to create a new post. Use a model-backed form.
