@@ -2,15 +2,14 @@
 
 ## Instructions
 - Allow a user to create a new post. Use a model-backed form.
-- Add the following validations for a new post.
+- Add the following validations for a new post. Display validation errors in the `new` view.
   - Require `title`, `url`, and `description`.
   - `title` must be at least 5 characters.
   - `url` must be unique.
-- Display validation errors on the template.
 - Allow a user to update a post. Use a model-backed form.
 - Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
 - Extract common code used in the `new` and `edit` views to a partial.
-- Allow a user to create a new category. Use a model-backed form.
+- Allow a user to create a new category. Use a model-backed form. The `name` field must not be empty. Display validation errors in the `new` view.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
 ## Allow a user to create a new post
@@ -89,7 +88,7 @@
 ## Add validations for a new post.
 - Add validations to model.
   ```
-  # `app/models/post.rb`
+  # app/models/post.rb
   
   class Post < ActiveRecord::Base
     belongs_to :creator, class_name: "User", foreign_key: "user_id"
@@ -356,6 +355,17 @@
     def category_params
       params.require(:category).permit!
     end
+  end
+  ```
+- Add validation for a new category.
+  ```
+  # app/models/category.rb 
+
+  class Category < ApplicationRecord
+    has_many :post_categories, dependent: :destroy
+    has_many :posts , through: :post_categories
+  
+    validates :name, presence: true
   end
   ```
 - Add `new` view. Use a partial.
