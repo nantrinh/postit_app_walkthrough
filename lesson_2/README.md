@@ -1,6 +1,6 @@
-# Instructions
+# Lecture 1
 
-## Lecture 1
+## Instructions
 - Allow a user to create a new post. Use a model-backed form.
 - Add the following validations for a new post.
   - Require `title`, `url`, and `description`.
@@ -13,8 +13,7 @@
 - Allow a user to create a new category. Use a model-backed form.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
-
-### Allow a user to create a new post
+## Allow a user to create a new post
 - Create a test user.
   - Run `User.create(username: "Test")` in rails console.
 - Add `new` and `create` actions. For now, set the default user to "Test".
@@ -87,7 +86,7 @@
   - Create a new post.
   - Check `index` view ("/posts") to see if the category was created.
 
-### Add validations for a new post.
+## Add validations for a new post.
 - Add validations to model.
   ```
   # `app/models/post.rb`
@@ -140,7 +139,7 @@
   - Check that the error messages show up in the view as intended.
   - Check that the post is created successfully if all validations are satisfied.
 
-### Allow a user to edit a post
+## Allow a user to edit a post
 - Add `edit` and `update` actions 
   ```
   # app/controllers/posts_controller.rb
@@ -241,7 +240,7 @@
   - Check that the error messages show up in the view as intended.
   - Check that the post is updated successfully if all validations are satisfied.
 
-### Simplify posts controller using `before_action`
+## Simplify posts controller using `before_action`
   - `show`, `edit`, and `update` all instantiate a `Post` object based on the value of `id` in `params`. 
   ```
   # app/controllers/posts_controller.rb
@@ -278,7 +277,7 @@
   end
   ```
 
-### Extract common code in the `new` and `edit` views to a partial
+## Extract common code in the `new` and `edit` views to a partial
 - [Note](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit): In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post". The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
 - [Note](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials): Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore.
   ```
@@ -327,7 +326,7 @@
   ```
 - Test your changes: Verify that the behavior of the `new` and `edit` views are unaffected.
 
-### Allow a user to create a new category.
+## Allow a user to create a new category.
 - Add `new` and `create` actions.
   ```
   # app/controllers/categories_controller.rb
