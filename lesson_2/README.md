@@ -79,9 +79,10 @@
   ```
   # app/views/posts/index.html.erb
 
+  <%= render 'shared/flash' %>
   <%= link_to "New Post", new_post_path %>
   
-  <%= render 'shared/flash' %>
+  # code omitted for brevity
   ```
   ```
   # app/views/shared/_flash.html.erb
@@ -415,10 +416,16 @@
     <%= f.submit %>
   <% end %>
   ```
-- Add link to create a new category.
+- Edit `index` view.
+  - Add link to create a new category.
+  - Add flash notice display using partial.
   ```
   # app/views/categories/index.html.erb
+  
+  <%= render 'shared/flash' %>
   <%= link_to "New Category", new_category_path %>
+
+  # code omitted for brevity
   ```
 - Test your changes.
   - Create a new category.
@@ -426,6 +433,50 @@
 
 ## Extract validation error code to a partial. 
 ```
+# app/views/posts/_form.html.erb
+
+<%= render 'shared/errors', obj: @post %>
+
+<%= form_with(model: @post, local: true) do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div>
+    <%= f.label :url %>
+    <%= f.text_field :url %>
+  </div>
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description, rows: 5 %>
+  </div>
+  <%= f.submit %>
+<% end %>
+```
+```
+# app/views/categories/_form.html.erb
+
+<%= render 'shared/errors', obj: @category %>
+
+<%= form_with(model: @category, local: true) do |f| %>
+  <div>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <%= f.submit %>
+<% end %>
+```
+```
+# app/views/shared/_errors.html.erb
+
+<% if obj.errors.any? %>
+  <h5>Please fix the following errors:</h5>
+  <ul>
+    <% obj.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
 ```
 
 ## Lecture 2
