@@ -95,7 +95,7 @@
   - Create a new post.
   - Check `index` view ("/posts") to see if the post was created and flash notice is displayed.
 
-## Add validations for a new post.
+## Add validations for a new post
 - Add validations to model.
   ```
   # app/models/post.rb
@@ -343,7 +343,7 @@
 - Test your changes.
   - Verify that the behavior of the `new` and `edit` views are unaffected.
 
-## Allow a user to create a new category.
+## Allow a user to create a new category
 - Add `new` and `create` actions. Downcase the name before saving.
   ```
   # app/controllers/categories_controller.rb
@@ -431,7 +431,7 @@
   - Create a new category.
   - Check `index` view ("/categories") to see if the category was created.
 
-## Extract validation error code to a partial. 
+## Extract validation error code to a partial
 ```
 # app/views/posts/_form.html.erb
 
