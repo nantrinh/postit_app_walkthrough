@@ -84,7 +84,7 @@
   ```
 - Test your changes.
   - Create a new post.
-  - Check `index` view ("/posts") to see if the category was created.
+  - Check `index` view ("/posts") to see if the post was created.
 
 ## Add validations for a new post.
 - Add validations to model.
@@ -134,13 +134,13 @@
     <%= f.submit "Create Post" %>
   <% end %>
   ```
-- Test your changes
+- Test your changes.
   - Try to submit a new post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
   - Check that the error messages show up in the view as intended.
   - Check that the post is created successfully if all validations are satisfied.
 
 ## Allow a user to edit a post
-- Add `edit` and `update` actions 
+- Add `edit` and `update` actions.
   ```
   # app/controllers/posts_controller.rb
   
@@ -241,7 +241,6 @@
   - Check that the post is updated successfully if all validations are satisfied.
 
 ## Simplify posts controller using `before_action`
-  - `show`, `edit`, and `update` all instantiate a `Post` object based on the value of `id` in `params`. 
   ```
   # app/controllers/posts_controller.rb
   
@@ -324,7 +323,8 @@
   
   <%= render 'form' %>
   ```
-- Test your changes: Verify that the behavior of the `new` and `edit` views are unaffected.
+- Test your changes.
+  - Verify that the behavior of the `new` and `edit` views are unaffected.
 
 ## Allow a user to create a new category.
 - Add `new` and `create` actions.
