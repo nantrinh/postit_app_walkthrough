@@ -1,4 +1,4 @@
-# Lecture 1
+# Lecture 3 
 
 ## Instructions
 - Allow a user to create a new post. Use a model-backed form.
@@ -8,8 +8,11 @@
   - `url` must be unique.
 - Allow a user to update a post. Use a model-backed form.
 - Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
-- Extract common code used in the `new` and `edit` views to a partial.
-- Allow a user to create a new category. Use a model-backed form. The `name` field must not be empty. Display validation errors in the `new` view.
+- Extract common code used in the `new` and `edit` views to partials.
+- Allow a user to create a new category. Use a model-backed form.
+- Add the following validations for a new post. Display validation errors in the `new` view.
+  - Require `name`.
+  - `name` must be unique.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
 ## Allow a user to create a new post
@@ -72,18 +75,24 @@
   ```
 - Edit `index` view.
   - Add link to create a new post.
-  - Add flash notice display.
+  - Add flash notice display using partial.
   ```
   # app/views/posts/index.html.erb
+
   <%= link_to "New Post", new_post_path %>
   
+  <%= render 'shared/flash' %>
+  ```
+  ```
+  # app/views/shared/_flash.html.erb
+
   <% if flash[:notice] %>
     <div><%= flash[:notice] %></div>
   <% end %>
   ```
 - Test your changes.
   - Create a new post.
-  - Check `index` view ("/posts") to see if the post was created.
+  - Check `index` view ("/posts") to see if the post was created and flash notice is displayed.
 
 ## Add validations for a new post.
 - Add validations to model.
@@ -97,7 +106,7 @@
     has_many :categories, through: :post_categories
   
     validates :title, presence: true, length: {minimum: 5}
-    validates :url, presence: true
+    validates :url, presence: true, uniqueness: true
     validates :description, presence: true
   end
   ```
@@ -132,6 +141,8 @@
     </div>
     <%= f.submit "Create Post" %>
   <% end %>
+
+  <%= link_to "All Posts", posts_path %>
   ```
 - Test your changes.
   - Try to submit a new post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
@@ -199,6 +210,8 @@
     </div>
     <%= f.submit "Update Post" %>
   <% end %>
+
+  <%= link_to "All Posts", posts_path %>
   ```
 - Add links to edit each post. 
   ```
@@ -313,6 +326,8 @@
   <h4>Create a new post</h4>
   
   <%= render 'form' %>
+
+  <%= link_to "All Posts", posts_path %>
   ```
 
   ```
@@ -321,12 +336,14 @@
   <h4>Edit this post</h4>
   
   <%= render 'form' %>
+
+  <%= link_to "All Posts", posts_path %>
   ```
 - Test your changes.
   - Verify that the behavior of the `new` and `edit` views are unaffected.
 
 ## Allow a user to create a new category.
-- Add `new` and `create` actions.
+- Add `new` and `create` actions. Downcase the name before saving.
   ```
   # app/controllers/categories_controller.rb
 
@@ -339,6 +356,7 @@
   
     def create
       @category = Category.new(category_params)  
+      @category.name = @category.name.downcase
   
       if @category.save
         flash[:notice] = "A new category was created."
@@ -365,7 +383,7 @@
     has_many :post_categories, dependent: :destroy
     has_many :posts , through: :post_categories
   
-    validates :name, presence: true
+    validates :name, presence: true, uniqueness: true
   end
   ```
 - Add `new` view. Use a partial.
@@ -405,6 +423,10 @@
 - Test your changes.
   - Create a new category.
   - Check `index` view ("/categories") to see if the category was created.
+
+## Extract validation error code to a partial. 
+```
+```
 
 ## Lecture 2
 ### New comment
