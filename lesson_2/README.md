@@ -308,8 +308,10 @@ end
 Verify that the behavior of the `new` and `edit` views are unaffected.
 
 ### Allow a user to create a new category.
-- Add `new` and `create` actions. File: `app/controllers/categories_controller.rb`
+- Add `new` and `create` actions.
   ```
+  # app/controllers/categories_controller.rb
+
   class CategoriesController < ApplicationController
     # code omitted for brevity
   
@@ -337,14 +339,18 @@ Verify that the behavior of the `new` and `edit` views are unaffected.
     end
   end
   ```
-- Add `new` view. File: `app/views/categories/new.html.erb`
+- Add `new` view. Use a partial.
   ```
+  # app/views/categories/new.html.erb
+
   <h4>Create a new post</h4>
   
   <%= render 'form' %>
   ```
-  `app/views/categories/_form.html.erb`
+
   ```
+  # app/views/categories/_form.html.erb
+
   <% if @category.errors.any? %>
     <h5>Please fix the following errors:</h5>
     <ul>
@@ -362,11 +368,12 @@ Verify that the behavior of the `new` and `edit` views are unaffected.
     <%= f.submit %>
   <% end %>
   ```
-- Edit `index` view: add link to `new` view. File: `app/views/categories/index.html.erb`
+- Edit `index` view: add link to `new` view.
   ```
+  # app/views/categories/index.html.erb
   <%= link_to "New Category", new_category_path %>
   ```
-- Test your changes
+- Test your changes.
   - Create a new category.
   - Check `index` view ("/categories") to see if the category was created.
 
