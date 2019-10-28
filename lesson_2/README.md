@@ -90,7 +90,7 @@ end
 
 #### Test your changes
 - Create a new post.
-- Check in rails console to see if the post was created: `pp (User.find_by username: "Test").posts.all`
+- Check `index` view ("/posts") to see if the category was created.
 
 ### Add validations
 `app/models/post.rb`
@@ -309,8 +309,70 @@ Verify that the behavior of the `new` and `edit` views are unaffected.
 
 ### Allow a user to create a new category.
 - Add `new` and `create` actions
-- Create view for `new`
-- Test it
+  `app/controllers/categories_controller.rb`
+  ```
+  class CategoriesController < ApplicationController
+    # code omitted for brevity
+  
+    def new
+      @category = Category.new
+    end
+  
+    def create
+      @category = Category.new(category_params)  
+  
+      if @category.save
+        flash[:notice] = "A new category was created."
+        redirect_to categories_path
+      else
+        render :new 
+      end
+    end
+  
+    # code omitted for brevity
+  
+    private
+  
+    def category_params
+      params.require(:category).permit!
+    end
+  end
+  ```
+- Add `new` view
+  `app/views/categories/new.html.erb`
+  ```
+  <h4>Create a new post</h4>
+  
+  <%= render 'form' %>
+  ```
+  `app/views/categories/_form.html.erb`
+  ```
+  <% if @category.errors.any? %>
+    <h5>Please fix the following errors:</h5>
+    <ul>
+      <% @category.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= form_with(model: @category, local: true) do |f| %>
+    <div>
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+    </div>
+    <%= f.submit %>
+  <% end %>
+  ```
+- Edit `index` view
+  Add link to `new` view.
+  `app/views/categories/index.html.erb`
+  ```
+  <%= link_to "New Category", new_category_path %>
+  ```
+- Test your changes
+  - Create a new category.
+  - Check `index` view ("/categories") to see if the category was created.
 
 ## Lecture 2
 ### New comment
