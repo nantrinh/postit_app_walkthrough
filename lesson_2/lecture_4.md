@@ -1,14 +1,25 @@
 # Lecture 4
 
-This document follows along with Lesson 2, Lecture 4 of the Launch School 5301 Rails Course. There are some differences in the implementations but the main ideas are the same. I used Rails 6 and Ruby 2.5.3. I did not use Twitter Bootstrap.
-
 ## Instructions
+- Change the association name between comments and user to comments and creator.
 - Allow a user to create a new comment on a post.
   - The form for a new comment should be displayed on the posts `show` view.
   - The form should be submitted via a POST request to `/posts/:post_id/comments`.
 - Add the following validations for a new comment. Display validation errors in the posts `show` view.
   - Require `body`.
 - Display all comments related to a post on the posts `show` view.
+
+## Change the association name
+```
+# app/models/comment.rb
+
+ class Comment < ActiveRecord::Base
+   belongs_to :creator, class_name: "User", foreign_key: "user_id"
+   belongs_to :post
+
+   validates :body, presence: true
+ end
+```
 
 ## Allow a user to create a new comment 
 - Add `create` action. For now, set the default user to "Test". 
@@ -18,11 +29,11 @@ This document follows along with Lesson 2, Lecture 4 of the Launch School 5301 R
   class CommentsController < ApplicationController
     def create
       @post = Post.find(params[:post_id])
-      @comment = Comment.new(comment_params)
-      @comment.post = @post
+  
+      @comment = @post.comments.new(comment_params)
   
       @user = User.find_by username: "Test"
-      @comment.user = @user
+      @comment.creator = @user
   
       if @comment.save
         flash[:notice] = "Your comment was added."
@@ -42,12 +53,26 @@ This document follows along with Lesson 2, Lecture 4 of the Launch School 5301 R
   # config/routes.rb
 
   Rails.application.routes.draw do
+    root to: "posts#index"
+  
     resources :categories, except: :destroy
   
     resources :posts, except: :destroy do
       resources :comments, only: :create
     end
   end
+  ```
+- Create an new instance of a comment in the posts `show` action.
+  ```
+  # app/controllers/posts_controller.rb
+  
+  # code omitted for brevity
+
+  def show
+    @comment = Comment.new
+  end
+
+  # code omitted for brevity
   ```
 - Add new comment form to posts `show` view.
   ```
@@ -68,16 +93,63 @@ This document follows along with Lesson 2, Lecture 4 of the Launch School 5301 R
   ```
 
 ## Add validations for a new comment
-- Add `validates :body, presence: true` to `app/models/comments.rb`
-- Add `<%= render 'shared/errors', obj: @comment %>` to `app/views/posts/show.html.erb`
+- Add `validates :body, presence: true` to `app/models/comments.rb`.
+- Display validation errors in the posts `show` view.
+    ```ruby
+    # app/views/posts/show.html.erb
 
-### New comment
-On the show post page, display a model backed comment creation form. You'll need to modify the routes to support a nested comment creation url (eg, HTTP POST request to /posts/:post_id/comments), create a CommentsController#create action, and figure out which template to render when there's a validation error. See the sample solution for the workflow: tl-postit.herokuapp.com (navigate to the show post page after logging in).
+    # specify category id to prevent errors when validations are triggered
+    <h1><%= @post.title %></h1>
+    
+    <%= render 'shared/flash' %>
+    
+    <p> Tags: 
+    <% @post.categories.each do |category| %>
+      <%= link_to category.name, category_path(category.id) %>
+    <% end %>
+    </p>
+    
+    <p>URL: <%= @post.url %></p>
+    <p>Description: <%= @post.description %></p>
+    
+    # add code to render errors partial
+    <%= form_for [@post, @comment] do |f| %>
+      <%= render 'shared/errors', obj: @comment %>
+      <div>
+        <%= f.label :body, "Leave a comment" %>
+        <br/>
+        <%= f.text_area :body, rows: 3 %>
+      </div>
+      <%= f.submit "Create comment" %>
+    <% end %>
+    
+    <h5>Comments</h5>
+    <% @post.comments.each do |comment| %>
+      <article>
+        <p><%= comment.body %></p>
+        <p><%= comment.creator.username %>, <%= comment.created_at %></p>
+      </article>
+    <% end %>
+    
+    <%= link_to "All Posts", posts_path %>
+    ```
+## Display all comments related to a post on the posts `show` view
+```ruby
+# app/views/posts/show.html.erb
 
-This is putting knowledge of nested resources and model backed forms together.
-- Add `create` action.
-- Add nested route.
-- 
+# code omitted for brevity
+
+<h5>Comments</h5>
+<% @post.comments.each do |comment| %>
+  <article>
+    <p><%= comment.body %></p>
+    <p><%= comment.creator.username %>, <%= comment.created_at %></p>
+  </article>
+<% end %>
+
+<%= link_to "All Posts", posts_path %>
+```
+
 ### Select categories on new/edit post form
 On the post form, expose either a combo box or check boxes to allow selection of categories for this post. Hint: use the category_ids virtual attribute.
 
