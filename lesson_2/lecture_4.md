@@ -18,6 +18,7 @@
 - Add the following validations for a new comment. Display validation errors in the posts `show` view.
   - Require `body`.
 - Display all comments related to a post on the posts `show` view.
+- Allow a user to associate a post with categories when creating a new post and when editing a post.
 
 ## Change the association name
 ```ruby
@@ -160,11 +161,21 @@
 <%= link_to "All Posts", posts_path %>
 ```
 
-### Select categories on new/edit post form
-On the post form, expose either a combo box or check boxes to allow selection of categories for this post. Hint: use the category_ids virtual attribute.
+## Allow a user to associate a post with categories
+- Note: If you want to mass assign an array, you have to use syntax like this in the permit method: `permit(category_ids: [])` .
+- Add the code below to the form in `_form.html.erb`.
+  ```
+  <%= f.label "Categories" %>
+  <%= f.collection_check_boxes :category_ids, Category.all, :id, :name do |cb| %>
+    <% cb.label {cb.check_box + cb.text.capitalize} %>
+  <% end %>
+  ```
+- Modify the `post_params` method in `app/controllers/posts_controller.rb`.
+  ```
+  def post_params
+    params.require(:post).permit(:title, :url, :description, category_ids: [])
+  end
+  ```
 
-### Show Category page 
-After your posts are associated with categories, display the categories that each post is associated with. When clicking on the category, take the user to the show category page where all the posts associated with that category are displayed. Look at the sample app for workflow ideas, but feel free to be creative!
-
-### Helpers
-Use Rails helpers to fix the url format as well as output a more friendly date-time format.
+## Additional Changes
+- Add a link to edit the post on the show post view 
