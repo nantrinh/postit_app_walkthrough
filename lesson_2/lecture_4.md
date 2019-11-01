@@ -22,6 +22,7 @@
 - Allow a user to associate a post with categories when creating a new post and when editing a post.
 - Allow a user to click on post URLs and navigate to those URLs.
 - Display timestamps in a format like "11/01/2019 7:01pm UTC".
+- Add a link to edit the post on the post `show` view.
 
 ## Change the association name
 ```ruby
@@ -220,4 +221,5 @@
   - Replace `comment.created_at` with `display_datetime(comment.created_at)`.
 
 ## Additional Changes
-- Add a link to edit the post on the show post view 
+- Add a link to edit the post on the post `show` view 
+  - Add `<%= link_to "Edit Post", edit_post_path %>` to `app/views/posts/show.html.erb`
