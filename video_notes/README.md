@@ -1,3 +1,18 @@
+# Video Notes
+
+This repo contains timestamped notes for select videos. I created these so I could easily navigate to the certain parts of the videos when looking to clarify a certain concept.
+
+The timestamps are in `length_of_video - where_you_are_in_the_video` format, because that is what is displayed in the Launch School video controller and thus easier for me to jot down as I watch the videos.
+
+# Table of Contents
+* [Lesson 1](#lesson-1)
+   * [M:M Association Solution](#mm-association-solution)
+* [Lesson 2](#lesson-2)
+   * [Lecture 3](#lecture-3)
+      * [Part 1](#part-1)
+      * [Part 2](#part-2)
+   * [Lecture 4](#lecture-4)
+
 # Lesson 1
 ## M:M Association Solution
 Main Idea:  How to support a many to many association using `has_many: through`
