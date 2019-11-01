@@ -1,10 +1,20 @@
 # Lesson 1
+In this lesson, I set up a new application based on the following entity relationship diagram:
+![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
 
-Table of Contents
-=================
+## Instructions
+- Create new application.
+- Create tables.
+- Create routes for posts and categories. Prevent the delete route from being accessed.
+- Create controllers and views to view:
+  - all posts
+  - a specific post and its associated categories
+  - all categories
+  - a specific category and its associated posts
+- Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
 
-   * [Introduction](#introduction)
-   * [Instructions](#instructions)
+## Table of Contents
+
    * [Create new application](#create-new-application)
    * [Create tables](#create-tables)
       * [Users](#users)
@@ -33,28 +43,18 @@ Table of Contents
          * [categories#show](#categoriesshow)
    * [Change the association name.](#change-the-association-name)
 
-# Instructions
-- Create an app called PostIt based on the entity relationship diagram. ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
-- Create routes for posts and categories. Prevent the delete route from being accessed.
-- Create controllers and views to view:
-  - all posts
-  - a specific post and its associated categories
-  - all categories
-  - a specific category and its associated posts
-- Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
-
-# Create new application
+## Create new application
 - `rails new postit`
 - Run `cd postit`
 - Run `rails server`
 - Navigate to `http://localhost:3000` in browser and verify that a welcome page is shown.
 
-# Create tables
+## Create tables
 After creating each migration file and modifying its contents:
 1. Run `rails db:migrate`.
 2. Run `cat db/schema.rb` to inspect the schema. We want to check if the migration had the intended effects.
 
-## Users
+### Users
 `rails g migration CreateUsers`
 
 ```
@@ -66,7 +66,7 @@ def change
   end
 ```
 
-## Posts
+### Posts
 `rails g migration CreatePosts`
 
 ```
@@ -81,7 +81,7 @@ def change
   end
 ```
 
-## Comments
+### Comments
 `rails g migration CreateComments`
 
 ```
@@ -95,7 +95,7 @@ def change
   end
 ```
 
-## Categories
+### Categories
 `rails generate migration CreateCategories`
 
 ```
@@ -107,7 +107,7 @@ def change
   end
 ```
 
-## PostCategories 
+### PostCategories 
 `rails generate migration CreatePostCategories`
 
 ```
@@ -121,12 +121,12 @@ def change
 end
 ```
 
-# Create models
+## Create models
 - Run `rails console` to open up the rails console.
 - After creating each model file, run `reload!` to reload the console.
 - Run `[ModelName].all` to verify that a SQL query is executed to select all rows from the appropriate table. We want to check that each model is hooked up with the appropriate table.
 
-## User
+### User
 `app/models/user.rb`
 
 ```
@@ -136,7 +136,7 @@ class User < ApplicationRecord
 end
 ```
 
-## Post
+### Post
 `app/models/post.rb`
 
 ```
@@ -147,7 +147,7 @@ class Post < ApplicationRecord
 end
 ```
 
-## Comment
+### Comment
 `app/models/comment.rb`
 
 ```
@@ -157,7 +157,7 @@ class Comment < ApplicationRecord
 end
 ```
 
-## Category
+### Category
 `app/models/category.rb`
 
 ```
@@ -166,7 +166,7 @@ class Category < ApplicationRecord
 end
 ```
 
-## PostCategory
+### PostCategory
 `app/models/post_category.rb`
 
 ```
@@ -176,12 +176,12 @@ class PostCategory < ApplicationRecord
 end
 ```
 
-# Check associations
+## Check associations
 Run the following commands in the rails console and check that the output is as expected.
 If you encounter errors, try restarting the rails console (not just running `reload!`).
 It is assumed that the commands are run sequentially from one section to the next (e.g., commands in "1:M association between User and Post" are run before "1:M association between User and Comment".
 
-## 1:M association between User and Post
+### 1:M association between User and Post
 ```
 nancy = User.create(username: "Nancy")
 victor = User.create(username: "Victor")
@@ -195,7 +195,7 @@ nancy.posts.map {|x| x.title} # ["How to make chili oil", "How to make compost"]
 victor.posts.map {|x| x.title} # ["Why bok choy is great for cats"]
 ```
 
-## 1:M association between User and Comment
+### 1:M association between User and Comment
 ```
 Comment.create(body: "I agree!", user: nancy, post: bok_choy)
 Comment.create(body: "This looks delicious!", user: victor, post: chili)
@@ -205,12 +205,12 @@ nancy.comments.map {|x| x.body} # ["I agree!", "I'm commenting on my own post."]
 victor.comments.map {|x| x.body} # ["This looks delicious!"]
 ```
 
-## 1:M association between Post and Comment
+### 1:M association between Post and Comment
 ```
 chili.comments.map {|x| x.body} # ["This looks delicious!", "I'm commenting on my own post."]
 ```
 
-## M:M association between Post and Categories
+### M:M association between Post and Categories
 ```
 recipes = Category.create(name: "recipes")
 food = Category.create(name: "food")
@@ -229,7 +229,7 @@ chili.categories.map {|x| x.name} # ["recipes", "food"]
 bok_choy.categories.map {|x| x.name} # ["food", "cat"]
 ```
 
-# Create routes
+## Create routes
 Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
 `config/routes.db`
 
@@ -241,14 +241,14 @@ end
 
 Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
  
-# Create controllers and views
+## Create controllers and views
 Create controllers and views to view:
 - all posts
 - a specific post and its associated categories
 - all categories
 - a specific category and its associated posts
 
-## Create controllers
+### Create controllers
 `app/controllers/posts.rb`
 
 ```
@@ -277,10 +277,10 @@ class CategoriesController < ApplicationController
 end
 ```
 
-## Create views
+### Create views
 After each view is created, navigate to the appropriate URL in the browser to verify that the response is as expected.
 Make sure your server is running before checking the URLs (run `rails server`).
-### posts#index
+#### posts#index
 `app/views/posts/index.html.erb`
 `localhost:3000/posts`
 
@@ -309,7 +309,7 @@ Make sure your server is running before checking the URLs (run `rails server`).
 </table>
 ```
 
-### posts#show
+#### posts#show
 `app/views/posts/show.html.erb`
 `localhost:3000/posts/:id`
 
@@ -327,7 +327,7 @@ Make sure your server is running before checking the URLs (run `rails server`).
 <%= link_to "All Posts", posts_path %>
 ```
 
-### categories#index
+#### categories#index
 `app/views/categories/index.html.erb`
 `localhost:3000/categories`
 
@@ -341,7 +341,7 @@ Make sure your server is running before checking the URLs (run `rails server`).
 </ul>
 ```
 
-### categories#show
+#### categories#show
 `app/views/categories/show.html.erb`
 `localhost:3000/categories/:id`
 
@@ -372,7 +372,7 @@ Make sure your server is running before checking the URLs (run `rails server`).
 <%= link_to "All Categories", categories_path %>
 ```
 
-# Change the association name.
+## Change the association name.
 
 - In `app/models/post.rb`, change the line `belongs_to :user` to `belongs_to :creator, class_name: "User", foreign_key: "user_id"`.
 - Open rails console and check that `Post.first.creator` returns the first user object, and `Post.first.user` now throws a `NoMethodError`. 
