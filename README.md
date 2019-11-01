@@ -7,10 +7,7 @@ The biggest differences are:
 - I do not use Twitter Bootstrap. The course does.
 
 ## Contents of this repository
-- `lesson_x` directories contain relevant material for each lesson.
-- `flashcards` contains notes that I intend to format in a quiz-friendly manner.
-- `video_notes` contains timestamped notes for select videos.
-- `images` contains images I use in the READMEs.
-
-
-
+- `lesson_x/` directories contain relevant material for each lesson.
+- `flashcards/` contains notes that I intend to format in a quiz-friendly manner.
+- `video_notes.md` contains timestamped notes for select videos.
+- `images/` contains images I use in the READMEs.
