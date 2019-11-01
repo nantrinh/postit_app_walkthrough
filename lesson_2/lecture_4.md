@@ -6,9 +6,10 @@
 * [Allow a user to create a new comment](#allow-a-user-to-create-a-new-comment)
 * [Add validations for a new comment](#add-validations-for-a-new-comment)
 * [Display all comments related to a post on the posts show view](#display-all-comments-related-to-a-post-on-the-posts-show-view)
-   * [Select categories on new/edit post form](#select-categories-on-newedit-post-form)
-   * [Show Category page](#show-category-page)
-   * [Helpers](#helpers)
+* [Allow a user to associate a post with categories](#allow-a-user-to-associate-a-post-with-categories)
+* [Allow a user to click on post URLs and navigate to those URLs](#allow-a-user-to-click-on-post-urls-and-navigate-to-those-urls)
+* [Display timestamps in a format like "10/31/2019 7:04pm UTC"](#display-timestamps-in-a-format-like-10312019-704pm-utc)
+* [Additional Changes](#additional-changes)
 
 ## Instructions
 - Change the association name between comments and user to comments and creator.
@@ -19,6 +20,8 @@
   - Require `body`.
 - Display all comments related to a post on the posts `show` view.
 - Allow a user to associate a post with categories when creating a new post and when editing a post.
+- Allow a user to click on post URLs and navigate to those URLs.
+- Display timestamps in a format like "10/31/2019 7:04pm UTC".
 
 ## Change the association name
 ```ruby
@@ -176,6 +179,45 @@
     params.require(:post).permit(:title, :url, :description, category_ids: [])
   end
   ```
+## Allow a user to click on post URLs and navigate to those URLs
+- Ensure that URLs are prepended with `"http://"` when displayed.
+  - Add a helper.
+  ```
+  # app/helpers/application_helper.rb 
+
+  module ApplicationHelper
+    def fix_url(str)
+      str.starts_with?("http://") ? str : "http://#{str}"
+    end
+  end
+  ```
+  - `app/views/posts/index.html.erb` 
+    - Replace `post.url` with `fix_url(post.url)`.
+  - `app/views/posts/show.html.erb`
+    - Replace `@post.url` with `fix_url(@post.url)`.
+- Ensure that the `href` attributes are set to the URLs.
+- `app/views/posts/index.html.erb` 
+  - Replace `link_to fix_url(post.url)` with `link_to(body=fix_url(post.url), url=fix_url(post.url))`.
+- `app/views/posts/show.html.erb`
+  - Replace `link_to fix_url(@post.url)` with `link_to(body=fix_url(@post.url), url=fix_url(@post.url))`.
+
+## Display timestamps in a format like "10/31/2019 7:04pm UTC" 
+- Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/date/rdoc/DateTime.html#method-i-strftime).
+- Add a helper.
+  ```
+  # app/helpers/application_helper.rb 
+  
+  module ApplicationHelper
+  
+    # code omitted for clarity 
+  
+    def display_datetime(dt)
+      dt.strftime("%m/%d/%Y %l:%M%P %Z")
+    end
+  end
+  ```
+- `app/views/posts/show.html.erb`
+  - Replace `comment.created_at` with `display_datetime(comment.created_at)`.
 
 ## Additional Changes
 - Add a link to edit the post on the show post view 

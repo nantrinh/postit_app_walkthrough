@@ -16,7 +16,7 @@
     <% @posts.each do |post| %>
       <tr>
         <td><%= post.title %></td>
-        <td><%= post.url %></td>
+        <td><%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %></td>
         <td><%= post.description %></td>
         <td><%= link_to "Show", post %></td>
         <td><%= link_to "Edit", edit_post_path(post) %></td>

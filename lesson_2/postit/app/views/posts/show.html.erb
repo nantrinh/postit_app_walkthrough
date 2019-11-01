@@ -8,7 +8,7 @@
 <% end %>
 </p>
 
-<p>URL: <%= @post.url %></p>
+<p>URL: <%= link_to(body=fix_url(@post.url), url=fix_url(@post.url)) %></p>
 <p>Description: <%= @post.description %></p>
 
 <%= form_for [@post, @comment] do |f| %>
@@ -25,7 +25,7 @@
 <% @post.comments.each do |comment| %>
   <article>
     <p><%= comment.body %></p>
-    <p><%= comment.creator.username %>, <%= comment.created_at %></p>
+    <p><%= comment.creator.username %>, <%= display_datetime(comment.created_at) %></p>
   </article>
 <% end %>
 
