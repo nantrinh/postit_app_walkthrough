@@ -1,5 +1,6 @@
 # Lesson 1
 In this lesson, I set up a new application based on the following entity relationship diagram:
+
 ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
 
 ## Instructions
