@@ -1,18 +1,47 @@
-# Introduction
-I condensed what I learned in Lesson 1 of the Launch School 5301 Rails Course into this document. I used Rails 6 and Ruby 2.5.3.
+# Lesson 1
+
+Table of Contents
+=================
+
+   * [Introduction](#introduction)
+   * [Instructions](#instructions)
+   * [Create new application](#create-new-application)
+   * [Create tables](#create-tables)
+      * [Users](#users)
+      * [Posts](#posts)
+      * [Comments](#comments)
+      * [Categories](#categories)
+      * [PostCategories](#postcategories)
+   * [Create models](#create-models)
+      * [User](#user)
+      * [Post](#post)
+      * [Comment](#comment)
+      * [Category](#category)
+      * [PostCategory](#postcategory)
+   * [Check associations](#check-associations)
+      * [1:M association between User and Post](#1m-association-between-user-and-post)
+      * [1:M association between User and Comment](#1m-association-between-user-and-comment)
+      * [1:M association between Post and Comment](#1m-association-between-post-and-comment)
+      * [M:M association between Post and Categories](#mm-association-between-post-and-categories)
+   * [Create routes](#create-routes)
+   * [Create controllers and views](#create-controllers-and-views)
+      * [Create controllers](#create-controllers)
+      * [Create views](#create-views)
+         * [posts#index](#postsindex)
+         * [posts#show](#postsshow)
+         * [categories#index](#categoriesindex)
+         * [categories#show](#categoriesshow)
+   * [Change the association name.](#change-the-association-name)
 
 # Instructions
-Create an app called PostIt based on the entity relationship diagram. ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
-
-Create routes for posts and categories. Prevent the delete route from being accessed.
-
-Create controllers and views to view:
-- all posts
-- a specific post and its associated categories
-- all categories
-- a specific category and its associated posts
-
-Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
+- Create an app called PostIt based on the entity relationship diagram. ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
+- Create routes for posts and categories. Prevent the delete route from being accessed.
+- Create controllers and views to view:
+  - all posts
+  - a specific post and its associated categories
+  - all categories
+  - a specific category and its associated posts
+- Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
 
 # Create new application
 - `rails new postit`
@@ -147,7 +176,7 @@ class PostCategory < ApplicationRecord
 end
 ```
 
-# Check Associations
+# Check associations
 Run the following commands in the rails console and check that the output is as expected.
 If you encounter errors, try restarting the rails console (not just running `reload!`).
 It is assumed that the commands are run sequentially from one section to the next (e.g., commands in "1:M association between User and Post" are run before "1:M association between User and Comment".
@@ -200,7 +229,7 @@ chili.categories.map {|x| x.name} # ["recipes", "food"]
 bok_choy.categories.map {|x| x.name} # ["food", "cat"]
 ```
 
-# Create routes.
+# Create routes
 Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
 `config/routes.db`
 
@@ -212,14 +241,14 @@ end
 
 Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
  
-# Create controllers and views.
+# Create controllers and views
 Create controllers and views to view:
 - all posts
 - a specific post and its associated categories
 - all categories
 - a specific category and its associated posts
 
-## Create controllers.
+## Create controllers
 `app/controllers/posts.rb`
 
 ```
@@ -248,7 +277,7 @@ class CategoriesController < ApplicationController
 end
 ```
 
-## Create views.
+## Create views
 After each view is created, navigate to the appropriate URL in the browser to verify that the response is as expected.
 Make sure your server is running before checking the URLs (run `rails server`).
 ### posts#index
