@@ -1,5 +1,15 @@
 # Lecture 4
 
+## Table of Contents
+* [Instructions](#instructions)
+* [Change the association name](#change-the-association-name)
+* [Allow a user to create a new comment](#allow-a-user-to-create-a-new-comment)
+* [Add validations for a new comment](#add-validations-for-a-new-comment)
+* [Display all comments related to a post on the posts show view](#display-all-comments-related-to-a-post-on-the-posts-show-view)
+   * [Select categories on new/edit post form](#select-categories-on-newedit-post-form)
+   * [Show Category page](#show-category-page)
+   * [Helpers](#helpers)
+
 ## Instructions
 - Change the association name between comments and user to comments and creator.
 - Allow a user to create a new comment on a post.
@@ -10,7 +20,7 @@
 - Display all comments related to a post on the posts `show` view.
 
 ## Change the association name
-```
+```ruby
 # app/models/comment.rb
 
  class Comment < ActiveRecord::Base
@@ -23,7 +33,7 @@
 
 ## Allow a user to create a new comment 
 - Add `create` action. For now, set the default user to "Test". 
-  ```
+  ```ruby
   # app/controllers/comments_controller.rb 
   
   class CommentsController < ApplicationController
@@ -49,7 +59,7 @@
   end
   ```
 - Add nested route.
-  ```
+  ```ruby
   # config/routes.rb
 
   Rails.application.routes.draw do
@@ -63,7 +73,7 @@
   end
   ```
 - Create an new instance of a comment in the posts `show` action.
-  ```
+  ```ruby
   # app/controllers/posts_controller.rb
   
   # code omitted for brevity
@@ -75,7 +85,7 @@
   # code omitted for brevity
   ```
 - Add new comment form to posts `show` view.
-  ```
+  ```ruby
   # app/views/posts/show.html.erb
 
   # code omitted for brevity
