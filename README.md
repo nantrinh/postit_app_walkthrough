@@ -9,5 +9,5 @@ The biggest differences are:
 ## Contents of this repository
 - `lesson_x/` directories contain relevant material for each lesson.
 - `flashcards/` contains notes that I intend to format in a quiz-friendly manner.
-- `video_notes.md` contains timestamped notes for select videos.
+- [`video_notes.md`](https://github.com/nantrinh/ls_rails_notes/blob/master/video_notes.md) contains timestamped notes for select videos.
 - `images/` contains images I use in the READMEs.
