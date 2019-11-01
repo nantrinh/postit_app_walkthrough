@@ -1,5 +1,0 @@
-- 26:00: what the `label` element is used for
-- 21:40: how the `form_for` method works
-- 9:40: explanation of strong params
-- 7:50: how to work around strong params
-- 5:33: what happens when you submit a value in a form for a param that is not permitted. for example, if you only permit title and the user submits title and url.
