@@ -8,7 +8,7 @@
 * [Display all comments related to a post on the posts show view](#display-all-comments-related-to-a-post-on-the-posts-show-view)
 * [Allow a user to associate a post with categories](#allow-a-user-to-associate-a-post-with-categories)
 * [Allow a user to click on post URLs and navigate to those URLs](#allow-a-user-to-click-on-post-urls-and-navigate-to-those-urls)
-* [Display timestamps in a format like "10/31/2019 7:04pm UTC"](#display-timestamps-in-a-format-like-10312019-704pm-utc)
+* [Display timestamps in a format like "11/01/2019 7:01pm UTC"](#display-timestamps-in-a-format-like-10312019-704pm-utc)
 * [Additional Changes](#additional-changes)
 
 ## Instructions
@@ -21,7 +21,7 @@
 - Display all comments related to a post on the posts `show` view.
 - Allow a user to associate a post with categories when creating a new post and when editing a post.
 - Allow a user to click on post URLs and navigate to those URLs.
-- Display timestamps in a format like "10/31/2019 7:04pm UTC".
+- Display timestamps in a format like "11/01/2019 7:01pm UTC".
 
 ## Change the association name
 ```ruby
@@ -201,7 +201,7 @@
 - `app/views/posts/show.html.erb`
   - Replace `link_to fix_url(@post.url)` with `link_to(body=fix_url(@post.url), url=fix_url(@post.url))`.
 
-## Display timestamps in a format like "10/31/2019 7:04pm UTC" 
+## Display timestamps in a format like "11/01/2019 7:01pm UTC" 
 - Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/date/rdoc/DateTime.html#method-i-strftime).
 - Add a helper.
   ```
