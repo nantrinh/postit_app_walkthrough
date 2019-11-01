@@ -22,9 +22,9 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
    * [Display timestamps in a format like "11/01/2019 7:01pm UTC"](#display-timestamps-in-a-format-like-11012019-701pm-utc)
    * [Additional Changes](#additional-changes)
 
-# Lecture 3 
+## Lecture 3 
 
-## Instructions
+### Instructions
 - Allow a user to create a new post. Use a model-backed form.
 - Add the following validations for a new post. Display validation errors in the `new` view.
   - Require `title`, `url`, and `description`.
@@ -39,7 +39,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   - `name` must be unique.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
-## Allow a user to create a new post
+### Allow a user to create a new post
 - Create a test user.
   - Run `User.create(username: "Test")` in rails console.
 - Add `new` and `create` actions. For now, set the default user to "Test".
@@ -119,7 +119,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   - Create a new post.
   - Check `index` view ("/posts") to see if the post was created and flash notice is displayed.
 
-## Add validations for a new post
+### Add validations for a new post
 - Add validations to model.
   ```ruby
   # app/models/post.rb
@@ -174,7 +174,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   - Check that the error messages show up in the view as intended.
   - Check that the post is created successfully if all validations are satisfied.
 
-## Allow a user to edit a post
+### Allow a user to edit a post
 - Add `edit` and `update` actions.
   ```ruby
   # app/controllers/posts_controller.rb
@@ -277,7 +277,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   - Check that the error messages show up in the view as intended.
   - Check that the post is updated successfully if all validations are satisfied.
 
-## Simplify posts controller using `before_action`
+### Simplify posts controller using `before_action`
   ```ruby
   # app/controllers/posts_controller.rb
   
@@ -313,7 +313,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   end
   ```
 
-## Extract common code in the `new` and `edit` views to a partial
+### Extract common code in the `new` and `edit` views to a partial
 - [Note](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit): In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post". The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
 - [Note](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials): Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore.
   ```ruby
@@ -367,7 +367,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 - Test your changes.
   - Verify that the behavior of the `new` and `edit` views are unaffected.
 
-## Allow a user to create a new category
+### Allow a user to create a new category
 - Add `new` and `create` actions. Downcase the name before saving.
   ```ruby
   # app/controllers/categories_controller.rb
@@ -455,7 +455,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   - Create a new category.
   - Check `index` view ("/categories") to see if the category was created.
 
-## Extract validation error code to a partial
+### Extract validation error code to a partial
 ```ruby
 # app/views/posts/_form.html.erb
 
@@ -503,9 +503,9 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 <% end %>
 ```
 
-# Lecture 4
+## Lecture 4
 
-## Instructions
+### Instructions
 - Change the association name between comments and user to comments and creator.
 - Allow a user to create a new comment on a post.
   - The form for a new comment should be displayed on the posts `show` view.
@@ -518,7 +518,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 - Display timestamps in a format like "11/01/2019 7:01pm UTC".
 - Add a link to edit the post on the post `show` view.
 
-## Change the association name
+### Change the association name
 ```ruby
 # app/models/comment.rb
 
@@ -530,7 +530,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
  end
 ```
 
-## Allow a user to create a new comment 
+### Allow a user to create a new comment 
 - Add `create` action. For now, set the default user to "Test". 
   ```ruby
   # app/controllers/comments_controller.rb 
@@ -601,7 +601,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
   # code omitted for brevity
   ```
 
-## Add validations for a new comment
+### Add validations for a new comment
 - Add `validates :body, presence: true` to `app/models/comments.rb`.
 - Display validation errors in the posts `show` view.
     ```ruby
@@ -642,7 +642,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
     
     <%= link_to "All Posts", posts_path %>
     ```
-## Display all comments related to a post on the posts `show` view
+### Display all comments related to a post on the posts `show` view
 ```ruby
 # app/views/posts/show.html.erb
 
@@ -659,7 +659,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 <%= link_to "All Posts", posts_path %>
 ```
 
-## Allow a user to associate a post with categories
+### Allow a user to associate a post with categories
 - Note: If you want to mass assign an array, you have to use syntax like this in the permit method: `permit(category_ids: [])` .
 - Add the code below to the form in `_form.html.erb`.
   ```
@@ -674,7 +674,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
     params.require(:post).permit(:title, :url, :description, category_ids: [])
   end
   ```
-## Allow a user to click on post URLs and navigate to those URLs
+### Allow a user to click on post URLs and navigate to those URLs
 - Ensure that URLs are prepended with `"http://"` when displayed.
   - Add a helper.
   ```
@@ -696,7 +696,7 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 - `app/views/posts/show.html.erb`
   - Replace `link_to fix_url(@post.url)` with `link_to(body=fix_url(@post.url), url=fix_url(@post.url))`.
 
-## Display timestamps in a format like "11/01/2019 7:01pm UTC" 
+### Display timestamps in a format like "11/01/2019 7:01pm UTC" 
 - Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/date/rdoc/DateTime.html#method-i-strftime).
 - Add a helper.
   ```
@@ -714,6 +714,6 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 - `app/views/posts/show.html.erb`
   - Replace `comment.created_at` with `display_datetime(comment.created_at)`.
 
-## Additional Changes
+### Additional Changes
 - Add a link to edit the post on the post `show` view 
   - Add `<%= link_to "Edit Post", edit_post_path %>` to `app/views/posts/show.html.erb`
