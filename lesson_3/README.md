@@ -23,8 +23,13 @@
   user.authenticate('password') # the user object 
   ```
 - Add routes.
-  - We do not add a resource because CRUD actions are not going to be performed on users. Instead, we want to manually build the routes. We follow Rails convention in the naming of the routes.
-  - Add `get '/login', to: 'sessions#new'` and `post '/login', to: 'sessions#create'` to `config/routes.rb`.
+  - We follow Rails convention in the naming of the routes.
+  - Add the following routes to `config/routes.rb`.
+    ```
+    get '/login', to: 'sessions#new'
+    post '/login', to: 'sessions#create'
+    get '/logout', to: 'sessions#destroy'
+    ```
 
 - Add a SessionsController.
   ```
@@ -35,6 +40,9 @@
     end
 
     def create
+    end
+
+    def destroy
     end
   end
   ```
@@ -60,5 +68,126 @@
   ```
   - Navigate to `localhost:3000/login` and verify that the form is displayed.
 
+# Add sessions
+- Edit sessions controller.
+  ```
+  # app/controllers/sessions_controller.rb 
+
+  class SessionsController < ApplicationController
+    def new
+    end
+
+    def create
+      user = User.find_by(username: params[:username])
+      if user && user.authenticate(params[:password])
+        session[:user_id] = user.id
+        flash[:notice] = "Welcome, you've logged in."
+        redirect_to root_path
+      else
+        flash.now[:error] = "There is something wrong with your username or password."
+        render :new
+      end
+    end
+    
+    def destroy
+      session[:user_id] = nil
+      redirect_to root_path
+    end
+  end
+  ```
+- Edit application controller.
+  - Note: `||=` is used to prevent multiple database queries from being made in one request. The rest of the statement is not executed if `@current_user` is truthy. This technique is known as memoization. 
+  - Note: `helper_method` makes the methods available in all of the controllers and view templates.
+  ```
+  # app/controllers/application_controller.rb
+
+  class ApplicationController < ActionController::Base
+    helper_method :current_user, :logged_in?
+    
+    def current_user
+      @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    end
+    
+    def logged_in?
+      !!current_user
+    end
+  end
+  ```
+- Edit views.
+
+
 # WORK IN PROGRESS 
-at -24:58 in solution:authentication video
+
+- edit views
+  - if logged in (`<% if logged_in? %>; <% end %>`)
+    - show link to `logout_path`
+    - show link to create new post 
+    - show form to create a new comment
+    - show link to edit a post
+    - show link to create new category
+    - show link to register (register_path)
+  - if not logged in, show link to `login_path`
+- in posts controller, use before_action to require a user to be logged in for all actions except show and index `before_action :require_user, except [:show, :index]`
+- do the same for comments_controller and categories_controller
+  `before_action :require_user` in comments
+  `before_action :require_user, only: [:new, :create]` in categories
+- add `require_user` method to application_controller
+  ```
+  def require_user
+    if !logged_in?
+      flash[:error] = "Must be logged in to do that."
+      redirect_to root_path
+    end
+  end
+  ```
+- when creating a new post or new comment, set the creator to the current user `@post.creator = current_user`
+
+# CRUD actions for users
+resources :users, only [:show, :create, :edit, :update]
+get '/register', to: 'users#new'
+- add validations to model
+```
+validates :username, presence: true, uniqueness: true
+validates :password, presence: true, on:create, length: {minimum: 5}
+```
+- controller
+```
+def new
+  @user = User.new
+end
+
+def create
+  @user = User.new(user_params)
+
+  if @user.save
+    session[:user_id] = @user.id
+    flash[:notice] = "You are registered."
+    redirect_to root_path
+  else
+    render :new
+  end
+end
+
+private
+
+def user_params
+  params.require(:user).permit(:username, :password)  
+end
+```
+- new template for users
+```
+<h5>Register</h5>
+
+<%= form_with @user do |f| %>
+  <%= render 'shared/errors', obj: @user %>
+  <div>
+    <%= f.label :username %>
+    <%= f.text_field :username %>
+  </div>
+  <div>
+    <%= f.label :password %>
+    <%= f.password_field :password %>
+  </div>
+  <%= f.submit "Register" %>
+<% end %>
+```
