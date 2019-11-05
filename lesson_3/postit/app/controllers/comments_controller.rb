@@ -1,10 +1,12 @@
 class CommentsController < ApplicationController
+  before_action :require_user
+
   def create
     @post = Post.find(params[:post_id])
 
     @comment = @post.comments.new(comment_params)
 
-    @user = User.find_by username: "Test"
+    @user = current_user
     @comment.creator = @user
 
     if @comment.save

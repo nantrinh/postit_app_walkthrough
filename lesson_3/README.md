@@ -140,26 +140,36 @@
     <h1><%= title %></h1>
     ```
   - Edit all views to use the header partial. For example, add `<%= render 'shared/header', title: "Log In" %>` to `app/views/sessions/new.html.erb`.
-- Require a user to be logged in for all `post` actions except `show` and `index`.
-  - Add `before_action :require_user, except [:show, :index]` to `app/controllers/posts_controller.rb`.
+- Restrict certain actions to logged-in users.
+  - Add a `require_user` method to `app/controllers/application_controller.rb`.
+    ```
+    def require_user
+      if !logged_in?
+        flash[:error] = "Must be logged in to do that."
+        redirect_to root_path
+      end
+    end
+    ```
+  - Require a user to be logged in for all `posts` actions except `show` and `index`.
+    - Add `before_action :require_user, except [:show, :index]` to `app/controllers/posts_controller.rb`.
+  - Require a user to be logged in for all `comments` actions.
+    - Add `before_action :require_user` to `app/controllers/comments_controller.rb`.
+  - Require a user to be logged in for the `new` and `create` `categories` actions.
+    - Add `before_action :require_user, only: [:new, :create]` to `app/controllers/categories_controller.rb`.
+  - Hide the form to create a new comment and the links to edit posts from the user unless they are logged in.
+    - Wrap the pertinent lines of code in the views in `<% if logged_in? %>` and `<% end %>`.
+  - Display who created a post and when.
+    - Add `Created by: <%= @post.creator.username %> at <%= display_datetime(@post.created_at) %>` to `app/views/posts/show.html.erb`.
+- Edit the posts and comments controller to set the creator to the current user (instead of test user).
+  - `@post.creator = current_user`
+- Check your changes.
+  - Verify that you can log in and log out.
+  - Verify that certain parts of the UI only show up if the user is logged in.
+  - Verify that users cannot access certain routes (e.g., `localhost:3000/posts/new`) unless they are logged in.
+  - Verify that the logged_in user's name is displayed when a new post is created.
+  - Verify that the logged_in user's name is displayed when a new comment is created.
 
 # WORK IN PROGRESS 
-
-- in posts controller, use before_action to require a user to be logged in for all actions except show and index 
-- do the same for comments_controller and categories_controller
-  `before_action :require_user` in comments
-  `before_action :require_user, only: [:new, :create]` in categories
-- add `require_user` method to application_controller
-  ```
-  def require_user
-    if !logged_in?
-      flash[:error] = "Must be logged in to do that."
-      redirect_to root_path
-    end
-  end
-  ```
-- when creating a new post or new comment, set the creator to the current user `@post.creator = current_user`
-
 # CRUD actions for users
 resources :users, only [:show, :create, :edit, :update]
 get '/register', to: 'users#new'
