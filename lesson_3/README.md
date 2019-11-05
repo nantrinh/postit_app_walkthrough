@@ -114,20 +114,38 @@
   end
   ```
 - Edit views.
+  - Add navigation partial.
+    ```
+    # app/views/shared/_nav.html.erb
 
+    <nav>
+      <ul>
+        <li><%= link_to "Posts", posts_path %>
+        <li><%= link_to "Categories", categories_path %>
+    
+        <% if logged_in? %>
+          <li><%= link_to "New Post", new_post_path %>
+          <li><%= link_to "Log Out", logout_path %>
+        <% else %>
+          <li><%= link_to "Log In", login_path %>
+        <% end %>
+      </ul>
+    </nav>
+    ```
+  - Add header partial.
+    ```
+    # app/views/shared/_header.html.erb
+
+    <%= render 'shared/nav' %>
+    <h1><%= title %></h1>
+    ```
+  - Edit all views to use the header partial. For example, add `<%= render 'shared/header', title: "Log In" %>` to `app/views/sessions/new.html.erb`.
+- Require a user to be logged in for all `post` actions except `show` and `index`.
+  - Add `before_action :require_user, except [:show, :index]` to `app/controllers/posts_controller.rb`.
 
 # WORK IN PROGRESS 
 
-- edit views
-  - if logged in (`<% if logged_in? %>; <% end %>`)
-    - show link to `logout_path`
-    - show link to create new post 
-    - show form to create a new comment
-    - show link to edit a post
-    - show link to create new category
-    - show link to register (register_path)
-  - if not logged in, show link to `login_path`
-- in posts controller, use before_action to require a user to be logged in for all actions except show and index `before_action :require_user, except [:show, :index]`
+- in posts controller, use before_action to require a user to be logged in for all actions except show and index 
 - do the same for comments_controller and categories_controller
   `before_action :require_user` in comments
   `before_action :require_user, only: [:new, :create]` in categories

@@ -1,0 +1,13 @@
+<nav>
+  <ul>
+    <li><%= link_to "Posts", posts_path %>
+    <li><%= link_to "Categories", categories_path %>
+
+    <% if logged_in? %>
+      <li><%= link_to "New Post", new_post_path %>
+      <li><%= link_to "Log Out", logout_path %>
+    <% else %>
+      <li><%= link_to "Log In", login_path %>
+    <% end %>
+  </ul>
+</nav>
