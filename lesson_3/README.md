@@ -253,3 +253,79 @@
   - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 
 # WORK IN PROGRESS 
+- add dropdown for user on nav
+- add this under if logged_in? in nav
+```
+
+<div>
+  <%= link_to("", 'data-toggle' => 'dropdown') do %>
+    <%= current_user.username %>
+  <% end %>
+    <ul>
+      <li><%= link_to edit_user_path(current_user) do %>
+        edit profile
+      <% end %>
+      </li>
+      <li><%= link_to user_path(current_user) do %>
+        view profile
+      <% end %>
+      </li>
+      <li><%= link_to logout_path do %>
+        logout
+      <% end %>
+      </li>
+    </ul>
+</div>
+```
+- define actions in controller
+```
+before_action :set_user, only: [:show, :edit]
+
+def update
+  if @user.update(user_params)
+    flash[:notice] = "Your profile was updated."
+    redirect_to user_path(@user)
+  else
+    render :edit
+  end
+end
+
+private
+
+def set_user
+  @user = User.find(params[:id])
+end
+```
+
+- extract form for new user to a partial; use the same form for edit view, except display "Update Profile" in the submit button
+    `f.submit(@user.newrecord? ? "Register" : "Update Profile")`
+- create user profile page (show)
+```
+render "Profile: #{@user.username}"
+show username: username
+show count of user posts
+
+show count of user comments
+show the comments that you made, and which post you made it on
+since you're using a comment partial, only show this when you're on show_post
+<% if show_post %>
+  <%= comment.body %> on <%= link_to comment.post.title, post_path(comment.post) %> at <% display_datetime(comment.created_at) %>
+<% end %>
+
+past in show_post param if you're on show_post
+default it to false in the partial
+```
+
+- wherever you have the user's name, as an author of a post or comment, link it to the user page
+
+- only allow a user to edit themselves, not another user
+`before_action :require_same_user, only: [:edit, :update]`
+
+```
+def require_same_user
+  if current_user != @user
+    flash[:error] = "You're not allowed to do that."
+    redirect_to root_path
+  end
+end
+```
