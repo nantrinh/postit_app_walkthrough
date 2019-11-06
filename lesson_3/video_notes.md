@@ -38,3 +38,71 @@
 - 9:30: control who can do which actions
 - 6:30: set user id to authenticated user in the controllers
 - 5:00: recap
+
+## Lecture 6
+### Part 1
+- 46:00: subject: user_id. object: post_id, photo_id, or video_id. the comment can be for either a post, photo, or video.
+- 45:00: this way of doing it is not great because there are too many empty cells.
+- 43:30: have a column for id, and one column to identify the thing you are tracking (e.g., is it a post, photo, or video?)
+- 42:45: id, body, user_id, commentable_type, commentable_id (rails convention is *able_type and *able_id). commentable_type is a string (e.g., "Image", "Post").
+- 41:33: composite foreign key: commentable_type and commentable_id together form a foreign key.
+- 39:08: ERD with votes 
+- 36:20: create votes table migration 
+    ```
+    def change
+      create_table :votes do |t|
+        t.boolean :vote
+        t.integer :user_id
+        t.string :voteable_type
+        t.integer :voteable_id
+        t.timestamps
+      end
+    end
+    ```
+- 34:10: create vote model 
+    ```
+    class Vote < ActiveRecord::Base
+      belongs_to :creator, class_name: 'User', foreign_key: 'user_id'
+    end
+    ```
+- 31:13: set up polymorphic association in vote model (the M side of 1:M)
+    ```
+    belongs_to :voteable, polymorphic: true
+    ```
+- 29:32: set up polymorphic association on the 1 side (of 1:M)
+    `has_many :votes, as: :voteable` in posts and comments models
+- 28:10: checking in rails console 
+- 21:55: add up arrow and down arrows to upvote and downvote comments
+    ```
+    <% link_to '' do %>
+      <i class='icon-arrow-up'></i>
+    <% end %>
+    <% link_to '' do %>
+      <i class='icon-arrow-down'></i>
+    <% end %>
+    ```
+- 18:00: need a route. could route to POST /votes => 'VotesController#create' 
+- 16:00: alternatively, could route to POST /posts/3/vote => 'PostsController#vote' and same for comments
+- 14:00: the second way will be demonstrated, partly for teaching reasons. if you're going to have votes for many types of things, the first way would be better.
+- 12:30: using `member`. the created route would be `POST /posts/:id/vote posts#vote`. you use this if you will be working with members of the class.
+    ```
+    resources :posts, except: [:destroy] do
+      member do
+        post :vote
+      end
+
+      resources :comments, only: [:create]
+    end
+    ```
+- 10:00: you would use `collection do; get :archives; end` if you were not going to pass in an object in the route: `GET /posts/archives posts#archives`
+- 3:00: 
+    ```
+    <% link_to vote_post_path(post), method: 'post' do %>
+      <i class='icon-arrow-up'></i>
+    <% end %>
+    <% link_to '' do %>
+      <i class='icon-arrow-down'></i>
+    <% end %>
+    ```
+
+### Part 2
