@@ -1,6 +1,8 @@
 # Instructions
+## Add authentication
 - Use `has_secure_password` to set up user authentication.
 - Add manual routes to log in and log out.
+## Add sessions
 - Add session capability (a user can be logged in or logged out).
 - Add a navigation partial.
   - Always show a link to posts#index and a link to categories#index.
@@ -15,6 +17,11 @@
   - Links to edit posts
 - Display who created a post and when.
 - Edit the posts and comments controller to set the creator to the current user (instead of test user).
+## Add CRUD actions for users 
+- Allow registration of a new user.
+  - Require a username and password.
+  - Username must be unique.
+  - Password must be at least 5 characters long.
 
 # Add authentication
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
