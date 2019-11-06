@@ -1,7 +1,24 @@
+# Instructions
+- Use `has_secure_password` to set up user authentication.
+- Add manual routes to log in and log out.
+- Add session capability (a user can be logged in or logged out).
+- Add a navigation partial.
+  - Always show a link to posts#index and a link to categories#index.
+  - If a user is logged in, show a link to create a new post and a link to log out.
+  - If a user is not logged in, show a link to register and a link to log in.
+- Prevent non-logged-in users from accessing:
+  - All `posts` actions except `show` and `index`
+  - All `comments` actions
+  - `categories` `new` and `create` actions
+- Prevent non-logged-in users from viewing:
+  - The form to create a new comment
+  - Links to edit posts
+- Display who created a post and when.
+- Edit the posts and comments controller to set the creator to the current user (instead of test user).
+
 # Add authentication
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
   - `rails g migration add_password_digest_to_users`
-
   ```
   def change
     add_column :users, :password_digest, :string
@@ -151,18 +168,15 @@
       end
     end
     ```
-  - Require a user to be logged in for all `posts` actions except `show` and `index`.
-    - Add `before_action :require_user, except [:show, :index]` to `app/controllers/posts_controller.rb`.
-  - Require a user to be logged in for all `comments` actions.
-    - Add `before_action :require_user` to `app/controllers/comments_controller.rb`.
-  - Require a user to be logged in for the `new` and `create` `categories` actions.
-    - Add `before_action :require_user, only: [:new, :create]` to `app/controllers/categories_controller.rb`.
-  - Hide the form to create a new comment and the links to edit posts from the user unless they are logged in.
-    - Wrap the pertinent lines of code in the views in `<% if logged_in? %>` and `<% end %>`.
-  - Display who created a post and when.
-    - Add `Created by: <%= @post.creator.username %> at <%= display_datetime(@post.created_at) %>` to `app/views/posts/show.html.erb`.
-- Edit the posts and comments controller to set the creator to the current user (instead of test user).
-  - `@post.creator = current_user`
+  - Prevent non-logged-in users from accessing:
+    - All `posts` actions except `show` and `index`: Add `before_action :require_user, except [:show, :index]` to `app/controllers/posts_controller.rb`.
+    - All `comments` actions: Add `before_action :require_user` to `app/controllers/comments_controller.rb`.
+    - `categories` `new` and `create` actions: Add `before_action :require_user, only: [:new, :create]` to `app/controllers/categories_controller.rb`.
+  - Prevent non-logged-in users from viewing:
+    - The form to create a new comment: Wrap the form in `<% if logged_in? %>` and `<% end %>`.
+    - Links to edit posts: Wrap the links in `<% if logged_in? %>` and `<% end %>`.
+  - Display who created a post and when: Add `Created by: <%= @post.creator.username %> at <%= display_datetime(@post.created_at) %>` to `app/views/posts/show.html.erb`.
+- Edit the posts and comments controller to set the creator to the current user (instead of test user): `@post.creator = current_user`
 - Check your changes.
   - Verify that you can log in and log out.
   - Verify that certain parts of the UI only show up if the user is logged in.
@@ -226,5 +240,9 @@
   ```
 - If user is not logged in, display link to register.
   - Add `<%= link_to 'Register', register_path %>` to `app/views/shared/_nav.html.erb`.
+- Check your changes.
+  - Register a new user. Trigger the uniqueness validation first.
+  - Verify that you are automatically logged in as the new user upon creation.
+  - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 
 # WORK IN PROGRESS 
