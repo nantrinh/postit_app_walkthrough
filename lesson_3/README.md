@@ -1,6 +1,7 @@
 # Add authentication
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
   - `rails g migration add_password_digest_to_users`
+
   ```
   def change
     add_column :users, :password_digest, :string
@@ -169,53 +170,61 @@
   - Verify that the logged_in user's name is displayed when a new post is created.
   - Verify that the logged_in user's name is displayed when a new comment is created.
 
-# WORK IN PROGRESS 
-# CRUD actions for users
-resources :users, only [:show, :create, :edit, :update]
-get '/register', to: 'users#new'
-- add validations to model
-```
-validates :username, presence: true, uniqueness: true
-validates :password, presence: true, on:create, length: {minimum: 5}
-```
-- controller
-```
-def new
-  @user = User.new
-end
-
-def create
-  @user = User.new(user_params)
-
-  if @user.save
-    session[:user_id] = @user.id
-    flash[:notice] = "You are registered."
-    redirect_to root_path
-  else
-    render :new
+# Add CRUD actions for users
+- Edit `config/routes.rb`.
+  - Add `resources :users, only: [:show, :create, :edit, :update]`.
+  - Add `get '/register', to: 'users#new'`.
+- Add validations to `app/models/post.rb` 
+  ```
+  validates :username, presence: true, uniqueness: true
+  validates :password, presence: true, on: create, length: {minimum: 5}
+  ```
+- Add actions to users controller.
+  ```
+  class UsersController < ApplicationController
+    def new
+      @user = User.new
+    end
+    
+    def create
+      @user = User.new(user_params)
+    
+      if @user.save
+        session[:user_id] = @user.id
+        flash[:notice] = "You are registered."
+        redirect_to root_path
+      else
+        render :new
+      end
+    end
+    
+    private
+    
+    def user_params
+      params.require(:user).permit(:username, :password)  
+    end
   end
-end
+  ```
+- Add `new` view.
+  ```
+  # app/views/users/new.html.erb
+  
+  <%= render 'shared/header', title: "Register" %>
+  
+  <%= form_with(model: @user, local: true) do |f| %>
+    <%= render 'shared/errors', obj: @user %>
+    <div>
+      <%= f.label :username %>
+      <%= f.text_field :username %>
+    </div>
+    <div>
+      <%= f.label :password %>
+      <%= f.password_field :password %>
+    </div>
+    <%= f.submit "Register" %>
+  <% end %>
+  ```
+- If user is not logged in, display link to register.
+  - Add `<%= link_to 'Register', register_path %>` to `app/views/shared/_nav.html.erb`.
 
-private
-
-def user_params
-  params.require(:user).permit(:username, :password)  
-end
-```
-- new template for users
-```
-<h5>Register</h5>
-
-<%= form_with @user do |f| %>
-  <%= render 'shared/errors', obj: @user %>
-  <div>
-    <%= f.label :username %>
-    <%= f.text_field :username %>
-  </div>
-  <div>
-    <%= f.label :password %>
-    <%= f.password_field :password %>
-  </div>
-  <%= f.submit "Register" %>
-<% end %>
-```
+# WORK IN PROGRESS 

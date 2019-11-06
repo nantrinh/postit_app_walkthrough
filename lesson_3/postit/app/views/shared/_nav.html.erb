@@ -1,13 +1,13 @@
 <nav>
   <ul>
-    <li><%= link_to "Posts", posts_path %>
-    <li><%= link_to "Categories", categories_path %>
-
+    <li><%= link_to "Posts", posts_path %></li>
+    <li><%= link_to "Categories", categories_path %></li>
     <% if logged_in? %>
-      <li><%= link_to "New Post", new_post_path %>
-      <li><%= link_to "Log Out", logout_path %>
+      <li><%= link_to "New Post", new_post_path %></li>
+      <li><%= link_to "Log Out", logout_path %></li>
     <% else %>
-      <li><%= link_to "Log In", login_path %>
+      <li><%= link_to 'Register', register_path %></li>
+      <li><%= link_to "Log In", login_path %></li>
     <% end %>
   </ul>
 </nav>
