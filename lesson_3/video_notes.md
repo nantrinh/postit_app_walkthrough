@@ -106,3 +106,48 @@
     ```
 
 ### Part 2
+- 41:14: data-method attribute; javascript file that uses it. this is why you can write a link that can use POST or DELETE.
+- 33:55: how to pass in params using link_to  
+  `<% link_to vote_post_path(post, vote: true), method: 'post' do %>`
+- 30:00: define vote action in posts controller
+  ```
+  # add :vote to before_action 
+
+  def vote
+    @vote = Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
+
+    if @vote.validi?
+      flash[:notice] = "Your vote was counted."
+    else
+      flash[:error] = "Your vote was not counted."
+    end
+
+    redirect_to :back
+  end
+  ```
+- 22:30: display (number of upvotes - number of downvotes). since this is business logic, put it in the post model.
+  ```
+  def total_votes
+    up_votes - down_votes
+  end
+
+  def up_votes
+    self.votes.where(vote: true).size
+  end
+
+  def down_votes
+    self.votes.where(vote: false).size
+  end
+  ```
+- 16:40: sort posts in index view to display posts in decreasing order of (number of upvotes - number of downvotes).
+  ```
+  def index
+    # NOTE/TODO: it would be safer to retrieve a subset because
+    # you might have a very large number of Post records
+    @posts = Post.all.sort_by {|x| x.total_votes}.reverse
+  end
+  ```
+- 14:00: how to only count each user's vote once: add validation to vote model. 
+  `validates_uniqueness_of :creator, scope: :voteable`
+- 9:00: rails escapes all tags by default
+- 7:10: you can use `html_safe` to tell rails you don't want to escape the tags. `flash[:error] = "some string".html_safe`
