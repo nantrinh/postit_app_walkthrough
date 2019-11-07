@@ -1,26 +1,8 @@
 <%= render 'shared/header', title: "Posts" %>
 <%= render 'shared/flash' %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>URL</th>
-      <th>Description</th>
-    </tr>
-  </thead>
- 
-  <tbody>
-    <% @posts.each do |post| %>
-      <tr>
-        <td><%= post.title %></td>
-        <td><%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %></td>
-        <td><%= post.description %></td>
-        <td><%= link_to "Show", post %></td>
-        <% if logged_in? %>
-          <td><%= link_to "Edit", edit_post_path(post) %></td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<section> 
+  <% @posts.each do |post| %>
+    <%= render 'post', post: post %>
+  <% end %>
+</section>
