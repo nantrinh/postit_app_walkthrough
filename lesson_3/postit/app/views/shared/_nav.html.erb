@@ -1,13 +1,15 @@
-<nav>
-  <ul>
-    <li><%= link_to "Posts", posts_path %></li>
-    <li><%= link_to "Categories", categories_path %></li>
-    <% if logged_in? %>
-      <li><%= link_to "New Post", new_post_path %></li>
-      <li><%= link_to "Log Out", logout_path %></li>
-    <% else %>
-      <li><%= link_to 'Register', register_path %></li>
-      <li><%= link_to "Log In", login_path %></li>
-    <% end %>
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #e3f2fd;">
+  <%= link_to "PostIt", root_path, class: "navbar-brand" %>
+  
+  <ul class="navbar-nav">
+    <li class="nav-item"><%= link_to "Posts", posts_path, class: "nav-link" %></li>
+    <li class="nav-item"><%= link_to "Categories", categories_path, class: "nav-link" %></li>
+  <% if logged_in? %>
+    <li class="nav-item"><%= link_to "New Post", new_post_path, class: "nav-link" %></li>
+    <li class="nav-item"><%= link_to "Log Out", logout_path, class: "nav-link" %></li>
+  <% else %>
+    <li class="nav-item"><%= link_to 'Register', register_path, class: "nav-link" %></li>
+    <li class="nav-item"><%= link_to "Log In", login_path, class: "nav-link" %></li>
+  <% end %>
   </ul>
 </nav>
