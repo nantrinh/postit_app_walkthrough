@@ -1,23 +1,25 @@
 <%= render 'shared/errors', obj: @post %>
 
-<%= form_with(model: @post, local: true) do |f| %>
-  <div>
-    <%= f.label :title %>
-    <%= f.text_field :title %>
-  </div>
-  <div>
-    <%= f.label :url %>
-    <%= f.text_field :url %>
-  </div>
-  <div>
-    <%= f.label :description %>
-    <%= f.text_area :description, rows: 5 %>
-  </div>
-  <div>
-    <%= f.label "Categories" %>
-    <%= f.collection_check_boxes :category_ids, Category.all, :id, :name do |cb| %>
-      <% cb.label {cb.check_box + cb.text.capitalize} %>
-    <% end %>
-  </div>
-  <%= f.submit %>
-<% end %>
+<section class='container'>
+  <%= form_with(model: @post, local: true) do |f| %>
+    <div class='form-group'>
+      <%= f.label :title %>
+      <%= f.text_field :title, class: 'form-control w-50' %>
+    </div>
+    <div class='form-group'>
+      <%= f.label :url, 'URL' %>
+      <%= f.text_field :url, class: 'form-control w-50' %>
+    </div>
+    <div class='form-group'>
+      <%= f.label :description %>
+      <%= f.text_area :description, rows: 5, class: 'form-control w-50' %>
+    </div>
+    <div>
+      <%= f.label "Categories:" %>
+      <%= f.collection_check_boxes :category_ids, Category.all, :id, :name do |cb| %>
+        <% cb.label(class: 'checkbox inline mx-2') {cb.check_box(class: 'checkbox mr-1') + cb.text.capitalize} %>
+      <% end %>
+    <div>
+    <%= f.submit(options={class: "btn btn-outline-primary btn-sm mt-3"}) %>
+  <% end %>
+</section>
