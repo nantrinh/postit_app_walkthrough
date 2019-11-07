@@ -1,8 +1,8 @@
-<%= render 'shared/header', title: "Posts" %>
+<%= render 'shared/header', title: 'Posts' %>
 <%= render 'shared/flash' %>
 
-<section> 
-  <% @posts.each do |post| %>
+<section class="row justify-content-center"> 
+  <% @posts.each_with_index do |post, i| %>
     <%= render 'post', post: post %>
   <% end %>
 </section>

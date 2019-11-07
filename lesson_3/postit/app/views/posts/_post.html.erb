@@ -1,12 +1,14 @@
-<article class="card bg-light m-3" style="max-width: 18rem;">
+<article class="card bg-light m-3" style="width: 18rem;">
   <h5 class="card-header"><%= post.title %></h5>
   <div class="card-body">
     <p><%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %></p>
     <p class="card-text"><%= post.description %></p>
-    <small class="text-muted"><%= "#{post.creator.username}, #{display_datetime(post.created_at)}" %></small>
+    <p><small class="text-muted"><%= "#{post.creator.username}, #{display_datetime(post.created_at)}" %></small></p>
     <div class="btn-group">
       <button type="button" class="btn btn-sm btn-outline-secondary"><%= link_to "View", post_path(post) %></button>
-      <button type="button" class="btn btn-sm btn-outline-secondary"><%= link_to "Edit", edit_post_path(post) %></button>
+      <% if current_user == post.creator %>
+        <button type="button" class="btn btn-sm btn-outline-secondary"><%= link_to "Edit", edit_post_path(post) %></button>
+      <% end %>
     </div>
   </div>
 </article>
