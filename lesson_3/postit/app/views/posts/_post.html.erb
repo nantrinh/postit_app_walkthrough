@@ -4,10 +4,10 @@
     <%= render 'post_url', post: post %>
     <p class="card-text"><%= post.description %></p>
     <%= render 'shared/creator_details', obj: post %>
-    <div class="btn-group mt-auto w-50">
-      <button type="button" class="btn btn-sm btn-outline-secondary"><%= link_to "View", post_path(post) %></button>
+    <div class="btn-group mt-auto">
+      <%= button_to "View", post_path(post), method: 'get', class: "btn btn-sm btn-outline-secondary" %>
       <% if current_user == post.creator %>
-        <button type="button" class="btn btn-sm btn-outline-secondary"><%= link_to "Edit", edit_post_path(post) %></button>
+        <%= button_to "Edit", edit_post_path(post), method: 'get', class: "btn btn-sm btn-outline-secondary border-left-0" %>
       <% end %>
     </div>
   </div>
