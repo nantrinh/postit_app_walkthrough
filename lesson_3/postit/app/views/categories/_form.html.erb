@@ -1,9 +1,11 @@
 <%= render 'shared/errors', obj: @category %>
 
-<%= form_with(model: @category, local: true) do |f| %>
-  <div>
-    <%= f.label :name %>
-    <%= f.text_field :name %>
-  </div>
-  <%= f.submit %>
-<% end %>
+<section class='container'>
+  <%= form_with(model: @category, local: true) do |f| %>
+    <div class='form-group'>
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control w-50' %>
+    </div>
+    <%= f.submit(options={class: "btn btn-outline-primary mt-3"}) %>
+  <% end %>
+</section>

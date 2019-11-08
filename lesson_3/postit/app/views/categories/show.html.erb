@@ -1,29 +1,14 @@
-<h1></h1>
-
 <% title = "Posts Tagged \"#{@category.name.capitalize}\"" %>
 
 <%= render 'shared/header', title: title %>
-<%= render 'shared/flash' %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>URL</th>
-      <th>Description</th>
-    </tr>
-  </thead>
- 
-  <tbody>
-    <% @category.posts.each do |post| %>
-      <tr>
-        <td><%= post.title %></td>
-        <td><%= post.url %></td>
-        <td><%= post.description %></td>
-        <td><%= link_to "Show", post %></td>
-      </tr>
+<% posts = @category.posts %>
+<section class="row justify-content-center"> 
+  <% if posts.empty? %>
+    No posts to show.
+  <% else %>
+    <% posts.each_with_index do |post, i| %>
+      <%= render 'posts/post', post: post %>
     <% end %>
-  </tbody>
-</table>
-
-<%= link_to "Back", categories_path %>
+  <%end %>
+</section>
