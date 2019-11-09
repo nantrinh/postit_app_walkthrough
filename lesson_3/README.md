@@ -252,6 +252,13 @@
   - Verify that you are automatically logged in as the new user upon creation.
   - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 
+# Add Bootstrap Styling
+At this point, I give in and finally add styling using [Bootstrap](https://getbootstrap.com/) to my application. I style my app differently than the instructors do.
+
+I didn't fully understand the [official installation instructions](https://github.com/twbs/bootstrap-rubygem), so I consulted [this Medium article](https://medium.com/@biancapower/how-to-add-bootstrap-4-to-a-rails-5-app-650118459a1e) for help.
+
+After styling, my app looks like this: ![](../gifs/postit_lesson_3_demo.gif).
+
 # WORK IN PROGRESS 
 - add dropdown for user on nav
 - add this under if logged_in? in nav
