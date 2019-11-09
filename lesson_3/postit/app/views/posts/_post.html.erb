@@ -2,7 +2,7 @@
   <h5 class="card-header"><%= post.title %></h5>
   <div class="card-body d-flex flex-column">
     <%= render 'posts/post_url', post: post %>
-    <p class="card-text"><%= post.description %></p>
+    <p class="card-text"><%= simple_format(post.description) %></p>
     <%= render 'shared/creator_details', obj: post %>
     <div class="btn-group mt-auto">
       <%= button_to "View", post_path(post), method: 'get', class: "btn btn-sm btn-outline-secondary" %>

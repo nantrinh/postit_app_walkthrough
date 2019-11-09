@@ -1,7 +1,7 @@
 <%= render 'shared/header', title: @post.title, post: @post %>
 
 <section class='container justify-content-center'>
-  <p><%= @post.description %></p>
+  <p><%= simple_format(@post.description) %></p>
   
   <% if logged_in? %>
     <section class='w-50 pt-5'>
