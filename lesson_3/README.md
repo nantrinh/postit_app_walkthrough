@@ -253,7 +253,7 @@
   - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 
 # Add Bootstrap Styling
-At this point, I give in and finally add styling using [Bootstrap](https://getbootstrap.com/) to my application. I style my app differently than the instructors do.
+At this point, I give in and finally add styling using [Bootstrap](https://getbootstrap.com/) to my application. I style my app differently than the instructors do. I referred to [this article](https://medium.com/@biancapower/how-to-add-bootstrap-4-to-a-rails-5-app-650118459a1e) for help with installation. I could not get the dropdowns on the navigation bar to work correctly, though, so my configuration may be incorrect.
 
 After styling, my app looks like this:
 
