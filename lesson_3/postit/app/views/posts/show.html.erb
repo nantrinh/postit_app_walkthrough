@@ -22,7 +22,7 @@
       <p class="text-muted">There aren't any comments for this post.</p>
     <% else %>
       <% @post.comments.each do |comment| %>
-        <%= render 'comment', comment: comment %>
+        <%= render 'comments/comment', comment: comment %>
       <% end %>
     <% end %>
   </section>
