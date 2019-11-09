@@ -1,7 +1,7 @@
 <%= render 'shared/errors', obj: @post %>
 
 <section class='container'>
-  <%= form_with(model: @post, local: true) do |f| %>
+  <%= form_with(model: @post, local: true, html: {autocomplete: 'off'}) do |f| %>
     <div class='form-group'>
       <%= f.label :title %>
       <%= f.text_field :title, class: 'form-control w-50' %>

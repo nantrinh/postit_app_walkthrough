@@ -1,7 +1,7 @@
 <%= render 'shared/errors', obj: @category %>
 
 <section class='container'>
-  <%= form_with(model: @category, local: true) do |f| %>
+  <%= form_with(model: @category, local: true, html: {autocomplete: 'off'}) do |f| %>
     <div class='form-group'>
       <%= f.label :name %>
       <%= f.text_field :name, class: 'form-control w-50' %>
