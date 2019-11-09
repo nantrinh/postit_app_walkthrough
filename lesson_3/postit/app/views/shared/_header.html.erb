@@ -1,4 +1,5 @@
 <% post ||= nil %>
+<% user ||= nil %>
 
 <%= render 'shared/nav' %>
 <section class='jumbotron text-center'>
@@ -6,6 +7,8 @@
   <% if post %>
     <%= render 'post_url', post: post %>
     <%= render 'shared/creator_details', obj: post %>
+  <% elsif user %>
+    <%= link_to 'Edit', edit_user_path(current_user.id) %>
   <% end %>
 </section>
 <%= render 'shared/flash' %>

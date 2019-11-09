@@ -259,34 +259,13 @@ After styling, my app looks like this:
 
 ![](../gifs/postit_lesson_3_demo.gif).
 
-# WORK IN PROGRESS 
-- add dropdown for user on nav
-- add this under if logged_in? in nav
+# Allow a logged-in user to edit their profile
+- Add the following to users controller.
 ```
+before_action :set_user, only: [:show, :edit, :update]
 
-<div>
-  <%= link_to("", 'data-toggle' => 'dropdown') do %>
-    <%= current_user.username %>
-  <% end %>
-    <ul>
-      <li><%= link_to edit_user_path(current_user) do %>
-        edit profile
-      <% end %>
-      </li>
-      <li><%= link_to user_path(current_user) do %>
-        view profile
-      <% end %>
-      </li>
-      <li><%= link_to logout_path do %>
-        logout
-      <% end %>
-      </li>
-    </ul>
-</div>
-```
-- define actions in controller
-```
-before_action :set_user, only: [:show, :edit]
+def edit
+end
 
 def update
   if @user.update(user_params)
@@ -303,9 +282,37 @@ def set_user
   @user = User.find(params[:id])
 end
 ```
+- Add a `show` view with a link to the `edit` view.
+```
+# app/views/users/show.html.erb
 
-- extract form for new user to a partial; use the same form for edit view, except display "Update Profile" in the submit button
-    `f.submit(@user.newrecord? ? "Register" : "Update Profile")`
+<%= render 'shared/header', title: current_user.username, user: true %>
+```
+
+```
+# app/views/shared/_header.html.erb
+
+<% post ||= nil %>
+<% user ||= nil %>
+
+<%= render 'shared/nav' %>
+<section class='jumbotron text-center'>
+  <h1 class='jumbotron-heading'><%= title %></h1>
+  <% if post %>
+    <%= render 'post_url', post: post %>
+    <%= render 'shared/creator_details', obj: post %>
+  <% elsif user %>
+    <%= link_to 'Edit', edit_user_path(current_user.id) %>
+  <% end %>
+</section>
+<%= render 'shared/flash' %>
+```
+- Extract the form for a new user to a partial; use the same form for the edit view. The submit button should display `"Update Profile"` in the `edit` view, and `"Register"` in the `new` view: `f.submit(@user.newrecord? ? "Register" : "Update Profile")`
+- Check your changes.
+  - Log in. Edit the username. Check that the new name shows up in posts and comments created by the user.
+  - Edit the password. Log out, then check that you can log back in using the new username and password.
+
+# WORK IN PROGRESS 
 - create user profile page (show)
 ```
 render "Profile: #{@user.username}"

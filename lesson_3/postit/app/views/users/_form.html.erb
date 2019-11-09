@@ -1,0 +1,14 @@
+<div class='container'>
+  <%= form_with(model: @user, local: true) do |f| %>
+    <%= render 'shared/errors', obj: @user %>
+    <div class='form-group'>
+      <%= f.label :username %>
+      <%= f.text_field :username, class: 'form-control w-50' %>
+    </div>
+    <div class='form-group'>
+      <%= f.label :password %>
+      <%= f.password_field :password, class: 'form-control w-50' %>
+    </div>
+    <%= f.submit(@user.new_record? ? "Register" : "Update Profile", class: "btn btn-outline-primary mt-3")%>
+  <% end %>
+</div>
