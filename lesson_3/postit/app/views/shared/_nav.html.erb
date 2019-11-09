@@ -1,16 +1,41 @@
+<!--Navbar-->
 <nav class='navbar navbar-expand-sm navbar-dark bg-dark'>
+  <!-- Navbar brand -->
   <%= link_to 'PostIt', root_path, class: 'navbar-brand' %>
-  
-  <ul class='navbar-nav'>
-    <li class='nav-item'><%= link_to 'Posts', posts_path, class: 'nav-link' %></li>
-    <li class='nav-item'><%= link_to 'Categories', categories_path, class: 'nav-link' %></li>
-  <% if logged_in? %>
-    <li class='nav-item'><%= link_to 'New Post', new_post_path, class: 'nav-link' %></li>
-    <li class='nav-item'><%= link_to 'New Category', new_category_path, class: 'nav-link' %></li>
-    <li class='nav-item'><%= link_to 'Log Out', logout_path, class: 'nav-link' %></li>
-  <% else %>
-    <li class='nav-item'><%= link_to 'Register', register_path, class: 'nav-link' %></li>
-    <li class='nav-item'><%= link_to 'Log In', login_path, class: 'nav-link' %></li>
-  <% end %>
-  </ul>
+    <!-- Collapse button -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+    aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Collapsible content -->
+  <div class="collapse navbar-collapse" id="basicExampleNav">
+
+    <!-- Links -->
+    <ul class='navbar-nav'>
+      <li class='nav-item'>
+        <%= link_to 'Posts', posts_path, class: 'nav-link' %>
+      </li>
+      <li class='nav-item'>
+        <%= link_to 'Categories', categories_path, class: 'nav-link' %>
+      </li>
+      <% if logged_in? %>
+        <li class='nav-item'>
+          <%= link_to 'New Post', new_post_path, class: 'nav-link' %>
+        </li>
+        <li class='nav-item'>
+          <%= link_to 'New Category', new_category_path, class: 'nav-link' %>
+        </li>
+        <li class='nav-item'>
+          <%= link_to 'Log Out', logout_path, class: 'nav-link' %>
+        </li>
+      <% else %>
+        <li class='nav-item'>
+          <%= link_to 'Register', register_path, class: 'nav-link' %>
+        </li>
+        <li class='nav-item'>
+          <%= link_to 'Log In', login_path, class: 'nav-link' %>
+        </li>
+      <% end %>
+    </ul>
 </nav>
