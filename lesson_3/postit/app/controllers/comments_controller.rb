@@ -10,10 +10,10 @@ class CommentsController < ApplicationController
     @comment.creator = @user
 
     if @comment.save
-      flash[:notice] = "Your comment was added."
+      flash[:notice] = 'Your comment was added.'
       redirect_to post_path(@post)
     else
-      render "posts/show"
+      render 'posts/show'
     end
   end
 
