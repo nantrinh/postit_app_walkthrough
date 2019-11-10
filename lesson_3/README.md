@@ -1,4 +1,19 @@
-# Instructions
+# Lesson 3
+
+## Table of Contents
+* [Lecture 5](#lecture-5)
+   * [Instructions](#instructions)
+   * [Add authentication](#add-authentication)
+   * [Add sessions](#add-sessions)
+   * [Allow a new user to register](#allow-a-new-user-to-register)
+   * [Add Bootstrap styling](#add-bootstrap-styling)
+   * [Allow a logged-in user to edit their profile](#allow-a-logged-in-user-to-edit-their-profile)
+   * [Only allow a user to edit their own profile](#only-allow-a-user-to-edit-their-own-profile)
+   * [Display a user's posts and comments on the users show view](#display-a-users-posts-and-comments-on-the-users-show-view)
+   * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
+
+## Lecture 5
+### Instructions
 - Add authentication
   - Use `has_secure_password` to set up user authentication.
   - Add manual routes to log in and log out.
@@ -23,7 +38,7 @@
     - Username must be unique.
     - Password must be at least 5 characters long.
 
-# Add authentication
+### Add authentication
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
   - `rails g migration add_password_digest_to_users`
   ```
@@ -93,7 +108,7 @@
   ```
   - Navigate to `localhost:3000/login` and verify that the form is displayed.
 
-# Add sessions
+### Add sessions
 - Edit sessions controller.
   ```
   # app/controllers/sessions_controller.rb 
@@ -191,7 +206,7 @@
   - Verify that the logged_in user's name is displayed when a new post is created.
   - Verify that the logged_in user's name is displayed when a new comment is created.
 
-# Allow a new user to register. 
+### Allow a new user to register
 - Edit `config/routes.rb`.
   - Add `resources :users, only: [:show, :create, :edit, :update]`.
   - Add `get '/register', to: 'users#new'`.
@@ -252,14 +267,14 @@
   - Verify that you are automatically logged in as the new user upon creation.
   - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 
-# Add Bootstrap styling
+### Add Bootstrap styling
 At this point, I give in and finally add styling using [Bootstrap](https://getbootstrap.com/) to my application. I style my app differently than the instructors do. I referred to [this article](https://medium.com/@biancapower/how-to-add-bootstrap-4-to-a-rails-5-app-650118459a1e) for help with installation. I could not get the dropdowns on the navigation bar to work correctly, though, so my configuration may be incorrect.
 
 After styling, my app looks like this:
 
 ![](../gifs/postit_lesson_3_demo.gif).
 
-# Allow a logged-in user to edit their profile
+### Allow a logged-in user to edit their profile
 - Add the following to users controller.
   ```
   before_action :set_user, only: [:show, :edit, :update]
@@ -312,7 +327,7 @@ After styling, my app looks like this:
   - Log in. Edit the username. Check that the new name shows up in posts and comments created by the user.
   - Edit the password. Log out, then check that you can log back in using the new username and password.
 
-# Only allow a user to edit their own profile. 
+### Only allow a user to edit their own profile
 - Add the following to `app/controllers/users_controller.rb`.
   ```
   before_action :require_same_user, only: [:edit, :update]
@@ -326,7 +341,7 @@ After styling, my app looks like this:
   ```
 - Check your changes: Log in as one user and attempt to access the edit page of another user.
 
-# Display a user's posts and comments on the users `show` view 
+### Display a user's posts and comments on the users `show` view 
 - Edit `show` view.
   ```
   # app/views/users/show.html.erb
@@ -416,7 +431,7 @@ After styling, my app looks like this:
     </section>
   </section>
   ```
-# Link to the `show` view for a user wherever you have the user name displayed.
+### Link to the `show` view for a user wherever you have the user name displayed
 ```
 # app/views/shared/_creator_details.html.erb
 
