@@ -440,4 +440,4 @@ After styling, my app looks like this:
 ```
 
 ### Demo of user pages
-![](../gifs/postit_lecture_5_end_demo.gif)
+![](../gifs/postit_lecture_5_users_demo.gif)
