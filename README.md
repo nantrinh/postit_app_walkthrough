@@ -4,7 +4,8 @@ This repo contains my notes for each lesson of the Launch School 5301 Rapid Prot
 
 The biggest differences are:
 - I use Rails 6 and Ruby 2.5.3. The course uses Rails 4 and Ruby 2.
-- I do not use Twitter Bootstrap until Lesson 3. The course uses it from the beginning. If I were to do this project all over again I would use Bootstrap from the start. It was painful figuring it out by myself in Lesson 3 (I did not want to go back and rewatch all the videos from Lessons 1 and 2).
+- I do not use Twitter Bootstrap until Lesson 3. The course uses it from the beginning. If I were to do this project all over again I would use Bootstrap from the start.
+  - [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font, so I used the [font-awesome-rails gem](https://github.com/bokmann/font-awesome-rails) to get icons. Remember to restart your server after installing!
 
 ## Contents
 - `lesson_x/` directories contain relevant material for each lesson.
