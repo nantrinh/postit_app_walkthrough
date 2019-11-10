@@ -11,6 +11,7 @@
    * [Only allow a user to edit their own profile](#only-allow-a-user-to-edit-their-own-profile)
    * [Display a user's posts and comments on the users show view](#display-a-users-posts-and-comments-on-the-users-show-view)
    * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
+   * [Demo of user pages](#demo-of-user-pages)
 
 ## Lecture 5
 ### Instructions
