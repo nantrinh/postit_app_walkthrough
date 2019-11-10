@@ -272,7 +272,7 @@ At this point, I give in and finally add styling using [Bootstrap](https://getbo
 
 After styling, my app looks like this:
 
-![](../gifs/postit_lesson_3_demo.gif).
+![](../gifs/postit_lecture_5_add_bootstrap_demo.gif)
 
 ### Allow a logged-in user to edit their profile
 - Add the following to users controller.
@@ -437,3 +437,6 @@ After styling, my app looks like this:
 
 <p><small class="text-muted"><%= link_to(obj.creator.username, user_path(obj.creator.id)) + " #{display_datetime(obj.created_at)}" %></small></p>
 ```
+
+### Demo of user pages
+![](../gifs/postit_lecture_5_end_demo.gif)
