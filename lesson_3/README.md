@@ -448,3 +448,55 @@ After styling, my app looks like this:
 
 ## Lecture 6
 ### Instructions
+
+### Create vote model
+- Create table.
+  - `rails g migration create_votes`
+  ```ruby
+
+  class CreateVotes < ActiveRecord::Migration[6.0]
+    def change
+      create_table :votes do |t|
+        t.boolean :vote
+        t.belongs_to :user
+        t.string :voteable_type
+        t.integer :voteable_id
+        t.timestamps
+      end
+  
+      add_index :votes, [:voteable_type, :voteable_id]
+    end
+  end
+  ```
+  - `rails db:migrate`
+- Define model.
+  ```ruby
+  # app/models/vote.rb 
+  
+  class Vote < ApplicationRecord
+    belongs_to :creator, class_name: 'User', foreign_key: 'user_id'
+    belongs_to :voteable, polymorphic: true
+  end
+  ```
+- Set up polymorphic association in `app/models/post.rb` and `app/models/comment.rb`.
+  `has_many :votes, as: :voteable`
+- Check your changes in `rails console`.
+  ```
+  # Create a new vote: user 1 upvoted on post 2.
+  Vote.create(user_id: 1, vote: true, voteable_type: 'Post', voteable_id: 2)
+  
+  # Create a new vote: user 1 upvoted on comment 1.
+  Vote.create(user_id: 1, vote: true, voteable_type: 'Comment', voteable_id: 1)
+  
+  # Create a new vote: user 2 downvoted on post 2.
+  Vote.create(user_id: 2, vote: false, voteable_type: 'Post', voteable_id: 2)
+  
+  pp Post.find(2).votes # should print two votes
+  pp Comment.find(1).votes # should print one vote
+  pp User.find(1).votes # should print two votes 
+  pp User.find(2).votes # should print one vote 
+  ```
+
+### 
+
+
