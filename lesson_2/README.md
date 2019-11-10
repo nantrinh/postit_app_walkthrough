@@ -1,7 +1,7 @@
 # Lesson 2
 This covers Lectures 3 and 4. I leave out comments on testing changes here, but be sure to test all changes you make in your app as you go.
 
-# Table of Contents
+## Table of Contents
 * [Lecture 3](#lecture-3)
    * [Instructions](#instructions)
    * [Allow a user to create a new post](#allow-a-user-to-create-a-new-post)
