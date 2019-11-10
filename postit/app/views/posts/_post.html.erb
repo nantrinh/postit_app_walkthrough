@@ -1,0 +1,14 @@
+<article class="card bg-light m-3" style="width: 18rem;">
+  <h5 class="card-header"><%= post.title %></h5>
+  <div class="card-body d-flex flex-column">
+    <%= render 'posts/post_url', post: post %>
+    <p class="card-text"><%= simple_format(truncate(post.description, length: 100)) %></p>
+    <%= render 'shared/creator_details', obj: post %>
+    <div class="btn-group mt-auto">
+      <%= button_to "View", post_path(post), method: 'get', class: "btn btn-sm btn-outline-secondary" %>
+      <% if current_user == post.creator %>
+        <%= button_to "Edit", edit_post_path(post), method: 'get', class: "btn btn-sm btn-outline-secondary border-left-0" %>
+      <% end %>
+    </div>
+  </div>
+</article>

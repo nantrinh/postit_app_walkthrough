@@ -1,0 +1,10 @@
+<p> Categories: 
+<% categories = post.categories %>
+<% categories.each_with_index do |category, i| %>
+  <% if i < categories.size - 1 %>
+    <%= link_to(category.name, category_path(category.id)) + "," %>
+  <% else %>
+    <%= link_to(category.name, category_path(category.id)) %>
+  <% end %>
+<% end %>
+</p>

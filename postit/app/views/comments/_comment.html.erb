@@ -1,0 +1,13 @@
+<% show_post ||= false %>
+
+<article class="card bg-light mb-3" style="max-width: 18rem;">
+  <div class="card-body">
+    <p class="card-text"><%= comment.body %></p>
+    <small class='text-muted'>
+    <% if show_post %>
+      <%= link_to comment.post.title, post_path(comment.post) %>
+    <% end %>
+    </small>
+    <%= render 'shared/creator_details', obj: comment %>
+  </div>
+</article>
