@@ -1,6 +1,6 @@
 <%= render 'shared/header', title: "Log In" %>
 <div class='container'>
-  <%= form_with(url: '/login')do %>
+  <%= form_with(url: '/login', local: true) do %>
     <div class='form-group'>
       <%= label_tag 'username' %>
       <%= text_field_tag(name='username', value='', options={class: 'form-control w-50'}) %>

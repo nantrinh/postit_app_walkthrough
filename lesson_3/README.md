@@ -98,7 +98,7 @@
 
   <h5>Log In</h5>
   <div>
-    <%= form_tag '/login' do %>
+    <%= form_tag(url: '/login', local: true) do %>
       <div>
         <%= label_tag :username %>
         <%= text_field_tag :username %>
@@ -498,5 +498,3 @@ After styling, my app looks like this:
   ```
 
 ### 
-
-
