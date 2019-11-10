@@ -1,0 +1,12 @@
+<% if obj.errors.any? %>
+  <section class="alert alert-danger">
+    <div class="container">
+    <h5>Please fix the following errors:</h5>
+    <ul>
+      <% obj.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+    </div>
+  </section>
+<% end %>

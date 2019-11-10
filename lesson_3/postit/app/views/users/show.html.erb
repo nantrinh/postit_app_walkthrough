@@ -1,0 +1,33 @@
+<%= render 'shared/header', title: @user.username, user: @user == current_user %>
+
+<section class='container'>
+  <% number_of_posts = @user.posts.empty? ? 0 : @user.posts.size %>
+  <% number_of_comments = @user.comments.empty? ? 0 : @user.comments.size %>
+  
+  <ul class='nav nav-tabs'>
+    <li class='nav-item'>
+      <%= link_to "Posts (#{number_of_posts})", user_path(@user), class: 'nav-link' %>
+    </li>
+    <li class='nav-item'>
+      <%= link_to "Comments (#{number_of_comments})", user_path(@user, tab: 'comments'), class: 'nav-link' %>
+    </li>
+  </ul>
+  
+  <% if params[:tab].nil? %>
+    <% if @user.posts.empty? %>
+      <p class="text-muted">There aren't any posts for this user.</p>
+    <% else %>
+      <% @user.posts.each do |post| %>
+        <%= render 'posts/post', post: post %>
+      <% end %>
+    <% end %>
+  <% elsif params[:tab] == 'comments' %>
+    <% if @user.comments.empty? %>
+      <p class="text-muted">There aren't any comments for this user.</p>
+    <% else %>
+      <% @user.comments.each do |comment| %>
+        <%= render 'comments/comment', comment: comment, show_post: true %>
+      <% end %>
+    <% end %>
+  <% end %>
+</section>
