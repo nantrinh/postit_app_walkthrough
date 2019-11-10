@@ -8,7 +8,7 @@
    * [Allow a new user to register](#allow-a-new-user-to-register)
    * [Add Bootstrap styling](#add-bootstrap-styling)
    * [Allow a logged-in user to edit their profile](#allow-a-logged-in-user-to-edit-their-profile)
-   * [Only allow a user to edit their own profile](#only-allow-a-user-to-edit-their-own-profile)
+   * [Prevent users from editing other users' profiles](#prevent-users-from-editing-other-users-profiles)
    * [Display a user's posts and comments on the users show view](#display-a-users-posts-and-comments-on-the-users-show-view)
    * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
    * [Demo of user pages](#demo-of-user-pages)
@@ -33,11 +33,15 @@
     - Links to edit posts
   - Display who created a post and when.
   - Edit the posts and comments controller to set the creator to the current user (instead of test user).
-- Add CRUD actions for users 
-  - Allow registration of a new user.
-    - Require a username and password.
-    - Username must be unique.
-    - Password must be at least 5 characters long.
+- Allow registration of a new user.
+  - Require a username and password.
+  - Username must be unique.
+  - Password must be at least 5 characters long.
+- Allow a logged-in user to edit their own profile.
+- Prevent users from editing other users' profiles.
+- Display a user's posts and comments on the users `show` view.
+- Link to the `show` view for a user wherever you have the user name displayed.
+- Add Bootstrap styling.
 
 ### Add authentication
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
@@ -328,7 +332,7 @@ After styling, my app looks like this:
   - Log in. Edit the username. Check that the new name shows up in posts and comments created by the user.
   - Edit the password. Log out, then check that you can log back in using the new username and password.
 
-### Only allow a user to edit their own profile
+### Prevent users from editing other users' profiles
 - Add the following to `app/controllers/users_controller.rb`.
   ```
   before_action :require_same_user, only: [:edit, :update]
@@ -441,3 +445,6 @@ After styling, my app looks like this:
 
 ### Demo of user pages
 ![](../gifs/postit_lecture_5_users_demo.gif)
+
+## Lecture 6
+### Instructions
