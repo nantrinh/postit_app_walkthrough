@@ -1,13 +1,31 @@
 <% show_post ||= false %>
 
 <article class="card bg-light mb-3" style="max-width: 18rem;">
-  <div class="card-body">
-    <p class="card-text"><%= comment.body %></p>
-    <small class='text-muted'>
-    <% if show_post %>
-      <%= link_to comment.post.title, post_path(comment.post) %>
-    <% end %>
-    </small>
-    <%= render 'shared/creator_details', obj: comment %>
+  <div class='row no-gutters h-100'>
+    <aside class='col-md-2 votes text-center'>
+      <%= link_to vote_post_comment_path(comment.post, comment, vote: true), method: 'post' do %>
+        <%= fa_icon 'arrow-up' %>
+      <% end %>
+      </br>
+      <%= comment.total_votes %>
+      </br>
+      <%= link_to vote_post_comment_path(comment.post, comment, vote: false), method: 'post' do %>
+        <%= fa_icon 'arrow-down' %>
+      <% end %>
+    </aside>
+
+    <section class='col-md-10'>
+      <main class="card-body">
+        <p class="card-text"><%= comment.body %></p>
+      </main>
+
+        <footer class='card-footer'>
+        <small class='text-muted'>
+        <% if show_post %>
+          <%= link_to comment.post.title, post_path(comment.post) %>
+        <% end %>
+        </small>
+        <%= render 'shared/creator_details', obj: comment %>
+        </footer>
   </div>
 </article>

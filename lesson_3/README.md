@@ -509,7 +509,11 @@ resources :posts, except: :destroy do
     post 'vote'
   end
 
-  resources :comments, only: :create
+  resources :comments, only: :create do
+    member do
+      post 'vote'
+    end
+  end
 end
 ```
 
@@ -531,6 +535,7 @@ end
   </aside>
   ```
 - Define a `vote` action in PostsController.
+  - [NOTE](https://guides.rubyonrails.org/5_0_release_notes.html#action-pack-deprecations): `redirect_to :back`, which is used in the videos, was deprecated in Rails 5.0 in favor of `redirect_back`.
   ```ruby
   # app/controllers/posts_controller.rb
   
@@ -538,15 +543,41 @@ end
   
   def vote
     Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
-    redirect_to posts_path
+    redirect_back fallback_location: root_path
   end
   ```
 
-### Display total votes on a post
-- Define instance methods on the Post model.
-  ```ruby
-  # app/models/post.rb 
+### Allow a user to vote on a comment
+- Add up arrows and down arrows that trigger the vote actions.
+  ```
+  # app/views/comments/_comment.html.erb 
   
+  <aside class='col-md-2 votes text-center'>
+    <%= link_to vote_post_comment_path(comment.post, comment, vote: true), method: 'post' do %>
+      <%= fa_icon 'arrow-up' %>
+    <% end %>
+    </br>
+    <%= comment.total_votes %>
+    </br>
+    <%= link_to vote_post_comment_path(comment.post, comment, vote: false), method: 'post' do %>
+      <%= fa_icon 'arrow-down' %>
+    <% end %>
+  </aside>
+  ```
+- Define a `vote` action in CommentsController.
+  ```ruby
+  # app/controllers/comments_controller.rb
+  
+  def vote
+    @comment = Comment.find(params[:id])
+    Vote.create(voteable: @comment, creator: current_user, vote: params[:vote])
+    redirect_back fallback_location: root_path
+  end
+  ```
+
+### Display total votes on posts and comments
+- Define instance methods on the Post and Comment models.
+  ```ruby
   def total_votes
     self.upvotes - self.downvotes  
   end
@@ -560,6 +591,7 @@ end
   end
   ```
 - Add `<%= post.total_votes %>` to `app/views/posts/_post.html.erb`.
+- Add `<%= comment.total_votes %>` to `app/views/comments/_comment.html.erb`.
 
 ### Display posts in decreasing order of upvotes
 Modify the `index` action in PostsController to the following:
@@ -568,10 +600,6 @@ def index
   @posts = Post.all.sort_by{|x| x.total_votes}.reverse
 end
 ```
-
-### After voting, redirect to the page the user was on 
-- Use `redirect_back fallback_location: root_path` in the `vote` action of the posts controller.
-- [NOTE](https://guides.rubyonrails.org/5_0_release_notes.html#action-pack-deprecations): `redirect_to :back`, which is used in the videos, was deprecated in Rails 5.0 in favor of `redirect_back`.
 
 ### TODO
 - restrict user to one vote per post and one vote per comment

@@ -17,6 +17,14 @@ class CommentsController < ApplicationController
     end
   end
 
+  def vote
+    @comment = Comment.find(params[:id])
+    Vote.create(voteable: @comment, creator: current_user, vote: params[:vote])
+    redirect_back fallback_location: root_path
+  end
+
+  private
+
   def comment_params
     params.require(:comment).permit(:body)
   end
