@@ -570,6 +570,8 @@ end
 ```
 
 ### After voting, redirect to the page the user was on 
-Use `redirect_to :back` in the `vote` action of the posts controller.
+- Use `redirect_back fallback_location: root_path` in the `vote` action of the posts controller.
+- [NOTE](https://guides.rubyonrails.org/5_0_release_notes.html#action-pack-deprecations): `redirect_to :back`, which is used in the videos, was deprecated in Rails 5.0 in favor of `redirect_back`.
 
-### 
+### TODO
+- restrict user to one vote per post and one vote per comment
