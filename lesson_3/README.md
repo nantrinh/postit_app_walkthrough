@@ -560,3 +560,16 @@ end
   end
   ```
 - Add `<%= post.total_votes %>` to `app/views/posts/_post.html.erb`.
+
+### Display posts in decreasing order of upvotes
+Modify the `index` action in PostsController to the following:
+```ruby
+def index
+  @posts = Post.all.sort_by{|x| x.total_votes}.reverse
+end
+```
+
+### After voting, redirect to the page the user was on 
+Use `redirect_to :back` in the `vote` action of the posts controller.
+
+### 
