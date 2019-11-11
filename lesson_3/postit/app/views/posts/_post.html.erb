@@ -1,10 +1,13 @@
 <article class='card bg-light m-3 post'>
   <div class='row no-gutters h-100'>
-    <aside class='col-md-2 votes'>
-      <%= link_to '' do %>
+    <aside class='col-md-2 votes text-center'>
+      <%= link_to vote_post_path(post, vote: true), method: 'post' do %>
         <%= fa_icon 'arrow-up' %>
       <% end %>
-      <%= link_to '' do %>
+      </br>
+      <%= post.total_votes %>
+      </br>
+      <%= link_to vote_post_path(post, vote: false), method: 'post' do %>
         <%= fa_icon 'arrow-down' %>
       <% end %>
     </aside>

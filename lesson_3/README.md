@@ -46,7 +46,7 @@
 ### Add authentication
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
   - `rails g migration add_password_digest_to_users`
-  ```
+  ```ruby
   def change
     add_column :users, :password_digest, :string
   end
@@ -70,14 +70,14 @@
 - Add routes.
   - We follow Rails convention in the naming of the routes.
   - Add the following routes to `config/routes.rb`.
-    ```
+    ```ruby
     get '/login', to: 'sessions#new'
     post '/login', to: 'sessions#create'
     get '/logout', to: 'sessions#destroy'
     ```
 
 - Add a SessionsController.
-  ```
+  ```ruby
   # app/controllers/sessions_controller.rb
 
   class SessionsController < ApplicationController
@@ -93,7 +93,7 @@
   ```
 - Add a view.
   - We are not using model-backed form helpers because sessions is not a resource.
-  ```
+  ```ruby
   # app/views/sessions/new.html.erb
 
   <h5>Log In</h5>
@@ -115,7 +115,7 @@
 
 ### Add sessions
 - Edit sessions controller.
-  ```
+  ```ruby
   # app/controllers/sessions_controller.rb 
 
   class SessionsController < ApplicationController
@@ -143,7 +143,7 @@
 - Edit application controller.
   - Note: `||=` is used to prevent multiple database queries from being made in one request. The rest of the statement is not executed if `@current_user` is truthy. This technique is known as memoization. 
   - Note: `helper_method` makes the methods available in all of the controllers and view templates.
-  ```
+  ```ruby
   # app/controllers/application_controller.rb
 
   class ApplicationController < ActionController::Base
@@ -187,7 +187,7 @@
   - Edit all views to use the header partial. For example, add `<%= render 'shared/header', title: "Log In" %>` to `app/views/sessions/new.html.erb`.
 - Restrict certain actions to logged-in users.
   - Add a `require_user` method to `app/controllers/application_controller.rb`.
-    ```
+    ```ruby
     def require_user
       if !logged_in?
         flash[:error] = "Must be logged in to do that."
@@ -216,12 +216,12 @@
   - Add `resources :users, only: [:show, :create, :edit, :update]`.
   - Add `get '/register', to: 'users#new'`.
 - Add validations to `app/models/post.rb` 
-  ```
+  ```ruby
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, on: create, length: {minimum: 5}
   ```
 - Add actions to users controller.
-  ```
+  ```ruby
   class UsersController < ApplicationController
     def new
       @user = User.new
@@ -281,7 +281,7 @@ After styling, my app looks like this:
 
 ### Allow a logged-in user to edit their profile
 - Add the following to users controller.
-  ```
+  ```ruby
   before_action :set_user, only: [:show, :edit, :update]
   
   def edit
@@ -334,7 +334,7 @@ After styling, my app looks like this:
 
 ### Prevent users from editing other users' profiles
 - Add the following to `app/controllers/users_controller.rb`.
-  ```
+  ```ruby
   before_action :require_same_user, only: [:edit, :update]
   
   def require_same_user
@@ -448,6 +448,10 @@ After styling, my app looks like this:
 
 ## Lecture 6
 ### Instructions
+- Allow logged-in users to upvote or downvote once per post and comment. Each vote must belong to a user, and must belong to either a post or a comment.
+- Create the routes for the votes as follows:
+  - `POST /posts/:post_id/vote => posts#vote`
+  - `POST /posts/:post_id/comments/:comment_id/vote => comments#vote`
 
 ### Create vote model
 - Create table.
@@ -497,4 +501,62 @@ After styling, my app looks like this:
   pp User.find(2).votes # should print one vote 
   ```
 
-### 
+### Create vote routes 
+Modify the post routes block in `config/routes.rb` to the following.
+```ruby
+resources :posts, except: :destroy do
+  member do
+    post 'vote'
+  end
+
+  resources :comments, only: :create
+end
+```
+
+### Allow a user to vote on a post 
+- Add up arrows and down arrows that trigger the vote actions.
+  ```
+  # app/views/posts/_post.html.erb 
+  
+  <aside class='col-md-2 votes text-center'>
+    <%= link_to vote_post_path(post, vote: true), method: 'post' do %>
+      <%= fa_icon 'arrow-up' %>
+    <% end %>
+    </br>
+    <%= post.total_votes %>
+    </br>
+    <%= link_to vote_post_path(post, vote: false), method: 'post' do %>
+      <%= fa_icon 'arrow-down' %>
+    <% end %>
+  </aside>
+  ```
+- Define a `vote` action in PostsController.
+  ```ruby
+  # app/controllers/posts_controller.rb
+  
+  before_action :set_post, only: [:show, :edit, :update, :vote]
+  
+  def vote
+    Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
+    redirect_to posts_path
+  end
+  ```
+
+### Display total votes on a post
+- Define instance methods on the Post model.
+  ```ruby
+  # app/models/post.rb 
+  
+  def total_votes
+    self.upvotes - self.downvotes  
+  end
+  
+  def upvotes
+    self.votes.where(vote: true).size
+  end
+  
+  def downvotes
+    self.votes.where(vote: false).size
+  end
+  ```
+- Add `<%= post.total_votes %>` to `app/views/posts/_post.html.erb`.
