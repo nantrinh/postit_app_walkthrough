@@ -16,7 +16,9 @@
 
       <div class='card-body d-flex flex-column'>
         <%= render 'posts/post_url', post: post, card: true %>
-        <p class='card-text'><%= simple_format(truncate(post.description, length: 100)) %></p>
+        <p class='card-text'>
+          <%= simple_format(truncate(restrict_newlines(post.description, 5), length: 100)) %>
+        </p>
         <%= render 'shared/creator_details', obj: post %>
 
         <div class='btn-group mt-auto'>
