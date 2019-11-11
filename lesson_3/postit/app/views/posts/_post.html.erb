@@ -1,35 +1,35 @@
 <article class='card bg-light m-3 post'>
-  <div class='row no-gutters'>
-    <!-- votes -->
-    <div class='col-md-2 votes'>
+  <div class='row no-gutters h-100'>
+    <aside class='col-md-2 votes'>
       <%= link_to '' do %>
         <%= fa_icon 'arrow-up' %>
       <% end %>
       <%= link_to '' do %>
         <%= fa_icon 'arrow-down' %>
       <% end %>
-    </div>
+    </aside>
 
-    <!-- content -->
-    <div class='col-md-10'>
-      <h5 class='card-header'><%= truncate(post.title, length: 50) %></h5>
-
-      <div class='card-body d-flex flex-column'>
+    <section class='col-md-10'>
+      <header>
+        <h5 class='card-header'><%= truncate(post.title, length: 50) %></h5>
+      </header>
+  
+      <main class='card-body'>
         <%= render 'posts/post_url', post: post, card: true %>
         <p class='card-text'>
-          <%= simple_format(truncate(restrict_newlines(post.description, 5), length: 100)) %>
+          <%= simple_format(truncate(restrict_newlines(post.description, 5), length: 130)) %>
         </p>
+      </main>
+  
+      <footer class='card-footer'>
         <%= render 'shared/creator_details', obj: post %>
-
-        <div class='btn-group mt-auto'>
+        <nav class='btn-group mt-auto'>
           <%= button_to 'View', post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary' %>
           <% if current_user == post.creator %>
             <%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>
           <% end %>
-        </div>
-
-      </div>
-    </div>
-
+        </nav>
+      </footer>
+    </section>
   </div>
 </article>
