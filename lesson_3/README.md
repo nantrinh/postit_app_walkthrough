@@ -487,13 +487,13 @@ After styling, my app looks like this:
 - Check your changes in `rails console`.
   ```
   # Create a new vote: user 1 upvoted on post 2.
-  Vote.create(user_id: 1, vote: true, voteable_type: 'Post', voteable_id: 2)
+  Vote.create(user_id: 1, vote: true, voteable: Post.find(2))
   
   # Create a new vote: user 1 upvoted on comment 1.
-  Vote.create(user_id: 1, vote: true, voteable_type: 'Comment', voteable_id: 1)
+  Vote.create(user_id: 1, vote: true, voteable: Comment.find(1))
   
   # Create a new vote: user 2 downvoted on post 2.
-  Vote.create(user_id: 2, vote: false, voteable_type: 'Post', voteable_id: 2)
+  Vote.create(user_id: 2, vote: false, voteable: Post.find(2))
   
   pp Post.find(2).votes # should print two votes
   pp Comment.find(1).votes # should print one vote
@@ -601,5 +601,28 @@ def index
 end
 ```
 
+### Restrict user to one vote per object 
+- Add `validates_uniqueness_of :creator, scope: :voteable` to Vote model. 
+- Check your changes in `rails console`.
+  ```
+  # Create a new vote: user 1 upvoted on post 2.
+  Vote.create(user_id: 1, vote: true, voteable: Post.find(2))
+  # Run the above again. You should see `rollback transaction`.
+  
+  # Create a new vote: user 1 upvoted on comment 1.
+  Vote.create(user_id: 1, vote: true, voteable: Comment.find(1))
+  # Run the above again. You should see `rollback transaction`.
+
+  # Create a new vote: user 2 downvoted on post 2.
+  Vote.create(user_id: 2, vote: false, voteable: Post.find(2))
+  # Run the above again. You should see `rollback transaction`.
+  
+  pp Post.find(2).votes # should print two votes
+  pp Comment.find(1).votes # should print one vote
+  pp User.find(1).votes # should print two votes 
+  pp User.find(2).votes # should print one vote 
+  ```
+- Check your changes in the UI.
+
 ### TODO
-- restrict user to one vote per post and one vote per comment
+- gray out the vote up or down arrow if the user has voted already
