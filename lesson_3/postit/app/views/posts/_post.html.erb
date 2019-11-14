@@ -1,14 +1,22 @@
 <article class='card bg-light m-3 post'>
   <div class='row no-gutters h-100'>
     <aside class='col-md-2 votes text-center'>
-      <%= link_to vote_post_path(post, vote: true), method: 'post' do %>
-        <%= fa_icon 'arrow-up' %>
+      <% if !current_user || post.votes.where(user_id: current_user.id, vote: true).empty? %>
+        <%= link_to vote_post_path(post, vote: true), method: 'post' do %>
+          <%= fa_icon 'arrow-up' %>
+        <% end %>
+      <% else %>
+        <%= fa_icon 'arrow-up', class: 'disabled' %>
       <% end %>
       </br>
       <%= post.total_votes %>
       </br>
-      <%= link_to vote_post_path(post, vote: false), method: 'post' do %>
-        <%= fa_icon 'arrow-down' %>
+      <% if !current_user || post.votes.where(user_id: current_user.id, vote: false).empty? %>
+        <%= link_to vote_post_path(post, vote: false), method: 'post' do %>
+          <%= fa_icon 'arrow-down' %>
+        <% end %>
+      <% else %>
+        <%= fa_icon 'arrow-down', class: 'disabled' %>
       <% end %>
     </aside>
 
