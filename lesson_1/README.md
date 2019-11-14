@@ -14,6 +14,11 @@ In this lesson, I set up a new application based on the following entity relatio
   - a specific category and its associated posts
 - Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
 
+## My Additions/Changes/Clarifications
+- Use postgresql instead of sqlite3 to make deployment easier.
+- Deploy early on Heroku instead of waiting until the end of Lesson 3. I do this because when I went through the course initially and reached the deployment stage, I couldn't get it to work. I wish I deployed early to save myself the headache of trying to figure it out later. So I add this here.
+- Add instructions on how to install Bootstrap. The course does not mention how to do this so I figured it out myself and added it here for reference.
+
 ## Table of Contents
 
    * [Create new application](#create-new-application)
@@ -45,88 +50,108 @@ In this lesson, I set up a new application based on the following entity relatio
    * [Change the association name.](#change-the-association-name)
 
 ## Create new application
-- `rails new postit`
-- Run `cd postit`
-- Run `rails server`
-- Navigate to `http://localhost:3000` in browser and verify that a welcome page is shown.
+I use PostgreSQL instead of sqlite3 to make deployment easier.
+Helpful articles: [1](https://launchschool.com/blog/how-to-install-postgres-for-linux), [2](https://www.digitalocean.com/community/tutorials/how-to-set-up-ruby-on-rails-with-postgres)
+
+Make sure you are not in an existing git repo. It would be easier to deploy if the app is in its own repo and not nested within another one.
+- `rails new postit --database=postgresql`
+- `cd postit`
+- `rake db:setup`
+- `rails db:migrate`
+- `rails server`
+- Navigate to `http://localhost:3000` in browser and verify that a welcome page is shown. 
 
 ## Create tables
 After creating each migration file and modifying its contents:
 1. Run `rails db:migrate`.
-2. Run `cat db/schema.rb` to inspect the schema. We want to check if the migration had the intended effects.
+2. Check your changes: Run `cat db/schema.rb` to inspect the schema and verify that the migration had the intended effects.
 
 ### Users
-`rails g migration CreateUsers`
+`rails g migration create_users`
 
 ```
-def change
-  create_table :users do |t|
-    t.string :username
-
-    t.timestamps
-  end
-```
-
-### Posts
-`rails g migration CreatePosts`
-
-```
-def change
-  create_table :posts do |t|
-    t.string :title
-    t.string :url
-    t.text :description
-    t.belongs_to :user
-
-    t.timestamps
-  end
-```
-
-### Comments
-`rails g migration CreateComments`
-
-```
-def change
-  create_table :comments do |t|
-    t.text :body
-    t.belongs_to :user
-    t.belongs_to :post
-
-    t.timestamps
-  end
-```
-
-### Categories
-`rails generate migration CreateCategories`
-
-```
-def change
-  create_table :categories do |t|
-    t.string :name
-
-    t.timestamps
-  end
-```
-
-### PostCategories 
-`rails generate migration CreatePostCategories`
-
-```
-def change
-  create_table :post_categories do |t|
-    t.belongs_to :post
-    t.belongs_to :category
-
-    t.timestamps
+class CreateUsers < ActiveRecord::Migration[6.0]
+  def change
+    create_table :users do |t|
+      t.string :username
+  
+      t.timestamps
+    end
   end
 end
 ```
 
-## Create models
-- Run `rails console` to open up the rails console.
-- After creating each model file, run `reload!` to reload the console.
-- Run `[ModelName].all` to verify that a SQL query is executed to select all rows from the appropriate table. We want to check that each model is hooked up with the appropriate table.
+### Posts
+`rails g migration create_posts`
 
+```
+class CreatePosts < ActiveRecord::Migration[6.0]
+  def change
+    create_table :posts do |t|
+      t.string :title
+      t.string :url
+      t.text :description
+      t.belongs_to :user
+  
+      t.timestamps
+    end
+  end
+end
+```
+
+### Comments
+`rails g migration create_comments`
+
+```
+class CreateComments < ActiveRecord::Migration[6.0]
+  def change
+    create_table :comments do |t|
+      t.text :body
+      t.belongs_to :user
+      t.belongs_to :post
+  
+      t.timestamps
+    end
+  end
+end
+```
+
+### Categories
+`rails generate migration create_categories`
+
+```
+class CreateCategories < ActiveRecord::Migration[6.0]
+  def change
+    create_table :categories do |t|
+      t.string :name
+  
+      t.timestamps
+    end
+  end
+end
+```
+
+### PostCategories 
+`rails generate migration create_post_categories`
+
+```
+class CreatePostCategories < ActiveRecord::Migration[6.0]
+  def change
+    create_table :post_categories do |t|
+      t.belongs_to :post
+      t.belongs_to :category
+  
+      t.timestamps
+    end
+  end
+end
+```
+
+## Create a new git repository and make the first commit.
+See [docs](https://help.github.com/en/github/getting-started-with-github/create-a-repo) for instructions.
+Remember to commit often!
+
+## Create models
 ### User
 `app/models/user.rb`
 
@@ -144,7 +169,8 @@ end
 class Post < ApplicationRecord
   belongs_to :user
   has_many :comments, dependent: :destroy
-  has_many :categories, through: :post_categories, dependent: :destroy
+  has_many :post_categories, dependent: :destroy
+  has_many :categories, through: :post_categories
 end
 ```
 
@@ -163,7 +189,8 @@ end
 
 ```
 class Category < ApplicationRecord
-  has_many :posts , through: :post_categories, dependent: :destroy
+  has_many :post_categories, dependent: :destroy
+  has_many :posts , through: :post_categories
 end
 ```
 
@@ -178,37 +205,41 @@ end
 ```
 
 ## Check associations
-Run the following commands in the rails console and check that the output is as expected.
-If you encounter errors, try restarting the rails console (not just running `reload!`).
-It is assumed that the commands are run sequentially from one section to the next (e.g., commands in "1:M association between User and Post" are run before "1:M association between User and Comment".
+- Run the following commands in the rails console and check that the output is as expected.
+- If you encounter errors, try restarting the rails console (not just running `reload!`).
+- It is assumed that the commands are run sequentially from one section to the next (e.g., commands in "1:M association between User and Post" are run before "1:M association between User and Comment".
+- I include repetitive code so even if you encounter an error and have to restart the console you won't have to look through all the snippets to find out what a variable referred to (e.g., `chili = Post.find_by(title: 'How to make chili oil')`)
 
 ### 1:M association between User and Post
 ```
-nancy = User.create(username: "Nancy")
-victor = User.create(username: "Victor")
-chili = Post.create(title: "How to make chili oil", url: "woksoflife.com", description: "great recipe on how to make chili oil", user: nancy)
-compost = Post.create(title: "How to make compost", url: "urbangardening.com", description: "compost recipe using coffee grounds", user: nancy)
-bok_choy = Post.create(title: "Why bok choy is great for cats", url: "loveyourcats.com", description: "argument for more greens in your cat's diet", user: victor)
+nancy = User.create(username: 'Nancy')
+victor = User.create(username: 'Victor')
+chili = Post.create(title: 'How to make chili oil', url: 'woksoflife.com', description: 'great recipe on how to make chili oil', user: nancy)
+compost = Post.create(title: 'How to make compost', url: 'urbangardening.com', description: 'compost recipe using coffee grounds', user: nancy)
+bok_choy = Post.create(title: 'Why bok choy is great for cats', url: 'loveyourcats.com', description: 'argument for more greens in your cat's diet', user: victor)
 
-chili.user.username # "Nancy"
-bok_choy.find(3).user.username # "Victor"
-nancy.posts.map {|x| x.title} # ["How to make chili oil", "How to make compost"]
-victor.posts.map {|x| x.title} # ["Why bok choy is great for cats"]
+pp User.all # print all users
+pp Post.all # print all posts
 ```
 
 ### 1:M association between User and Comment
 ```
-Comment.create(body: "I agree!", user: nancy, post: bok_choy)
-Comment.create(body: "This looks delicious!", user: victor, post: chili)
+nancy = User.find_by(username: 'Nancy')
+victor = User.find_by(username: 'Victor')
+chili = Post.find_by(title: 'How to make chili oil')
+bok_choy = Post.find_by(title: 'Why bok choy is great for cats')
+
+Comment.create(body: 'I agree!', user: nancy, post: bok_choy)
+Comment.create(body: 'This looks delicious!', user: victor, post: chili)
 Comment.create(body: "I'm commenting on my own post.", user: nancy, post: chili)
 
-nancy.comments.map {|x| x.body} # ["I agree!", "I'm commenting on my own post."]
-victor.comments.map {|x| x.body} # ["This looks delicious!"]
+pp nancy.comments
+pp victor.comments
 ```
 
 ### 1:M association between Post and Comment
 ```
-chili.comments.map {|x| x.body} # ["This looks delicious!", "I'm commenting on my own post."]
+pp Post.find_by(title: 'How to make chili oil').comments # ['This looks delicious!', "I'm commenting on my own post."]
 ```
 
 ### M:M association between Post and Categories
@@ -217,17 +248,20 @@ recipes = Category.create(name: "recipes")
 food = Category.create(name: "food")
 cat = Category.create(name: "cat")
 
+chili = Post.find_by(title: 'How to make chili oil')
+bok_choy = Post.find_by(title: 'Why bok choy is great for cats')
+
 PostCategory.create(post: chili, category: recipes)
 PostCategory.create(post: chili, category: food)
 PostCategory.create(post: bok_choy, category: food)
 PostCategory.create(post: bok_choy, category: cat)
 
-recipes.posts.map {|x| x.title} # ["How to make chili oil"]
-food.posts.map {|x| x.title} # ["How to make chili oil", "Why bok choy is great for cats"]
-cat.posts.map {|x| x.title} # ["Why bok choy is great for cats"]
+pp recipes.posts # ["How to make chili oil"]
+pp food.posts # ["How to make chili oil", "Why bok choy is great for cats"]
+pp cat.posts # ["Why bok choy is great for cats"]
 
-chili.categories.map {|x| x.name} # ["recipes", "food"]
-bok_choy.categories.map {|x| x.name} # ["food", "cat"]
+pp chili.categories # ["recipes", "food"]
+pp bok_choy.categories # ["food", "cat"]
 ```
 
 ## Create routes
