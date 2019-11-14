@@ -1,9 +1,8 @@
 # Rails Notes
-
 This repo contains my notes for each lesson of the Launch School 5301 Rapid Prototyping with Ruby on Rails course. There are some differences in my implementations vs. those in the course videos, but the main ideas are the same.
 
 The biggest differences are:
-- I use Rails 6 and Ruby 2.5.3. The course uses Rails 4 and Ruby 2.
+- I use Rails 6 and Ruby 2.6.5. The course uses Rails 4 and Ruby 2.
 - I do not use Twitter Bootstrap until Lesson 3. The course uses it from the beginning. If I were to do this project all over again I would use Bootstrap from the start.
   - [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font, so I used the [font-awesome-rails gem](https://github.com/bokmann/font-awesome-rails) to get icons. Remember to restart your server after installing!
   - [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): The `well` class is frequently used in the videos. This class was dropped in Bootstrap v4. The [`cards`](https://getbootstrap.com/docs/4.0/components/card/) component provides similar functionality.

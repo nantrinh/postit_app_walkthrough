@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 2019_11_10_051401) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
@@ -20,8 +23,8 @@ ActiveRecord::Schema.define(version: 2019_11_10_051401) do
 
   create_table "comments", force: :cascade do |t|
     t.text "body"
-    t.integer "user_id"
-    t.integer "post_id"
+    t.bigint "user_id"
+    t.bigint "post_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["post_id"], name: "index_comments_on_post_id"
@@ -29,8 +32,8 @@ ActiveRecord::Schema.define(version: 2019_11_10_051401) do
   end
 
   create_table "post_categories", force: :cascade do |t|
-    t.integer "post_id"
-    t.integer "category_id"
+    t.bigint "post_id"
+    t.bigint "category_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["category_id"], name: "index_post_categories_on_category_id"
@@ -41,7 +44,7 @@ ActiveRecord::Schema.define(version: 2019_11_10_051401) do
     t.string "title"
     t.string "url"
     t.text "description"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_posts_on_user_id"
@@ -56,7 +59,7 @@ ActiveRecord::Schema.define(version: 2019_11_10_051401) do
 
   create_table "votes", force: :cascade do |t|
     t.boolean "vote"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "voteable_type"
     t.integer "voteable_id"
     t.datetime "created_at", precision: 6, null: false

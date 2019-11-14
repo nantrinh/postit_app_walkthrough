@@ -707,3 +707,40 @@ def vote
   redirect_back fallback_location: root_path
 end
 ```
+
+### Deployment Notes
+I did all of the following and my deployment was successful, but my app still crashes. I'll have to come back to this another time.
+
+#### How to migrate from sqlite to postgres 
+https://devcenter.heroku.com/articles/sqlite3#running-rails-on-postgres
+
+#### How to update your rbenv ruby version
+This is a condensed version of this [article](https://www.aloucaslabs.com/miniposts/how-to-update-your-rbenv-ruby-version).
+1. What is the latest stable release? [LINK](https://www.ruby-lang.org/en/downloads). At the time of writing this, it is 2.6.5.
+2. ` cd ~/.rbenv/plugins/ruby-build/ && git pull`
+3. Install it: `rbenv install 2.6.5`
+4. Set it to be the global ruby version of the system: `rbenv global 2.6.5`
+  - NOTE: I had this output when I ran `rbenv versions`, so I navigated to `/home/nancy/.ruby-version` and changed the contents of the file to `2.6.5`.
+  ```
+  system
+* 2.5.3 (set by /home/nancy/.ruby-version)
+  2.6.5
+  ```
+5. Rehash rbenv to install shims for all Ruby executables known to rbenv: `rbenv rehash`
+6. Check the ruby version. `ruby -v` It should be 2.6.5.
+
+#### How to update RubyGems
+`gem update --system`
+
+#### How to update bundler
+`gem install bundler`
+
+### How to update ruby version in the app
+- Change it in `Gemfile` and `.ruby-version`.
+- Run `bundle install`.
+
+### Deployment was successful but my app crashes
+Did you remember to migrate your database?
+`heroku run rake db:migrate`
+Are you still getting errors?
+`heroku run rails console` may give you more illuminating error messages.
