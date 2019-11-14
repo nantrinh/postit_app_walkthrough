@@ -40,8 +40,15 @@ class PostsController < ApplicationController
   end
 
   def vote
-    Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
-    redirect_back fallback_location: root_path 
+    # there should be at most 1 element in the array because we enforce
+    # uniqueness of user-voteable
+    existing_votes = @post.votes.where(user_id: current_user.id)
+    if existing_votes.empty?
+      Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
+    else
+      existing_votes.first.update(vote: params[:vote])
+    end
+    redirect_back fallback_location: root_path
   end
 
   private
