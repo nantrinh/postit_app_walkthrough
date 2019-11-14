@@ -624,5 +624,86 @@ end
   ```
 - Check your changes in the UI.
 
-### TODO
-- gray out the vote up or down arrow if the user has voted already
+### Additional changes (not specified in course videos)
+I added these features because I thought it made for a better user experience.
+- Disable voting and gray out the arrow corresponding to the vote the user has made on the comment or post. 
+- Allow a user to change their vote on a comment or post. I update the appropriate row in the votes table when the user changes their vote (no additional rows are created).
+- Extract the voting functionality to a partial.
+- Do not sort by total votes created because it's disconcerting when you vote on a post and it moves. I sort the posts in decreasing order of when it was created (oldest posts first). `@posts = Post.all.sort_by{|x| x.created_at}`
+
+```ruby
+# app/views/shared/_vote.html.erb
+
+<% if obj.class == Post %>
+  <% url_true = vote_post_path(obj, vote: true) %>
+  <% url_false = vote_post_path(obj, vote: false) %>
+<% elsif obj.class == Comment %>
+  <% url_true = vote_post_comment_path(obj.post, obj, vote: true) %>
+  <% url_false = vote_post_comment_path(obj.post, obj, vote: false) %>
+<% end %>
+
+<% if !current_user || obj.votes.where(user_id: current_user.id, vote: true).empty? %>
+  <%= link_to url_true, method: 'post' do %>
+    <%= fa_icon 'arrow-up' %>
+  <% end %>
+<% else %>
+  <%= fa_icon 'arrow-up', class: 'disabled' %>
+<% end %>
+</br>
+<%= obj.total_votes %>
+</br>
+<% if !current_user || obj.votes.where(user_id: current_user.id, vote: false).empty? %>
+  <%= link_to url_false, method: 'post' do %>
+    <%= fa_icon 'arrow-down' %>
+  <% end %>
+<% else %>
+  <%= fa_icon 'arrow-down', class: 'disabled' %>
+<% end %>
+```
+
+```ruby
+# app/views/posts/_post.html.erb
+# only the relevant code is shown
+
+<aside class='col-md-2 votes text-center'>
+  <%= render 'shared/vote', obj: post %>
+</aside>
+```
+
+```ruby
+# app/views/comments/_comment.html.erb
+# only the relevant code is shown
+
+<aside class='col-md-2 votes text-center'>
+  <%= render 'shared/vote', obj: comment %>
+</aside>
+```
+
+```ruby
+# app/controllers/posts_controller.rb
+# only the relevant code is shown
+def vote
+  existing_votes = @post.votes.where(user_id: current_user.id)
+  if existing_votes.empty?
+    Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
+  else
+    existing_votes.first.update(vote: params[:vote])
+  end
+  redirect_back fallback_location: root_path
+end
+```
+
+```ruby
+# app/controllers/posts_controller.rb
+# only the relevant code is shown
+def vote
+  @comment = Comment.find(params[:id])
+  existing_votes = @comment.votes.where(user_id: current_user.id)
+  if existing_votes.empty?
+    Vote.create(voteable: @comment, creator: current_user, vote: params[:vote])
+  else
+    existing_votes.first.update(vote: params[:vote])
+  end
+  redirect_back fallback_location: root_path
+end
+```
