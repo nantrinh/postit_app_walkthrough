@@ -20,34 +20,7 @@ In this lesson, I set up a new application based on the following entity relatio
 - Add instructions on how to install Bootstrap. The course does not mention how to do this so I figured it out myself and added it here for reference.
 
 ## Table of Contents
-
-   * [Create new application](#create-new-application)
-   * [Create tables](#create-tables)
-      * [Users](#users)
-      * [Posts](#posts)
-      * [Comments](#comments)
-      * [Categories](#categories)
-      * [PostCategories](#postcategories)
-   * [Create models](#create-models)
-      * [User](#user)
-      * [Post](#post)
-      * [Comment](#comment)
-      * [Category](#category)
-      * [PostCategory](#postcategory)
-   * [Check associations](#check-associations)
-      * [1:M association between User and Post](#1m-association-between-user-and-post)
-      * [1:M association between User and Comment](#1m-association-between-user-and-comment)
-      * [1:M association between Post and Comment](#1m-association-between-post-and-comment)
-      * [M:M association between Post and Categories](#mm-association-between-post-and-categories)
-   * [Create routes](#create-routes)
-   * [Create controllers and views](#create-controllers-and-views)
-      * [Create controllers](#create-controllers)
-      * [Create views](#create-views)
-         * [posts#index](#postsindex)
-         * [posts#show](#postsshow)
-         * [categories#index](#categoriesindex)
-         * [categories#show](#categoriesshow)
-   * [Change the association name.](#change-the-association-name)
+[TODO]
 
 ## Create new application
 I use PostgreSQL instead of sqlite3 to make deployment easier.
@@ -69,7 +42,7 @@ After creating each migration file and modifying its contents:
 ### Users
 `rails g migration create_users`
 
-```
+```ruby
 class CreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users do |t|
@@ -84,7 +57,7 @@ end
 ### Posts
 `rails g migration create_posts`
 
-```
+```ruby
 class CreatePosts < ActiveRecord::Migration[6.0]
   def change
     create_table :posts do |t|
@@ -102,7 +75,7 @@ end
 ### Comments
 `rails g migration create_comments`
 
-```
+```ruby
 class CreateComments < ActiveRecord::Migration[6.0]
   def change
     create_table :comments do |t|
@@ -119,7 +92,7 @@ end
 ### Categories
 `rails generate migration create_categories`
 
-```
+```ruby
 class CreateCategories < ActiveRecord::Migration[6.0]
   def change
     create_table :categories do |t|
@@ -134,7 +107,7 @@ end
 ### PostCategories 
 `rails generate migration create_post_categories`
 
-```
+```ruby
 class CreatePostCategories < ActiveRecord::Migration[6.0]
   def change
     create_table :post_categories do |t|
@@ -153,9 +126,9 @@ Remember to commit often!
 
 ## Create models
 ### User
-`app/models/user.rb`
+```ruby
+# app/models/user.rb
 
-```
 class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
@@ -163,9 +136,8 @@ end
 ```
 
 ### Post
-`app/models/post.rb`
-
-```
+```ruby
+# app/models/post.rb
 class Post < ApplicationRecord
   belongs_to :user
   has_many :comments, dependent: :destroy
@@ -175,9 +147,9 @@ end
 ```
 
 ### Comment
-`app/models/comment.rb`
+```ruby
+# app/models/comment.rb
 
-```
 class Comment < ApplicationRecord
   belongs_to :user
   belongs_to :post
@@ -185,9 +157,9 @@ end
 ```
 
 ### Category
-`app/models/category.rb`
+```ruby
+# app/models/category.rb
 
-```
 class Category < ApplicationRecord
   has_many :post_categories, dependent: :destroy
   has_many :posts , through: :post_categories
@@ -195,9 +167,9 @@ end
 ```
 
 ### PostCategory
-`app/models/post_category.rb`
+```ruby
+# app/models/post_category.rb
 
-```
 class PostCategory < ApplicationRecord
   belongs_to :post
   belongs_to :category
@@ -211,7 +183,7 @@ end
 - I include repetitive code so even if you encounter an error and have to restart the console you won't have to look through all the snippets to find out what a variable referred to (e.g., `chili = Post.find_by(title: 'How to make chili oil')`)
 
 ### 1:M association between User and Post
-```
+```ruby
 nancy = User.create(username: 'Nancy')
 victor = User.create(username: 'Victor')
 chili = Post.create(title: 'How to make chili oil', url: 'woksoflife.com', description: 'great recipe on how to make chili oil', user: nancy)
@@ -223,7 +195,7 @@ pp Post.all # print all posts
 ```
 
 ### 1:M association between User and Comment
-```
+```ruby
 nancy = User.find_by(username: 'Nancy')
 victor = User.find_by(username: 'Victor')
 chili = Post.find_by(title: 'How to make chili oil')
@@ -238,12 +210,12 @@ pp victor.comments
 ```
 
 ### 1:M association between Post and Comment
-```
+```ruby
 pp Post.find_by(title: 'How to make chili oil').comments # ['This looks delicious!', "I'm commenting on my own post."]
 ```
 
 ### M:M association between Post and Categories
-```
+```ruby
 recipes = Category.create(name: "recipes")
 food = Category.create(name: "food")
 cat = Category.create(name: "cat")
@@ -265,16 +237,15 @@ pp bok_choy.categories # ["food", "cat"]
 ```
 
 ## Create routes
-Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
-`config/routes.db`
+- Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
+  ```ruby
+  # config/routes.db
 
-```
-Rails.application.routes.draw do
-  resources :posts, :categories, except: :destroy
-end
-```
-
-Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
+  Rails.application.routes.draw do
+    resources :posts, :categories, except: :destroy
+  end
+  ```
+- Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
  
 ## Create controllers and views
 Create controllers and views to view:
