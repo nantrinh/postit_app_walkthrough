@@ -1,9 +1,13 @@
 # Lesson 1
-In this lesson, I set up a new application based on the following entity relationship diagram:
+At the end of this lesson, we would have an app deployed on heroku that supports the `posts#index`, `posts#show`, `categories#index`, and `categories#show` actions.
+
+![](../gifs/postit_lessson_1_demo.gif)
+
+The app would have the appropriate models and associations set up according to this entity relationship diagram:
 
 ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
 
-## Instructions
+## Course Instructions
 - Create new application.
 - Create tables.
 - Create routes for posts and categories. Prevent the delete route from being accessed.
@@ -292,6 +296,8 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 
 [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome. The article linked to above includes instructions on how to integrate it in your app.
 
+[NOTE](https://v4-alpha.getbootstrap.com/migration/#components): The `well` class is frequently used in the videos. This class was dropped in Bootstrap v4. I use the [`cards`](https://getbootstrap.com/docs/4.0/components/card/) component in my code, which provides similar functionality.
+
 ### Create views
 - After the views are created, navigate to the URLs in the browser to verify that the responses are as expected.
   - posts#index: `localhost:3000/posts`
@@ -441,10 +447,28 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 - Add data to your app using the rails console on heroku (`heroku run rails console`) and check that it is displayed as intended. You can use the commands from the [Check Associations](#check-associations) section to add the same data that we added to the development database.
 
 ## Additional styling 
+- Create a custom scss file. The code below sets a fixed width and height for the post partial, and for its components.
+  ```
+  # app/javascript/stylesheets/_custom.scss
 
-
-# TODO
-- deploy!!!
-- add the custom css to postit app to make cards uniform width
-- add the additonal styles to postit app (the truncating in the cards, mainly) 
-- change the association name in postit app
+  .card {
+    &.post {
+      width: 18rem;
+      height: 26rem;
+    }
+  }
+  
+  .card-header {
+    height: 5rem;
+  }
+  
+  .card-body {
+    height: 15rem;
+  }
+  
+  .card-footer {
+    height: 6rem;
+  } 
+  ```
+- Add `@import 'custom';` to `app/javascript/stylesheets`.
+- Commit to your repo and deploy again.
