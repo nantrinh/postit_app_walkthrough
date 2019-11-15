@@ -16,8 +16,8 @@ In this lesson, I set up a new application based on the following entity relatio
 
 ## My Additions/Changes/Clarifications
 - Use postgresql instead of sqlite3 to make deployment easier.
-- Deploy early on Heroku instead of waiting until the end of Lesson 3. I do this because when I went through the course initially and reached the deployment stage, I couldn't get it to work. I wish I deployed early to save myself the headache of trying to figure it out later. So I add this here.
-- Add instructions on how to install Bootstrap. The course does not mention how to do this so I figured it out myself and added it here for reference.
+- Add instructions on how to install Bootstrap. I had difficulty figuring out to do this, so I want to share the article that helped me.
+- Deploy early on Heroku instead of waiting until the end of Lesson 3. I add this here because that is what I wish I did when I went through the course initially. It would have saved me much headache and frustration.
 
 ## Table of Contents
 [TODO]
@@ -238,10 +238,12 @@ pp bok_choy.categories # ["food", "cat"]
 
 ## Create routes
 - Create routes for posts and categories. Prevent the delete route (destroy action) from being accessed.
+- Make the `posts#show` path the root path (home page).
   ```ruby
   # config/routes.db
 
   Rails.application.routes.draw do
+    root to: 'posts#index'
     resources :posts, :categories, except: :destroy
   end
   ```
@@ -255,9 +257,9 @@ Create controllers and views to view:
 - a specific category and its associated posts
 
 ### Create controllers
-`app/controllers/posts.rb`
+```ruby
+# app/controllers/posts.rb
 
-```
 class PostsController < ApplicationController
   def index
     @posts = Post.all
@@ -269,9 +271,9 @@ class PostsController < ApplicationController
 end
 ```
 
-`app/controllers/categories.rb`
+```ruby
+# app/controllers/categories.rb
 
-```
 class CategoriesController < ApplicationController
   def index
     @categories = Category.all
@@ -283,102 +285,153 @@ class CategoriesController < ApplicationController
 end
 ```
 
+### Install Bootstrap 4
+I followed the instructions in this [article](https://medium.com/@guilhermepejon/how-to-install-bootstrap-4-3-in-a-rails-6-app-using-webpack-9eae7a6e2832).
+- [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome. The article linked to above includes instructions on how to integrate it in your app.
+
 ### Create views
-After each view is created, navigate to the appropriate URL in the browser to verify that the response is as expected.
-Make sure your server is running before checking the URLs (run `rails server`).
-#### posts#index
-`app/views/posts/index.html.erb`
-`localhost:3000/posts`
+- After the views are created, navigate to the URLs in the browser to verify that the responses are as expected.
+  - posts#index: `localhost:3000/posts`
+  - posts#show: `localhost:3000/posts/:id`
+  - categories#index: `localhost:3000/categories`
+  - categories#show: `localhost:3000/categories/:id`
+- Make sure your server is running before checking the URLs (run `rails server`).
+- I use partials here, which are covered later in the course.
+- I style my app differently from the one in the videos.
+
+#### Shared
+```
+# header partial
+# app/views/shared/_header.html.erb
+
+<% post ||= nil %>
+
+<%= render 'shared/nav' %>
+<section class='jumbotron text-center'>
+  <h1 class='jumbotron-heading'><%= title %></h1>
+  <% if post %>
+    <p><%= post.url %></p>
+    <p><%= "#{post.user.username} #{post.created_at}" %></p>
+  <% end %>
+</section>
+```
 
 ```
-<h1>Posts</h1>
+# navigation bar partial
+# app/views/shared/_nav.html.erb
+
+<!--Navbar-->
+<nav class='navbar navbar-expand-sm navbar-dark bg-dark'>
+  <!-- Navbar brand -->
+  <%= link_to 'PostIt', root_path, class: 'navbar-brand' %>
+    <!-- Collapse button -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+    aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Collapsible content -->
+  <div class="collapse navbar-collapse" id="basicExampleNav">
+
+    <!-- Links -->
+    <ul class='navbar-nav'>
+      <li class='nav-item'>
+        <%= link_to 'Posts', posts_path, class: 'nav-link' %>
+      </li>
+      <li class='nav-item'>
+        <%= link_to 'Categories', categories_path, class: 'nav-link' %>
+      </li>
+    </ul>
+</nav>
+```
  
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>URL</th>
-      <th>Description</th>
-    </tr>
-  </thead>
- 
-  <tbody>
-    <% @posts.each do |post| %>
-      <tr>
-        <td><%= post.title %></td>
-        <td><%= post.url %></td>
-        <td><%= post.description %></td>
-        <td><%= link_to "Show", post %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+#### Posts
+```
+# post partial
+# app/views/posts/_post.html.erb
+
+<article class='card bg-light m-3 post'>
+  <div class='row no-gutters h-100'>
+    <section>
+      <header class='card-header'>
+        <h5><%= post.title %></h5>
+      </header>
+  
+      <main class='card-body'>
+        <%= post.url %>
+        <p class='card-text'>
+          <%= post.description %>
+        </p>
+      </main>
+  
+      <footer class='card-footer'>
+        <%= "#{post.user.username} #{post.created_at}" %>
+        <nav class='btn-group mt-auto'>
+          <%= button_to 'View', post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary' %>
+        </nav>
+      </footer>
+    </section>
+  </div>
+</article>
 ```
 
-#### posts#show
-`app/views/posts/show.html.erb`
-`localhost:3000/posts/:id`
-
 ```
-<h1><%= @post.title %></h1>
+# app/views/posts/index.html.erb
 
-<p> Tags: 
-<% @post.categories.each do |category| %>
-  <%= link_to category.name, category_path %>
-<% end %>
-</p>
+<%= render 'shared/header', title: 'Posts' %>
 
-<p>URL: <%= @post.url %></p>
-<p>Description: <%= @post.description %></p>
-<%= link_to "All Posts", posts_path %>
+<section class="row justify-content-center"> 
+  <% @posts.each_with_index do |post, i| %>
+    <%= render 'post', post: post %>
+  <% end %>
+</section>
 ```
 
-#### categories#index
-`app/views/categories/index.html.erb`
-`localhost:3000/categories`
-
 ```
-<h1>Categories</h1>
+# app/views/posts/show.html.erb
+
+<%= render 'shared/header', title: @post.title, post: @post %>
+
+<section class='container justify-content-center'>
+  <p><%= simple_format(@post.description) %></p>
+</section>
+```
+
+#### Categories
+```
+# app/views/categories/index.html.erb
+
+<%= render 'shared/header', title: "Categories" %>
 
 <ul>
 <% @categories.each do |category| %>
-  <li><%= link_to category.name.capitalize, category %></li>
+  <li><%= link_to(category.name.capitalize + " (#{pluralize(category.posts.size, 'post')})", category) %></li>
 <% end %>
 </ul>
 ```
 
-#### categories#show
-`app/views/categories/show.html.erb`
-`localhost:3000/categories/:id`
-
 ```
-<h1>Posts Tagged "<%= @category.name.capitalize %>"</h1>
+# app/views/categories/show.html.erb
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>URL</th>
-      <th>Description</th>
-    </tr>
-  </thead>
- 
-  <tbody>
-    <% @category.posts.each do |post| %>
-      <tr>
-        <td><%= post.title %></td>
-        <td><%= post.url %></td>
-        <td><%= post.description %></td>
-        <td><%= link_to "Show", post %></td>
-      </tr>
+<% title = "Posts Tagged \"#{@category.name.capitalize}\"" %>
+<%= render 'shared/header', title: title %>
+
+<% posts = @category.posts %>
+<section class="row justify-content-center"> 
+  <% if posts.empty? %>
+    No posts to show.
+  <% else %>
+    <% posts.each_with_index do |post, i| %>
+      <%= render 'posts/post', post: post %>
     <% end %>
-  </tbody>
-</table>
-
-<%= link_to "All Categories", categories_path %>
+  <%end %>
+</section>
 ```
 
-## Change the association name.
-
+## Change the association name
 - In `app/models/post.rb`, change the line `belongs_to :user` to `belongs_to :creator, class_name: "User", foreign_key: "user_id"`.
 - Open rails console and check that `Post.first.creator` returns the first user object, and `Post.first.user` now throws a `NoMethodError`. 
+- In the views, change all instances of `post.user` to `post.creator`.
+
+## Deploy
+
