@@ -1,30 +1,12 @@
 # Lesson 2
-This covers Lectures 3 and 4. I leave out comments on testing changes here, but be sure to test all changes you make in your app as you go.
 
 ## Table of Contents
-* [Lecture 3](#lecture-3)
-   * [Instructions](#instructions)
-   * [Allow a user to create a new post](#allow-a-user-to-create-a-new-post)
-   * [Add validations for a new post](#add-validations-for-a-new-post)
-   * [Allow a user to edit a post](#allow-a-user-to-edit-a-post)
-   * [Simplify posts controller using before_action](#simplify-posts-controller-using-before_action)
-   * [Extract common code in the new and edit views to a partial](#extract-common-code-in-the-new-and-edit-views-to-a-partial)
-   * [Allow a user to create a new category](#allow-a-user-to-create-a-new-category)
-   * [Extract validation error code to a partial](#extract-validation-error-code-to-a-partial)
-* [Lecture 4](#lecture-4)
-   * [Instructions](#instructions-1)
-   * [Change the association name](#change-the-association-name)
-   * [Allow a user to create a new comment](#allow-a-user-to-create-a-new-comment)
-   * [Add validations for a new comment](#add-validations-for-a-new-comment)
-   * [Display all comments related to a post on the posts show view](#display-all-comments-related-to-a-post-on-the-posts-show-view)
-   * [Allow a user to associate a post with categories](#allow-a-user-to-associate-a-post-with-categories)
-   * [Allow a user to click on post URLs and navigate to those URLs](#allow-a-user-to-click-on-post-urls-and-navigate-to-those-urls)
-   * [Display timestamps in a format like "11/01/2019 7:01pm UTC"](#display-timestamps-in-a-format-like-11012019-701pm-utc)
-   * [Additional Changes](#additional-changes)
+[TODO]
 
 ## Lecture 3 
 
-### Instructions
+### Course Instructions
+#### New Post
 - Allow a user to create a new post. Use a model-backed form.
 - Add the following validations for a new post. Display validation errors in the `new` view.
   - Require `title`, `url`, and `description`.
@@ -33,91 +15,175 @@ This covers Lectures 3 and 4. I leave out comments on testing changes here, but 
 - Allow a user to update a post. Use a model-backed form.
 - Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
 - Extract common code used in the `new` and `edit` views to partials.
+#### New Category
 - Allow a user to create a new category. Use a model-backed form.
 - Add the following validations for a new post. Display validation errors in the `new` view.
   - Require `name`.
   - `name` must be unique.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
-### Allow a user to create a new post
-- Create a test user.
-  - Run `User.create(username: "Test")` in rails console.
-- Add `new` and `create` actions. For now, set the default user to "Test".
-  ```ruby
-  # app/controllers/posts_controller.rb
+### What I Changed
+I only show the code with partials, for brevity's sake, since this is the third time I'm returning to this lesson. The course videos show the step-by-step approach, with commentary.
+
+### Create a test user
+Run `User.create(username: "Test")` in rails console.
+
+This will serve as the creator of posts created through the `posts#create` action for now. The course covers how to add user authentication in a later lesson.
+
+### Add `new` and `create` actions
+```ruby
+# app/controllers/posts_controller.rb
   
-  class PostsController < ApplicationController
-    # code omitted for brevity 
-  
-    def new
-      @post = Post.new
-    end
-  
-    def create
-      @post = Post.new(post_params)
-  
-      # TODO: change to logged in user
-      @post.creator = User.find_by username: "Test" 
-  
-      if @post.save
-        flash[:notice] = "Your post was created."
-        redirect_to posts_path
-      else
-        render :new
-      end
-    end
-  
-    private
-  
-    def post_params
-      params.require(:post).permit!
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+
+  def new
+    @post = Post.new
+  end
+
+  def create
+    @post = Post.new(post_params)
+
+    # TODO: set to current user when user authentication is added
+    @post.creator = User.find_by username: 'Test' 
+
+    if @post.save
+      flash[:notice] = 'Your post was created.'
+      redirect_to post_path(@post)
+    else
+      render :new
     end
   end
-  ```
-- Add `new` view.
-  - [Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_with` was introduced in Rails 5.1. `form_for` is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that you can still use `form_for` for now; your code will not break and no deprecation warning will be displayed, but `form_for` will be removed in the future.
-  ```ruby
-  # app/views/posts/new.html.erb
+
+  def show
+    @post = Post.find(params[:id])
+  end
+
+  private
+
+  def post_params
+    params.require(:post).permit!
+  end
+end
+```
+
+```ruby
+# app/controllers/categories_controller.rb
+
+class CategoriesController < ApplicationController
+  def index
+    @categories = Category.all
+  end
+
+  def new
+    @category = Category.new
+  end
+
+  def create
+    @category = Category.new(category_params)  
+    @category.name = @category.name.downcase
+
+    if @category.save
+      flash[:notice] = "A new category was created."
+      redirect_to categories_path
+    else
+      render :new 
+    end
+  end
+
+  def show
+    @category = Category.find(params[:id])
+  end
+
+  private
+
+  def category_params
+    params.require(:category).permit!
+  end
+end
+```
+
+### Add `new` views
+[Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_for`, which is used in the course videos, is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that your code will not break and no deprecation warning will be displayed if you use `form_for`, but it will be removed in the future. It is best to use `form_with` instead, which was introduced in Rails 5.1. 
+
+#### Posts 
+```
+# app/views/posts/new.html.erb
   
-  <h4>Create a new post</h4>
+<%= render 'shared/header', title: "Create a new post" %>
+<%= render 'form' %>
+```
+
+```
+# app/views/posts/_form.html.erb
   
-  <%= form_with model: @post do |f| %>
-    <div>
+<%= render 'shared/errors', obj: @post %>
+<section class='container'>
+  <%= form_with(model: @post, local: true, html: {autocomplete: 'off'}) do |f| %>
+    <div class='form-group'>
       <%= f.label :title %>
-      <%= f.text_field :title %>
+      <%= f.text_field :title, class: 'form-control w-50' %>
     </div>
-    <div>
-      <%= f.label :url %>
-      <%= f.text_field :url %>
+    <div class='form-group'>
+      <%= f.label :url, 'URL' %>
+      <%= f.text_field :url, class: 'form-control w-50' %>
     </div>
-    <div>
+    <div class='form-group'>
       <%= f.label :description %>
-      <%= f.text_area :description, rows: 5 %>
+      <%= f.text_area :description, rows: 5, class: 'form-control w-50' %>
     </div>
-    <%= f.submit "Create Post" %>
+    <%= f.submit(options={class: "btn btn-outline-primary mt-3"}) %>
   <% end %>
-  ```
-- Edit `index` view.
-  - Add link to create a new post.
-  - Add flash notice display using partial.
-  ```ruby
-  # app/views/posts/index.html.erb
+</section>
+```
 
-  <%= render 'shared/flash' %>
-  <%= link_to "New Post", new_post_path %>
+#### Categories
+```
+# app/views/categories/new.html.erb
   
-  # code omitted for brevity
-  ```
-  ```ruby
-  # app/views/shared/_flash.html.erb
+<%= render 'shared/header', title: "Create a new category" %>
+<%= render 'form' %>
+```
 
-  <% if flash[:notice] %>
-    <div><%= flash[:notice] %></div>
+```
+# app/views/categories/_form.html.erb
+  
+<%= render 'shared/errors', obj: @category %>
+<section class='container'>
+  <%= form_with(model: @category, local: true, html: {autocomplete: 'off'}) do |f| %>
+    <div class='form-group'>
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control w-50' %>
+    </div>
+    <%= f.submit(options={class: "btn btn-outline-primary mt-3"}) %>
   <% end %>
-  ```
-- Test your changes.
-  - Create a new post.
-  - Check `index` view ("/posts") to see if the post was created and flash notice is displayed.
+</section>
+```
+
+#### Shared
+```
+# app/views/shared/_errors.html.erb
+  
+<% if obj.errors.any? %>
+  <section class="alert alert-danger">
+    <div class="container">
+    <h5>Please fix the following errors:</h5>
+    <ul>
+      <% obj.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+    </div>
+  </section>
+<% end %>
+```
+
+### Test your changes.
+TODO: add gif and add to description
+- Create a new post.
+- Create a new category.
 
 ### Add validations for a new post
 - Add validations to model.
