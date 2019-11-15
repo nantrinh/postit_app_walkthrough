@@ -495,6 +495,6 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 - Add `@import 'custom';` to `app/javascript/stylesheets`.
 
 ## Commit and deploy again
-- Commit to your repo: `git push origin master`.
-- Deploy again: `git push heroku master`.
-- Check your deployed app: `heroku open`.
+- Commit to your repo: `git push origin master`
+- Deploy again: `git push heroku master`
+- Check your deployed app: `heroku open`
