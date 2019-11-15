@@ -20,13 +20,42 @@ The app would have the appropriate models and associations set up according to t
 
 ## What I Changed 
 - Use PostgreSQL instead of SQLite3 to make deployment easier.
+- Deploy early on Heroku instead of waiting until the end of Lesson 3.
 
 ## What I Added
 - How to install Bootstrap.
-- Deploy early on Heroku instead of waiting until the end of Lesson 3.
 
 ## Table of Contents
-[TODO]
+* [Create new application](#create-new-application)
+* [Create tables](#create-tables)
+   * [Users](#users)
+   * [Posts](#posts)
+   * [Comments](#comments)
+   * [Categories](#categories)
+   * [PostCategories](#postcategories)
+* [Create a new git repository and make the first commit](#create-a-new-git-repository-and-make-the-first-commit)
+* [Create models](#create-models)
+   * [User](#user)
+   * [Post](#post)
+   * [Comment](#comment)
+   * [Category](#category)
+   * [PostCategory](#postcategory)
+* [Check associations](#check-associations)
+   * [1:M association between User and Post](#1m-association-between-user-and-post)
+   * [1:M association between User and Comment](#1m-association-between-user-and-comment)
+   * [1:M association between Post and Comment](#1m-association-between-post-and-comment)
+   * [M:M association between Post and Categories](#mm-association-between-post-and-categories)
+* [Create routes](#create-routes)
+* [Create controllers](#create-controllers)
+* [Install Bootstrap 4](#install-bootstrap-4)
+* [Create views](#create-views)
+   * [Shared](#shared)
+   * [Posts](#posts-1)
+   * [Categories](#categories-1)
+* [Change the association name](#change-the-association-name)
+* [Deploy](#deploy)
+* [Additional styling](#additional-styling)
+* [Commit and deploy again](#commit-and-deploy-again)
 
 ## Create new application
 I use PostgreSQL instead of SQLite3.
@@ -126,7 +155,7 @@ class CreatePostCategories < ActiveRecord::Migration[6.0]
 end
 ```
 
-## Create a new git repository and make the first commit.
+## Create a new git repository and make the first commit
 See [docs](https://help.github.com/en/github/getting-started-with-github/create-a-repo) for instructions.
 Remember to commit often!
 
@@ -255,14 +284,7 @@ pp bok_choy.categories # ["food", "cat"]
   ```
 - Check that the output for `rails routes -g posts` and `rails routes -g categories` do not contain a route for the DELETE method.
  
-## Create controllers and views
-Create controllers and views to view:
-- all posts
-- a specific post and its associated categories
-- all categories
-- a specific category and its associated posts
-
-### Create controllers
+## Create controllers
 ```ruby
 # app/controllers/posts.rb
 
@@ -291,14 +313,14 @@ class CategoriesController < ApplicationController
 end
 ```
 
-### Install Bootstrap 4
+## Install Bootstrap 4
 I followed the instructions in this [article](https://hackernoon.com/integrate-bootstrap-4-and-font-awesome-5-in-rails-6-u87u32zd).
 
 [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome. The article linked to above includes instructions on how to integrate it in your app.
 
 [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): The `well` class is frequently used in the videos. This class was dropped in Bootstrap v4. I use the [`cards`](https://getbootstrap.com/docs/4.0/components/card/) component in my code, which provides similar functionality.
 
-### Create views
+## Create views
 - After the views are created, navigate to the URLs in the browser to verify that the responses are as expected.
   - posts#index: `localhost:3000/posts`
   - posts#show: `localhost:3000/posts/:id`
@@ -308,7 +330,7 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 - I use partials here, which are covered later in the course.
 - I style my app differently from the one in the videos.
 
-#### Shared
+### Shared
 ```
 # header partial
 # app/views/shared/_header.html.erb
@@ -354,7 +376,7 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 </nav>
 ```
  
-#### Posts
+### Posts
 ```
 # post partial
 # app/views/posts/_post.html.erb
@@ -406,7 +428,7 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 </section>
 ```
 
-#### Categories
+### Categories
 ```
 # app/views/categories/index.html.erb
 
@@ -471,4 +493,8 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
   } 
   ```
 - Add `@import 'custom';` to `app/javascript/stylesheets`.
-- Commit to your repo and deploy again.
+
+## Commit and deploy again
+- Commit to your repo: `git push origin master`.
+- Deploy again: `git push heroku master`.
+- Check your deployed app: `heroku open`.
