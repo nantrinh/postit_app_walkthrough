@@ -14,16 +14,18 @@ In this lesson, I set up a new application based on the following entity relatio
   - a specific category and its associated posts
 - Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
 
-## My Additions/Changes/Clarifications
-- Use postgresql instead of sqlite3 to make deployment easier.
-- Add instructions on how to install Bootstrap. I had difficulty figuring out to do this, so I want to share the article that helped me.
-- Deploy early on Heroku instead of waiting until the end of Lesson 3. I add this here because that is what I wish I did when I went through the course initially. It would have saved me much headache and frustration.
+## What I Changed 
+- Use PostgreSQL instead of SQLite3 to make deployment easier.
+
+## What I Added
+- How to install Bootstrap.
+- Deploy early on Heroku instead of waiting until the end of Lesson 3.
 
 ## Table of Contents
 [TODO]
 
 ## Create new application
-I use PostgreSQL instead of sqlite3 to make deployment easier.
+I use PostgreSQL instead of SQLite3.
 Helpful articles: [1](https://launchschool.com/blog/how-to-install-postgres-for-linux), [2](https://www.digitalocean.com/community/tutorials/how-to-set-up-ruby-on-rails-with-postgres)
 
 Make sure you are not in an existing git repo. It would be easier to deploy if the app is in its own repo and not nested within another one.
@@ -188,7 +190,7 @@ nancy = User.create(username: 'Nancy')
 victor = User.create(username: 'Victor')
 chili = Post.create(title: 'How to make chili oil', url: 'woksoflife.com', description: 'great recipe on how to make chili oil', user: nancy)
 compost = Post.create(title: 'How to make compost', url: 'urbangardening.com', description: 'compost recipe using coffee grounds', user: nancy)
-bok_choy = Post.create(title: 'Why bok choy is great for cats', url: 'loveyourcats.com', description: 'argument for more greens in your cat's diet', user: victor)
+bok_choy = Post.create(title: 'Why bok choy is great for cats', url: 'loveyourcats.com', description: "argument for more greens in your cat's diet", user: victor)
 
 pp User.all # print all users
 pp Post.all # print all posts
@@ -286,8 +288,9 @@ end
 ```
 
 ### Install Bootstrap 4
-I followed the instructions in this [article](https://medium.com/@guilhermepejon/how-to-install-bootstrap-4-3-in-a-rails-6-app-using-webpack-9eae7a6e2832).
-- [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome. The article linked to above includes instructions on how to integrate it in your app.
+I followed the instructions in this [article](https://hackernoon.com/integrate-bootstrap-4-and-font-awesome-5-in-rails-6-u87u32zd).
+
+[NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome. The article linked to above includes instructions on how to integrate it in your app.
 
 ### Create views
 - After the views are created, navigate to the URLs in the browser to verify that the responses are as expected.
@@ -434,4 +437,14 @@ I followed the instructions in this [article](https://medium.com/@guilhermepejon
 - In the views, change all instances of `post.user` to `post.creator`.
 
 ## Deploy
+- I followed the instructions in this [article](https://devcenter.heroku.com/articles/getting-started-with-rails6).
+- Add data to your app using the rails console on heroku (`heroku run rails console`) and check that it is displayed as intended. You can use the commands from the [Check Associations](#check-associations) section to add the same data that we added to the development database.
 
+## Additional styling 
+
+
+# TODO
+- deploy!!!
+- add the custom css to postit app to make cards uniform width
+- add the additonal styles to postit app (the truncating in the cards, mainly) 
+- change the association name in postit app
