@@ -180,6 +180,38 @@ end
 <% end %>
 ```
 
+### Add links to the `new` views in the navigation bar
+Add the two list items below to `app/views/shared/_nav.html.erb`.
+```
+<li class='nav-item'>
+  <%= link_to 'New Post', new_post_path, class: 'nav-link' %>
+</li>
+<li class='nav-item'>
+  <%= link_to 'New Category', new_category_path, class: 'nav-link' %>
+</li>
+```
+
+### Display `flash` messages 
+- Add `<%= render 'shared/flash' %>` to `app/views/shared/_header.html.erb`.
+- Create `flash` partial.
+  ```
+  # app/views/shared/_flash.html.erb 
+  
+  <% if flash[:notice] %>
+    <div class="alert alert-success">
+      <div class="container">
+        <%= flash[:notice] %>
+      </div>
+    </div>
+  <% elsif flash[:error] %>
+    <div class="alert alert-danger">
+      <div class="container">
+        <%= flash[:error] %>
+      </div>
+    </div>
+  <% end %>
+  ```
+
 ### Test your changes.
 TODO: add gif and add to description
 - Create a new post.
