@@ -106,7 +106,8 @@ end
 ```
 
 ### Add `new` views
-[Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_for`, which is used in the course videos, is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that your code will not break and no deprecation warning will be displayed if you use `form_for`, but it will be removed in the future. It is best to use `form_with` instead, which was introduced in Rails 5.1. 
+- [Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_for`, which is used in the course videos, is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that your code will not break and no deprecation warning will be displayed if you use `form_for`, but it will be removed in the future. It is best to use `form_with` instead, which was introduced in Rails 5.1. 
+- [Note](https://guides.rubyonrails.org/v6.0/working_with_javascript_in_rails.html#form-with): `form_with` submits forms using Ajax by default. To display the validation error messages properly, we can disable this behavior by setting the `local` option to `true`, as shown in the code below.
 
 #### Posts 
 ```
@@ -119,7 +120,6 @@ end
 ```
 # app/views/posts/_form.html.erb
   
-<%= render 'shared/errors', obj: @post %>
 <section class='container'>
   <%= form_with(model: @post, local: true, html: {autocomplete: 'off'}) do |f| %>
     <div class='form-group'>
@@ -150,7 +150,6 @@ end
 ```
 # app/views/categories/_form.html.erb
   
-<%= render 'shared/errors', obj: @category %>
 <section class='container'>
   <%= form_with(model: @category, local: true, html: {autocomplete: 'off'}) do |f| %>
     <div class='form-group'>
@@ -163,22 +162,7 @@ end
 ```
 
 #### Shared
-```
-# app/views/shared/_errors.html.erb
-  
-<% if obj.errors.any? %>
-  <section class="alert alert-danger">
-    <div class="container">
-    <h5>Please fix the following errors:</h5>
-    <ul>
-      <% obj.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-    </div>
-  </section>
-<% end %>
-```
+
 
 ### Add links to the `new` views in the navigation bar
 Add the two list items below to `app/views/shared/_nav.html.erb`.
@@ -212,7 +196,7 @@ Add the two list items below to `app/views/shared/_nav.html.erb`.
   <% end %>
   ```
 
-### Test your changes, commit, deploy, and test again
+### Test your changes and deploy
 Remember to create the test user in your production database too.
 - `heroku run rails console`
 - `User.create(username: 'Test')`
@@ -221,63 +205,66 @@ Demo:
 ![](../gifs/lesson_2_new_post_and_new_category.gif)
 
 
-### Add validations for a new post
-- Add validations to model.
-  ```ruby
-  # app/models/post.rb
+### Add validations
+```ruby
+# app/models/post.rb
   
-  class Post < ActiveRecord::Base
-    belongs_to :creator, class_name: "User", foreign_key: "user_id"
-    has_many :comments, dependent: :destroy
-    has_many :post_categories, dependent: :destroy
-    has_many :categories, through: :post_categories
-  
-    validates :title, presence: true, length: {minimum: 5}
-    validates :url, presence: true, uniqueness: true
-    validates :description, presence: true
-  end
-  ```
-- Display validation errors in `new` view.
-  - [Note](https://guides.rubyonrails.org/v6.0/working_with_javascript_in_rails.html#form-with): `form_with` submits forms using Ajax by default. To follow along with the exercise in class, disable this behavior by setting the `local` option to `true`.
-  ```ruby
-  # app/views/posts/new.html.erb
-  
-  <h4>Create a new post</h4>
-  
-  <% if @post.errors.any? %>
-    <h5>Please fix the following errors:</h5>
-    <ul>
-      <% @post.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  <% end %>
-  
-  <%= form_with(model: @post, local: true) do |f| %>
-    <div>
-      <%= f.label :title %>
-      <%= f.text_field :title %>
-    </div>
-    <div>
-      <%= f.label :url %>
-      <%= f.text_field :url %>
-    </div>
-    <div>
-      <%= f.label :description %>
-      <%= f.text_area :description, rows: 5 %>
-    </div>
-    <%= f.submit "Create Post" %>
-  <% end %>
+class Post < ActiveRecord::Base
+  belongs_to :creator, class_name: "User", foreign_key: "user_id"
+  has_many :comments, dependent: :destroy
+  has_many :post_categories, dependent: :destroy
+  has_many :categories, through: :post_categories
 
-  <%= link_to "All Posts", posts_path %>
-  ```
-- Test your changes.
-  - Try to submit a new post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
-  - Check that the error messages show up in the view as intended.
-  - Check that the post is created successfully if all validations are satisfied.
+  validates :title, presence: true, length: {minimum: 5}
+  validates :url, presence: true, uniqueness: true
+  validates :description, presence: true
+end
+```
+```ruby
+# app/models/category.rb
 
-### Allow a user to edit a post
-- Add `edit` and `update` actions.
+class Category < ApplicationRecord
+  has_many :post_categories, dependent: :destroy
+  has_many :posts , through: :post_categories
+
+  validates :name, presence: true, uniqueness: true
+end
+```
+
+### Display validation errors in `new` view.
+We set the `local` option to `true` in the forms already (see note in [Add new views](#add-new-views), so what we have to do now is render the errors if there are any.
+
+- Add `<%= render 'shared/errors', obj: @post` to `app/views/posts/_form.html.erb`.
+- Add `<%= render 'shared/errors', obj: @category` to `app/views/categories/_form.html.erb`.
+- Create an errors partial.
+  ```
+  # app/views/shared/_errors.html.erb
+    
+  <% if obj.errors.any? %>
+    <section class="alert alert-danger">
+      <div class="container">
+      <h5>Please fix the following errors:</h5>
+      <ul>
+        <% obj.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+      </div>
+    </section>
+  <% end %>
+  ```
+
+### Test your changes and deploy
+- Try to submit a new post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
+- Check that the error messages show up in the view as intended.
+- Check that the post is created successfully if all validations are satisfied.
+- Repeat the above steps for a new category.
+
+Demo:
+![](../gifs/lesson_2_validations.gif)
+
+
+### Add `edit` and `update` actions for posts.
   ```ruby
   # app/controllers/posts_controller.rb
   
