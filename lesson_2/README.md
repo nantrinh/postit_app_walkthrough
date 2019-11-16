@@ -218,7 +218,7 @@ Remember to create the test user in your production database too.
 - `User.create(username: 'Test')`
 
 Demo:
-![](../gifs/lesson_2_new_demo.gif)
+![](../gifs/lesson_2_new_post_and_new_category.gif)
 
 
 ### Add validations for a new post

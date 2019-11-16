@@ -1,7 +1,7 @@
 # Lesson 1
 At the end of this lesson, we would have an app deployed on heroku that supports the `posts#index`, `posts#show`, `categories#index`, and `categories#show` actions.
 
-![](../gifs/postit_lessson_1_demo.gif)
+![](../gifs/lesson_1.gif)
 
 The app would have the appropriate models and associations set up according to this entity relationship diagram:
 
