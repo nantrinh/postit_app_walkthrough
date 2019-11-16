@@ -212,10 +212,14 @@ Add the two list items below to `app/views/shared/_nav.html.erb`.
   <% end %>
   ```
 
-### Test your changes.
-TODO: add gif and add to description
-- Create a new post.
-- Create a new category.
+### Test your changes, commit, deploy, and test again
+Remember to create the test user in your production database too.
+- `heroku run rails console`
+- `User.create(username: 'Test')`
+
+Demo:
+![](../gifs/lesson_2_new_demo.gif)
+
 
 ### Add validations for a new post
 - Add validations to model.
