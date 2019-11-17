@@ -1,12 +1,8 @@
 # Lesson 2
 
-## Table of Contents
-[TODO]
-
-## Lecture 3 
-
 ### Course Instructions
-#### New Post
+#### Lecture 3
+##### Posts
 - Allow a user to create a new post. Use a model-backed form.
 - Add the following validations for a new post. Display validation errors in the `new` view.
   - Require `title`, `url`, and `description`.
@@ -15,7 +11,7 @@
 - Allow a user to update a post. Use a model-backed form.
 - Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
 - Extract common code used in the `new` and `edit` views to partials.
-#### New Category
+##### Categories
 - Allow a user to create a new category. Use a model-backed form.
 - Add the following validations for a new post. Display validation errors in the `new` view.
   - Require `name`.
@@ -24,6 +20,27 @@
 
 ### What I Changed
 I only show the code with partials, for brevity's sake, since this is the third time I'm returning to this lesson. The course videos show the step-by-step approach, with commentary.
+
+## Table of Contents
+* [Lecture 3](#lecture-3)
+   * [Create a test user](#create-a-test-user)
+   * [Add new and create actions](#add-new-and-create-actions)
+   * [Add new views](#add-new-views)
+      * [Posts](#posts)
+      * [Categories](#categories)
+      * [Shared](#shared)
+   * [Add links to the new views in the navigation bar](#add-links-to-the-new-views-in-the-navigation-bar)
+   * [Display flash messages](#display-flash-messages)
+   * [Test your changes and deploy](#test-your-changes-and-deploy)
+   * [Add validations](#add-validations)
+   * [Display validation errors in new view](#display-validation-errors-in-new-view)
+   * [Test your changes and deploy](#test-your-changes-and-deploy-1)
+   * [Add edit and update actions for posts](#add-edit-and-update-actions-for-posts)
+   * [Add edit view for posts](#add-edit-view-for-posts)
+   * [Add links to edit each post](#add-links-to-edit-each-post)
+   * [Test your changes and deploy](#test-your-changes-and-deploy-2)
+
+## Lecture 3 
 
 ### Create a test user
 Run `User.create(username: "Test")` in rails console.
@@ -231,7 +248,7 @@ class Category < ApplicationRecord
 end
 ```
 
-### Display validation errors in `new` view.
+### Display validation errors in `new` view
 We set the `local` option to `true` in the forms already (see note in [Add new views](#add-new-views), so what we have to do now is render the errors if there are any.
 
 - Add `<%= render 'shared/errors', obj: @post` to `app/views/posts/_form.html.erb`.
@@ -263,7 +280,7 @@ We set the `local` option to `true` in the forms already (see note in [Add new v
 Demo:
 ![](../gifs/lesson_2_validations.gif)
 
-### Add `edit` and `update` actions for posts.
+### Add `edit` and `update` actions for posts
 I skip ahead and use `before_action` here to simplify the `show`, `edit`, and `update` actions.
 ```ruby
 # app/controllers/posts_controller.rb
@@ -329,7 +346,7 @@ end
 <%= render 'form' %>
 ```
 
-### Add links to edit each post. 
+### Add links to edit each post
 Add this button inside the `nav` in the footer of the post partial: `<%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>`
 
 ### Test your changes and deploy
@@ -337,6 +354,7 @@ Add this button inside the `nav` in the footer of the post partial: `<%= button_
   - Check that the error messages show up in the view as intended.
   - Check that the post is updated successfully if all validations are satisfied.
 
+Screenshots of the new post partial look and edit post page:
 ![post partial](../images/post_partials_with_edit_button.png)
 
 ![edit post page](../images/edit_post_page.png)
