@@ -332,14 +332,14 @@ end
 ### Add links to edit each post. 
 Add this button inside the `nav` in the footer of the post partial: `<%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>`
 
-![](../images/post_partials_with_edit_button.png)
-
-![](../images/edit_post_page.png)
-
 ### Test your changes and deploy
   - Try to update a post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
   - Check that the error messages show up in the view as intended.
   - Check that the post is updated successfully if all validations are satisfied.
+
+![post partial](../images/post_partials_with_edit_button.png)
+
+![edit post page](../images/edit_post_page.png)
 
 ## Lecture 4
 
