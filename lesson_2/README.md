@@ -502,47 +502,35 @@ Demo:
     params.require(:post).permit(:title, :url, :description, category_ids: [])
   end
   ```
-### Add helpers
-#### Allow a user to click on post URLs and navigate to those URLs
-Ensure that URLs are prepended with `"http://"` when displayed.
+
+### Allow a user to click on post URLs and navigate to those URLs
 ```
 # app/helpers/application_helper.rb 
 
 module ApplicationHelper
   def fix_url(str)
-    str.starts_with?("http://") ? str : "http://#{str}"
+    str.start_with?('http://', 'https://') ? str : "http://#{str}"
   end
 end
 ```
-Replace all instances of `obj.url` with `fix_url(obj.url)` in the views.
-
-  - `app/views/posts/index.html.erb` 
-    - Replace `post.url` with `fix_url(post.url)`.
-  - `app/views/posts/show.html.erb`
-    - Replace `@post.url` with `fix_url(@post.url)`.
-- Ensure that the `href` attributes are set to the URLs.
-- `app/views/posts/index.html.erb` 
-  - Replace `link_to fix_url(post.url)` with `link_to(body=fix_url(post.url), url=fix_url(post.url))`.
-- `app/views/posts/show.html.erb`
-  - Replace `link_to fix_url(@post.url)` with `link_to(body=fix_url(@post.url), url=fix_url(@post.url))`.
+Replace `post.url` with `link_to(body=fix_url(post.url), url=fix_url(post.url))` in `app/views/posts/_post.html.erb` and `shared/_header.html.erb`.
 
 ### Display timestamps in a format like "11/01/2019 7:01pm UTC" 
-- Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/date/rdoc/DateTime.html#method-i-strftime).
-- Add a helper.
+Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/date/rdoc/DateTime.html#method-i-strftime).
+- Add this method to `app/helpers/application_helper.rb`:
   ```
-  # app/helpers/application_helper.rb 
-  
-  module ApplicationHelper
-  
-    # code omitted for clarity 
-  
-    def display_datetime(dt)
-      dt.strftime("%m/%d/%Y %l:%M%P %Z")
-    end
+  def display_datetime(dt)
+    dt.strftime("%m/%d/%Y %l:%M%P %Z")
   end
   ```
-- `app/views/posts/show.html.erb`
-  - Replace `comment.created_at` with `display_datetime(comment.created_at)`.
+- Extract creator details to a partial.
+```
+# app/views/shared/_creator_details.html.erb
+
+<p><small class="text-muted"><%= "#{obj.creator.username} #{display_datetime(obj.created_at)}" %></small></p>
+```
+- Replace `<%= "#{post.creator.username} #{post.created_at}" %>` with `<%= render 'shared/creator_details', obj: post %>` in `app/views/posts/_post.html.erb` and `app/views/shared/_header.html.erb`.
+- Replace `<%= "#{comment.creator.username} #{comment.created_at}" %>` with `<%= render 'shared/creator_details', obj: comment %>` in `app/views/comments/_comment.html.erb`.
 
 ### Additional styling
 - Sort posts in descending order of `created_at`.
