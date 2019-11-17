@@ -69,7 +69,6 @@ Demo of commenting on a post:
    * [Add route for comments](#add-route-for-comments)
    * [Create an new instance of a comment in the posts show action](#create-an-new-instance-of-a-comment-in-the-posts-show-action)
    * [Edit posts show view](#edit-posts-show-view)
-   * [Test your changes and deploy](#test-your-changes-and-deploy-3)
    * [Allow a user to associate a post with categories](#allow-a-user-to-associate-a-post-with-categories)
    * [Allow a user to click on post URLs and navigate to those URLs](#allow-a-user-to-click-on-post-urls-and-navigate-to-those-urls)
    * [Display timestamps in a format like "11/01/2019 7:01pm UTC"](#display-timestamps-in-a-format-like-11012019-701pm-utc)
@@ -394,6 +393,7 @@ Screenshots of the new post partial look and edit post page:
 ![edit post page](../images/edit_post_page.png)
 
 ## Lecture 4
+My reminders to test your changes and deploy are becoming repetitive, so I leave them out in this section, but it is a good idea to continue doing so with your app.
 
 ### Change the association name and add validation
 ```ruby
@@ -501,10 +501,6 @@ Add `@comment = Comment.new` to the `show` method in `app/controllers/posts_cont
   </footer>
 </article>
 ```
-
-### Test your changes and deploy
-Demo:
-![](../gifs/new_comment.gif)
 
 ### Allow a user to associate a post with categories
 - Note: If you want to mass assign an array, you have to use syntax like this in the permit method: `permit(category_ids: [])` .
