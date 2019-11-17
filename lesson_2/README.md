@@ -534,4 +534,27 @@ Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/da
 
 ### Additional styling
 - Sort posts in descending order of `created_at`.
-- Truncate displays
+  - Change the `index` method of PostsController to `@posts = Post.all.sort_by {|post| post.created_at}`.
+- Display newlines in post partial, but truncate display in order to keep all post "cards" of a uniform height.
+  - Add the following method to `app/helpers/application_helper.rb`
+  ```
+  def restrict_newlines(text, n)
+    text.count("\n") > n ? text.split("\n")[0..n].join("\n") + "..." : text
+  end
+  ```
+  - Replace `<%= post.description %>` with `<%= simple_format(truncate(restrict_newlines(post.description, 5), length: 130)) %>` in `app/views/posts/_post.html.erb`
+- Truncate the title if there are too many characters.
+  - Replace `<%= post.title %>` with `<%= truncate(post.title, length: 50) %>` in `app/views/posts/_post.html.erb`.
+- Truncate the url if there are too many characters. The code gets unwieldy so I extracted it to a partial.
+  ```
+  # app/views/posts/_post_url.html.erb
+
+  <% card ||= false %>
+  <% url_display = card ? truncate(fix_url(post.url), length: 28) : fix_url(post.url) %>
+
+  <p><%= link_to(body=url_display, url=fix_url(post.url)) %></p>
+  ```
+  - Replace `<%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %>` with `<%= render 'posts/post_url', post: post, card: true %>` in `app/views/posts/_post.html.erb`.
+  - Replace  `<%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %>` with `<%= render 'posts/post_url', post: post %>` in `app/views/shared/_header.html.erb`.
+
+### Test your changes and deploy
