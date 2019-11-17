@@ -21,9 +21,11 @@ The app would have the appropriate models and associations set up according to t
 ## What I Changed 
 - Use PostgreSQL instead of SQLite3 to make deployment easier.
 - Deploy early on Heroku instead of waiting until the end of Lesson 3.
+- I style the app differently.
 
 ## What I Added
 - How to install Bootstrap.
+- Fixed width and height of post partials.
 
 ## Table of Contents
 * [Create new application](#create-new-application)
@@ -328,7 +330,7 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
   - categories#show: `localhost:3000/categories/:id`
 - Make sure your server is running before checking the URLs (run `rails server`).
 - I use partials here, which are covered later in the course.
-- I style my app differently from the one in the videos.
+- REMINDER: I style my app differently from the one in the videos.
 
 ### Shared
 [Note](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials): Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore.
