@@ -64,7 +64,7 @@ class PostsController < ApplicationController
   private
 
   def post_params
-    params.require(:post).permit!
+    params.require(:post).permit(:title, :url, :description)
   end
 end
 ```
@@ -263,334 +263,83 @@ We set the `local` option to `true` in the forms already (see note in [Add new v
 Demo:
 ![](../gifs/lesson_2_validations.gif)
 
-
 ### Add `edit` and `update` actions for posts.
-  ```ruby
-  # app/controllers/posts_controller.rb
-  
-  class PostsController < ApplicationController
-  
-    # code omitted for brevity 
-  
-    def edit
-      @post = Post.find(params[:id])
-    end
-  
-    def update
-      @post = Post.find(params[:id])
-  
-      if @post.update(post_params)
-        flash[:notice] = "This post was updated."
-        redirect_to post_path(@post)
-      else
-        render :edit
-      end
-    end
-  
-    private
-  
-    def post_params
-      params.require(:post).permit!
+I skip ahead and use `before_action` here to simplify the `show`, `edit`, and `update` actions.
+```ruby
+# app/controllers/posts_controller.rb
+
+class PostsController < ApplicationController
+  before_action :set_post, only: [:show, :edit, :update]
+
+  def index
+    @posts = Post.all
+  end
+
+  def new
+    @post = Post.new
+  end
+
+  def create
+    @post = Post.new(post_params)
+
+    @post.creator = User.find_by username: 'Test' 
+
+    if @post.save
+      flash[:notice] = 'Your post was created.'
+      redirect_to post_path(@post)
+    else
+      render :new
     end
   end
-  ```
-- Add `edit` view.
-  ```ruby
-  # app/views/posts/edit.html.erb 
-  
-  <h4>Edit this post</h4>
-  
-  <% if @post.errors.any? %>
-    <h5>Please fix the following errors:</h5>
-    <ul>
-      <% @post.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  <% end %>
-  
-  <%= form_with(model: @post, local: true) do |f| %>
-    <div>
-      <%= f.label :title %>
-      <%= f.text_field :title %>
-    </div>
-    <div>
-      <%= f.label :url %>
-      <%= f.text_field :url %>
-    </div>
-    <div>
-      <%= f.label :description %>
-      <%= f.text_area :description, rows: 5 %>
-    </div>
-    <%= f.submit "Update Post" %>
-  <% end %>
 
-  <%= link_to "All Posts", posts_path %>
-  ```
-- Add links to edit each post. 
-  ```ruby
-  # app/views/posts/index.html.erb
+  def show
+  end
 
-  <h1>Posts</h1>
-  
-  <%= link_to "New Post", new_post_path %>
-  
-  <% if flash[:notice] %>
-    <div><%= flash[:notice] %></div>
-  <% end %>
-   
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>URL</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-   
-    <tbody>
-      <% @posts.each do |post| %>
-        <tr>
-          <td><%= post.title %></td>
-          <td><%= post.url %></td>
-          <td><%= post.description %></td>
-          <td><%= link_to "Show", post %></td>
-          <td><%= link_to "Edit", edit_post_path(post) %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-  ```
-- Test your changes.
+  def edit
+  end
+
+  def update
+    if @post.update(post_params)
+      flash[:notice] = 'This post was updated.'
+      redirect_to post_path(@post)
+    else
+      render :edit
+    end
+  end
+
+  private
+
+  def post_params
+    params.require(:post).permit(:title, :url, :description)
+  end
+
+  def set_post
+    @post = Post.find(params[:id])
+  end
+end
+```
+
+### Add `edit` view for posts
+- [Note](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit): In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post". The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
+
+```ruby
+# app/views/posts/edit.html.erb 
+
+<%= render 'shared/header', title: 'Edit this post' %>
+<%= render 'form' %>
+```
+
+### Add links to edit each post. 
+Add this button inside the `nav` in the footer of the post partial: `<%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>`
+
+![](../images/post_partials_with_edit_button.png)
+
+![](../images/edit_post_page.png)
+
+### Test your changes and deploy
   - Try to update a post with inputs that trigger all of the validation errors, then change the inputs incrementally to pass each of the validations in turn.
   - Check that the error messages show up in the view as intended.
   - Check that the post is updated successfully if all validations are satisfied.
-
-### Simplify posts controller using `before_action`
-  ```ruby
-  # app/controllers/posts_controller.rb
-  
-  class PostsController < ApplicationController
-    before_action :set_post, only: [:show, :edit, :update]
-  
-    # code omitted for brevity
-  
-    def show
-    end
-  
-    # code omitted for brevity
-  
-    def edit
-    end
-  
-    def update
-      if @post.update(post_params)
-        flash[:notice] = "This post was updated."
-        redirect_to post_path(@post)
-      else
-        render :edit
-      end
-    end
-  
-    private
-  
-    # code omitted for brevity
-  
-    def set_post
-      @post = Post.find(params[:id])
-    end
-  end
-  ```
-
-### Extract common code in the `new` and `edit` views to a partial
-- [Note](https://api.rubyonrails.org/v6.0.0/classes/ActionView/Helpers/FormBuilder.html#method-i-submit): In Rails 6, when no value is given for the `submit` method, if the ActiveRecord object is a new record, it will use "Create Post" as the submit button label; otherwise it uses "Update Post". The Launch School videos show an older version of Rails, so they coded this behavior explicitly.
-- [Note](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials): Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore.
-  ```ruby
-  # app/views/posts/_form.html.erb
-  
-  <% if @post.errors.any? %>
-    <h5>Please fix the following errors:</h5>
-    <ul>
-      <% @post.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  <% end %>
-  
-  <%= form_with(model: @post, local: true) do |f| %>
-    <div>
-      <%= f.label :title %>
-      <%= f.text_field :title %>
-    </div>
-    <div>
-      <%= f.label :url %>
-      <%= f.text_field :url %>
-    </div>
-    <div>
-      <%= f.label :description %>
-      <%= f.text_area :description, rows: 5 %>
-    </div>
-    <%= f.submit %>
-  <% end %>
-  ```
-
-  ```ruby
-  # app/views/posts/new.html.erb
-  
-  <h4>Create a new post</h4>
-  
-  <%= render 'form' %>
-
-  <%= link_to "All Posts", posts_path %>
-  ```
-
-  ```ruby
-  # app/views/posts/edit.html.erb
-  
-  <h4>Edit this post</h4>
-  
-  <%= render 'form' %>
-
-  <%= link_to "All Posts", posts_path %>
-  ```
-- Test your changes.
-  - Verify that the behavior of the `new` and `edit` views are unaffected.
-
-### Allow a user to create a new category
-- Add `new` and `create` actions. Downcase the name before saving.
-  ```ruby
-  # app/controllers/categories_controller.rb
-
-  class CategoriesController < ApplicationController
-    # code omitted for brevity
-  
-    def new
-      @category = Category.new
-    end
-  
-    def create
-      @category = Category.new(category_params)  
-      @category.name = @category.name.downcase
-  
-      if @category.save
-        flash[:notice] = "A new category was created."
-        redirect_to categories_path
-      else
-        render :new 
-      end
-    end
-  
-    # code omitted for brevity
-  
-    private
-  
-    def category_params
-      params.require(:category).permit!
-    end
-  end
-  ```
-- Add validation for a new category.
-  ```ruby
-  # app/models/category.rb 
-
-  class Category < ApplicationRecord
-    has_many :post_categories, dependent: :destroy
-    has_many :posts , through: :post_categories
-  
-    validates :name, presence: true, uniqueness: true
-  end
-  ```
-- Add `new` view. Use a partial.
-  ```ruby
-  # app/views/categories/new.html.erb
-
-  <h4>Create a new post</h4>
-  
-  <%= render 'form' %>
-  ```
-
-  ```ruby
-  # app/views/categories/_form.html.erb
-
-  <% if @category.errors.any? %>
-    <h5>Please fix the following errors:</h5>
-    <ul>
-      <% @category.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  <% end %>
-
-  <%= form_with(model: @category, local: true) do |f| %>
-    <div>
-      <%= f.label :name %>
-      <%= f.text_field :name %>
-    </div>
-    <%= f.submit %>
-  <% end %>
-  ```
-- Edit `index` view.
-  - Add link to create a new category.
-  - Add flash notice display using partial.
-  ```ruby
-  # app/views/categories/index.html.erb
-  
-  <%= render 'shared/flash' %>
-  <%= link_to "New Category", new_category_path %>
-
-  # code omitted for brevity
-  ```
-- Test your changes.
-  - Create a new category.
-  - Check `index` view ("/categories") to see if the category was created.
-
-### Extract validation error code to a partial
-```ruby
-# app/views/posts/_form.html.erb
-
-<%= render 'shared/errors', obj: @post %>
-
-<%= form_with(model: @post, local: true) do |f| %>
-  <div>
-    <%= f.label :title %>
-    <%= f.text_field :title %>
-  </div>
-  <div>
-    <%= f.label :url %>
-    <%= f.text_field :url %>
-  </div>
-  <div>
-    <%= f.label :description %>
-    <%= f.text_area :description, rows: 5 %>
-  </div>
-  <%= f.submit %>
-<% end %>
-```
-```ruby
-# app/views/categories/_form.html.erb
-
-<%= render 'shared/errors', obj: @category %>
-
-<%= form_with(model: @category, local: true) do |f| %>
-  <div>
-    <%= f.label :name %>
-    <%= f.text_field :name %>
-  </div>
-  <%= f.submit %>
-<% end %>
-```
-```ruby
-# app/views/shared/_errors.html.erb
-
-<% if obj.errors.any? %>
-  <h5>Please fix the following errors:</h5>
-  <ul>
-    <% obj.errors.full_messages.each do |msg| %>
-      <li><%= msg %></li>
-    <% end %>
-  </ul>
-<% end %>
-```
 
 ## Lecture 4
 
@@ -806,3 +555,6 @@ Demo:
 ### Additional Changes
 - Add a link to edit the post on the post `show` view 
   - Add `<%= link_to "Edit Post", edit_post_path %>` to `app/views/posts/show.html.erb`
+
+### Additional styling
+- Sort posts in descending order of `created_at`.

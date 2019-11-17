@@ -331,6 +331,7 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 - I style my app differently from the one in the videos.
 
 ### Shared
+[Note](https://guides.rubyonrails.org/layouts_and_rendering.html#naming-partials): Partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore.
 ```
 # header partial
 # app/views/shared/_header.html.erb
