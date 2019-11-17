@@ -470,8 +470,20 @@ Add `@comment = Comment.new` to the `show` method in `app/controllers/posts_cont
 ```
 # app/views/comments/_comment.html.erb
 
-
+<article class="card bg-light mb-3" style="max-width: 18rem;">
+  <main class="card-body">
+    <p class="card-text"><%= comment.body %></p>
+  </main>
+  
+  <footer class='card-footer'>
+    <%= "#{comment.creator.username} #{comment.created_at}" %>
+  </footer>
+</article>
 ```
+
+### Test your changes and deploy
+Demo:
+![](../gifs/new_comment.gif)
 
 ### Allow a user to associate a post with categories
 - Note: If you want to mass assign an array, you have to use syntax like this in the permit method: `permit(category_ids: [])` .
