@@ -1,6 +1,11 @@
 # Lesson 2
 At the end of this lesson, the app will allow a user to create and update new posts, create new categories, and comment on posts. 
-![](../gifs/lesson_2.gif)
+
+Demo of creating a new post, creating a new category, and updating a post:
+![](../gifs/new_post_new_category_update_post.gif)
+
+Demo of commenting on a post:
+![](../gifs/new_comment.gif)
 
 ### Course Instructions
 #### Lecture 3
