@@ -383,27 +383,24 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
 # app/views/posts/_post.html.erb
 
 <article class='card bg-light m-3 post'>
-  <div class='row no-gutters h-100'>
-    <section>
-      <header class='card-header'>
-        <h5><%= post.title %></h5>
-      </header>
-  
-      <main class='card-body'>
-        <%= post.url %>
-        <p class='card-text'>
-          <%= post.description %>
-        </p>
-      </main>
-  
-      <footer class='card-footer'>
-        <%= "#{post.user.username} #{post.created_at}" %>
-        <nav class='btn-group mt-auto'>
-          <%= button_to 'View', post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary' %>
-        </nav>
-      </footer>
-    </section>
-  </div>
+  <header class='card-header'>
+    <h5><%= post.title %></h5>
+  </header>
+
+  <main class='card-body'>
+    <%= post.url %>
+    <p class='card-text'>
+      <%= post.description %>
+    </p>
+  </main>
+
+  <footer class='card-footer'>
+    <%= "#{post.creator.username} #{post.created_at}" %>
+    <nav class='btn-group mt-auto'>
+      <%= button_to 'View', post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary' %>
+      <%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>
+    </nav>
+  </footer>
 </article>
 ```
 
@@ -474,23 +471,23 @@ I followed the instructions in this [article](https://hackernoon.com/integrate-b
   ```
   # app/javascript/stylesheets/_custom.scss
 
-  .card {
-    &.post {
+  .post {
+    &.card {
       width: 18rem;
       height: 26rem;
     }
-  }
   
-  .card-header {
-    height: 5rem;
-  }
+    .card-header {
+      height: 5rem;
+    }
   
-  .card-body {
-    height: 15rem;
-  }
+    .card-body {
+      height: 15rem;
+    }
   
-  .card-footer {
+    .card-footer {
     height: 6rem;
+    }
   } 
   ```
 - Add `@import 'custom';` to `app/javascript/stylesheets`.
