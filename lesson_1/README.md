@@ -59,6 +59,8 @@ The app would have the appropriate models and associations set up according to t
 * [Additional styling](#additional-styling)
 * [Commit and deploy again](#commit-and-deploy-again)
 
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Create new application
 I use PostgreSQL instead of SQLite3.
 Helpful articles: [1](https://launchschool.com/blog/how-to-install-postgres-for-linux), [2](https://www.digitalocean.com/community/tutorials/how-to-set-up-ruby-on-rails-with-postgres)
