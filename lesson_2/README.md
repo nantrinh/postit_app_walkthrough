@@ -1,4 +1,6 @@
 # Lesson 2
+At the end of this lesson, the app will allow a user to create and update new posts, create new categories, and comment on posts. 
+![](../gifs/lesson_2.gif)
 
 ### Course Instructions
 #### Lecture 3
@@ -18,17 +20,34 @@
   - `name` must be unique.
 - Extract the part of the category and post forms that displays validation errors to a partial.
 
+#### Lecture 4 
+- Change the association name between comments and user to comments and creator.
+- Allow a user to create a new comment on a post.
+  - The form for a new comment should be displayed on the posts `show` view.
+  - The form should be submitted via a POST request to `/posts/:post_id/comments`.
+- Add the following validations for a new comment. Display validation errors in the posts `show` view.
+  - Require `body`.
+- Display all comments related to a post on the posts `show` view.
+- Allow a user to associate a post with categories when creating a new post and when editing a post.
+- Allow a user to click on post URLs and navigate to those URLs.
+- Display timestamps in a format like "11/01/2019 7:01pm UTC".
+- Add a link to edit the post on the post `show` view.
+
 ### What I Changed
-I only show the code with partials, for brevity's sake, since this is the third time I'm returning to this lesson. The course videos show the step-by-step approach, with commentary.
+- I only show the code with partials, for brevity's sake, since this is the third time I'm returning to this lesson. The course videos show the step-by-step approach, with commentary.
+- Sort posts in descending order of `created_at`.
+
+### What I Added
+- Display newlines in the post description.
+- Truncate post title, url, and description to fit in the fixed size post partials.
 
 ## Table of Contents
-* [Lecture 3](#lecture-3)
+* [Lecture 3](#lecture-3-1)
    * [Create a test user](#create-a-test-user)
-   * [Add new and create actions](#add-new-and-create-actions)
-   * [Add new views](#add-new-views)
-      * [Posts](#posts)
-      * [Categories](#categories)
-      * [Shared](#shared)
+   * [Add new and create actions for posts and categories](#add-new-and-create-actions-for-posts-and-categories)
+   * [Add new views for posts and categories](#add-new-views-for-posts-and-categories)
+      * [Posts](#posts-1)
+      * [Categories](#categories-1)
    * [Add links to the new views in the navigation bar](#add-links-to-the-new-views-in-the-navigation-bar)
    * [Display flash messages](#display-flash-messages)
    * [Test your changes and deploy](#test-your-changes-and-deploy)
@@ -39,6 +58,19 @@ I only show the code with partials, for brevity's sake, since this is the third 
    * [Add edit view for posts](#add-edit-view-for-posts)
    * [Add links to edit each post](#add-links-to-edit-each-post)
    * [Test your changes and deploy](#test-your-changes-and-deploy-2)
+* [Lecture 4](#lecture-4-1)
+   * [Change the association name and add validation](#change-the-association-name-and-add-validation)
+   * [Add create action for comments](#add-create-action-for-comments)
+   * [Add route for comments](#add-route-for-comments)
+   * [Create an new instance of a comment in the posts show action](#create-an-new-instance-of-a-comment-in-the-posts-show-action)
+   * [Edit posts show view](#edit-posts-show-view)
+   * [Test your changes and deploy](#test-your-changes-and-deploy-3)
+   * [Allow a user to associate a post with categories](#allow-a-user-to-associate-a-post-with-categories)
+   * [Allow a user to click on post URLs and navigate to those URLs](#allow-a-user-to-click-on-post-urls-and-navigate-to-those-urls)
+   * [Display timestamps in a format like "11/01/2019 7:01pm UTC"](#display-timestamps-in-a-format-like-11012019-701pm-utc)
+   * [Additional styling](#additional-styling)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 ## Lecture 3 
 
@@ -47,7 +79,7 @@ Run `User.create(username: "Test")` in rails console.
 
 This will serve as the creator of posts created through the `posts#create` action for now. The course covers how to add user authentication in a later lesson.
 
-### Add `new` and `create` actions
+### Add `new` and `create` actions for posts and categories
 ```ruby
 # app/controllers/posts_controller.rb
   
@@ -122,7 +154,7 @@ class CategoriesController < ApplicationController
 end
 ```
 
-### Add `new` views
+### Add `new` views for posts and categories
 - [Note](https://guides.rubyonrails.org/form_helpers.html#using-form-for-and-form-tag): `form_for`, which is used in the course videos, is now [soft-deprecated](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1), which means that your code will not break and no deprecation warning will be displayed if you use `form_for`, but it will be removed in the future. It is best to use `form_with` instead, which was introduced in Rails 5.1. 
 - [Note](https://guides.rubyonrails.org/v6.0/working_with_javascript_in_rails.html#form-with): `form_with` submits forms using Ajax by default. To display the validation error messages properly, we can disable this behavior by setting the `local` option to `true`, as shown in the code below.
 
@@ -177,9 +209,6 @@ end
   <% end %>
 </section>
 ```
-
-#### Shared
-
 
 ### Add links to the `new` views in the navigation bar
 Add the two list items below to `app/views/shared/_nav.html.erb`.
@@ -361,19 +390,6 @@ Screenshots of the new post partial look and edit post page:
 
 ## Lecture 4
 
-### Instructions
-- Change the association name between comments and user to comments and creator.
-- Allow a user to create a new comment on a post.
-  - The form for a new comment should be displayed on the posts `show` view.
-  - The form should be submitted via a POST request to `/posts/:post_id/comments`.
-- Add the following validations for a new comment. Display validation errors in the posts `show` view.
-  - Require `body`.
-- Display all comments related to a post on the posts `show` view.
-- Allow a user to associate a post with categories when creating a new post and when editing a post.
-- Allow a user to click on post URLs and navigate to those URLs.
-- Display timestamps in a format like "11/01/2019 7:01pm UTC".
-- Add a link to edit the post on the post `show` view.
-
 ### Change the association name and add validation
 ```ruby
 # app/models/comment.rb
@@ -386,7 +402,7 @@ class Comment < ApplicationRecord
 end
 ```
 
-### Add `create` action
+### Add `create` action for comments
 ```ruby
 # app/controllers/comments_controller.rb 
   
@@ -416,7 +432,7 @@ class CommentsController < ApplicationController
 end
 ```
 
-### Add nested route
+### Add route for comments
 ```ruby
 # config/routes.rb
 
@@ -556,5 +572,3 @@ Note: See Ruby docs for [`strftime`](https://ruby-doc.org/stdlib-2.6.1/libdoc/da
   ```
   - Replace `<%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %>` with `<%= render 'posts/post_url', post: post, card: true %>` in `app/views/posts/_post.html.erb`.
   - Replace  `<%= link_to(body=fix_url(post.url), url=fix_url(post.url)) %>` with `<%= render 'posts/post_url', post: post %>` in `app/views/shared/_header.html.erb`.
-
-### Test your changes and deploy
