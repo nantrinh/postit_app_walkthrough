@@ -487,12 +487,14 @@ Demo:
 
 ### Allow a user to associate a post with categories
 - Note: If you want to mass assign an array, you have to use syntax like this in the permit method: `permit(category_ids: [])` .
-- Add the code below to the form in `_form.html.erb`.
+- Add the code below to the form in `app/views/posts/_form.html.erb`.
   ```
-  <%= f.label "Categories" %>
-  <%= f.collection_check_boxes :category_ids, Category.all, :id, :name do |cb| %>
-    <% cb.label {cb.check_box + cb.text.capitalize} %>
-  <% end %>
+  <div>
+    <%= f.label "Categories:" %>
+    <%= f.collection_check_boxes :category_ids, Category.all, :id, :name do |cb| %>
+      <% cb.label(class: 'checkbox inline mx-2') {cb.check_box(class: 'checkbox mr-1') + cb.text.capitalize} %>
+    <% end %>
+  <div>
   ```
 - Modify the `post_params` method in `app/controllers/posts_controller.rb`.
   ```
@@ -500,18 +502,20 @@ Demo:
     params.require(:post).permit(:title, :url, :description, category_ids: [])
   end
   ```
-### Allow a user to click on post URLs and navigate to those URLs
-- Ensure that URLs are prepended with `"http://"` when displayed.
-  - Add a helper.
-  ```
-  # app/helpers/application_helper.rb 
+### Add helpers
+#### Allow a user to click on post URLs and navigate to those URLs
+Ensure that URLs are prepended with `"http://"` when displayed.
+```
+# app/helpers/application_helper.rb 
 
-  module ApplicationHelper
-    def fix_url(str)
-      str.starts_with?("http://") ? str : "http://#{str}"
-    end
+module ApplicationHelper
+  def fix_url(str)
+    str.starts_with?("http://") ? str : "http://#{str}"
   end
-  ```
+end
+```
+Replace all instances of `obj.url` with `fix_url(obj.url)` in the views.
+
   - `app/views/posts/index.html.erb` 
     - Replace `post.url` with `fix_url(post.url)`.
   - `app/views/posts/show.html.erb`
@@ -542,3 +546,4 @@ Demo:
 
 ### Additional styling
 - Sort posts in descending order of `created_at`.
+- Truncate displays
