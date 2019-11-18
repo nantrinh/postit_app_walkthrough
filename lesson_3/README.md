@@ -5,6 +5,9 @@
    * [Lecture 5](#lecture-5)
       * [Sessions](#sessions)
       * [Users](#users)
+   * [Lecture 6](#lecture-6)
+   * [What I Changed](#what-i-changed)
+   * [What I Added](#what-i-added)
 * [Lecture 5](#lecture-5-1)
    * [Add password attribute to users](#add-password-attribute-to-users)
    * [Sessions](#sessions-1)
@@ -29,6 +32,15 @@
       * [Update the user-related links in the navigation bar](#update-the-user-related-links-in-the-navigation-bar)
       * [Check your changes and deploy](#check-your-changes-and-deploy)
       * [Demos](#demos)
+* [Lecture 6](#lecture-6-1)
+   * [Add routes to vote on a post or comment](#add-routes-to-vote-on-a-post-or-comment)
+   * [Create votes polymorphic table](#create-votes-polymorphic-table)
+   * [Create votes model](#create-votes-model)
+   * [Set up polymorphic association](#set-up-polymorphic-association)
+   * [Track the total votes per post and per comment](#track-the-total-votes-per-post-and-per-comment)
+   * [Check your changes in rails console](#check-your-changes-in-rails-console)
+   * [Add voting feature to the UI](#add-voting-feature-to-the-ui)
+   * [Add vote actions to posts and comments controllers](#add-vote-actions-to-posts-and-comments-controllers)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -72,6 +84,20 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 - Add a link to edit the user's profile in the users `show` view. 
 - Link to the `show` view for a user wherever you have the user name displayed.
 - Update the user-related links in the navigation bar.
+### Lecture 6 
+- Allow logged-in users to upvote or downvote once per post and comment. Each vote must belong to a user, and must belong to either a post or a comment.
+- Display the total votes per post and per comment in the UI (total votes = number of upvotes - number of downvotes).
+- Create the routes for the votes as follows:
+  - `POST /posts/:post_id/vote => posts#vote`
+  - `POST /posts/:post_id/comments/:comment_id/vote => comments#vote`
+
+### What I Changed
+I sort the posts in decreasing order of their `created_at` timestamp instead of by total votes. I found it disconcerting to vote on a post and find that post has moved to another area on the page. I added this functionality in [Lesson 2](https://github.com/nantrinh/ls_rails_notes/tree/master/lesson_2#additional-styling). 
+
+### What I Added
+- Disable voting and gray out the arrow corresponding to the vote the user has made on the comment or post. 
+- Allow a user to change their vote on a comment or post. (I update the appropriate row in the votes table when the user changes their vote ; no additional rows are created).
+- Extract the voting functionality to a partial.
 
 ## Lecture 5
 ### Add password attribute to users 
@@ -523,192 +549,116 @@ Demo of user actions:
 ![](../gifs/lecture_5.gif)
 
 ## Lecture 6
-### Instructions
-- Allow logged-in users to upvote or downvote once per post and comment. Each vote must belong to a user, and must belong to either a post or a comment.
-- Create the routes for the votes as follows:
-  - `POST /posts/:post_id/vote => posts#vote`
-  - `POST /posts/:post_id/comments/:comment_id/vote => comments#vote`
-
-### Create vote model
-- Create table.
-  - `rails g migration create_votes`
-  ```ruby
-
-  class CreateVotes < ActiveRecord::Migration[6.0]
-    def change
-      create_table :votes do |t|
-        t.boolean :vote
-        t.belongs_to :user
-        t.string :voteable_type
-        t.integer :voteable_id
-        t.timestamps
-      end
-  
-      add_index :votes, [:voteable_type, :voteable_id]
-    end
-  end
-  ```
-  - `rails db:migrate`
-- Define model.
-  ```ruby
-  # app/models/vote.rb 
-  
-  class Vote < ApplicationRecord
-    belongs_to :creator, class_name: 'User', foreign_key: 'user_id'
-    belongs_to :voteable, polymorphic: true
-  end
-  ```
-- Set up polymorphic association in `app/models/post.rb` and `app/models/comment.rb`.
-  `has_many :votes, as: :voteable`
-- Check your changes in `rails console`.
-  ```
-  # Create a new vote: user 1 upvoted on post 2.
-  Vote.create(user_id: 1, vote: true, voteable: Post.find(2))
-  
-  # Create a new vote: user 1 upvoted on comment 1.
-  Vote.create(user_id: 1, vote: true, voteable: Comment.find(1))
-  
-  # Create a new vote: user 2 downvoted on post 2.
-  Vote.create(user_id: 2, vote: false, voteable: Post.find(2))
-  
-  pp Post.find(2).votes # should print two votes
-  pp Comment.find(1).votes # should print one vote
-  pp User.find(1).votes # should print two votes 
-  pp User.find(2).votes # should print one vote 
-  ```
-
-### Create vote routes 
-Modify the post routes block in `config/routes.rb` to the following.
+### Add routes to vote on a post or comment
 ```ruby
-resources :posts, except: :destroy do
-  member do
-    post 'vote'
-  end
+# config/routes.rb
 
-  resources :comments, only: :create do
+Rails.application.routes.draw do
+  root to: 'posts#index'
+
+  resources :categories, except: :destroy
+
+  resources :posts, except: :destroy do
     member do
       post 'vote'
     end
+
+    resources :comments, only: :create do
+      member do
+        post 'vote'
+      end
+    end
   end
+
+  resources :users, only: [:show, :create, :edit, :update]
+
+  get '/login', to: 'sessions#new'
+  post '/login', to: 'sessions#create'
+  get '/logout', to: 'sessions#destroy'
+  get '/register', to: 'users#new'
 end
 ```
 
-### Allow a user to vote on a post 
-- Add up arrows and down arrows that trigger the vote actions.
-  ```
-  # app/views/posts/_post.html.erb 
-  
-  <aside class='col-md-2 votes text-center'>
-    <%= link_to vote_post_path(post, vote: true), method: 'post' do %>
-      <%= fa_icon 'arrow-up' %>
-    <% end %>
-    </br>
-    <%= post.total_votes %>
-    </br>
-    <%= link_to vote_post_path(post, vote: false), method: 'post' do %>
-      <%= fa_icon 'arrow-down' %>
-    <% end %>
-  </aside>
-  ```
-- Define a `vote` action in PostsController.
-  - [NOTE](https://guides.rubyonrails.org/5_0_release_notes.html#action-pack-deprecations): `redirect_to :back`, which is used in the videos, was deprecated in Rails 5.0 in favor of `redirect_back`.
-  ```ruby
-  # app/controllers/posts_controller.rb
-  
-  before_action :set_post, only: [:show, :edit, :update, :vote]
-  
-  def vote
-    Vote.create(voteable: @post, creator: current_user, vote: params[:vote])
-    redirect_back fallback_location: root_path
-  end
-  ```
-
-### Allow a user to vote on a comment
-- Add up arrows and down arrows that trigger the vote actions.
-  ```
-  # app/views/comments/_comment.html.erb 
-  
-  <aside class='col-md-2 votes text-center'>
-    <%= link_to vote_post_comment_path(comment.post, comment, vote: true), method: 'post' do %>
-      <%= fa_icon 'arrow-up' %>
-    <% end %>
-    </br>
-    <%= comment.total_votes %>
-    </br>
-    <%= link_to vote_post_comment_path(comment.post, comment, vote: false), method: 'post' do %>
-      <%= fa_icon 'arrow-down' %>
-    <% end %>
-  </aside>
-  ```
-- Define a `vote` action in CommentsController.
-  ```ruby
-  # app/controllers/comments_controller.rb
-  
-  def vote
-    @comment = Comment.find(params[:id])
-    Vote.create(voteable: @comment, creator: current_user, vote: params[:vote])
-    redirect_back fallback_location: root_path
-  end
-  ```
-
-### Display total votes on posts and comments
-- Define instance methods on the Post and Comment models.
-  ```ruby
-  def total_votes
-    self.upvotes - self.downvotes  
-  end
-  
-  def upvotes
-    self.votes.where(vote: true).size
-  end
-  
-  def downvotes
-    self.votes.where(vote: false).size
-  end
-  ```
-- Add `<%= post.total_votes %>` to `app/views/posts/_post.html.erb`.
-- Add `<%= comment.total_votes %>` to `app/views/comments/_comment.html.erb`.
-
-### Display posts in decreasing order of upvotes
-Modify the `index` action in PostsController to the following:
+### Create votes polymorphic table 
+`rails g migration create_votes`
 ```ruby
-def index
-  @posts = Post.all.sort_by{|x| x.total_votes}.reverse
+
+class CreateVotes < ActiveRecord::Migration[6.0]
+  def change
+    create_table :votes do |t|
+      t.boolean :vote
+      t.belongs_to :user
+      t.string :voteable_type
+      t.integer :voteable_id
+      t.timestamps
+    end
+
+    add_index :votes, [:voteable_type, :voteable_id]
+  end
+end
+```
+`rails db:migrate`
+
+
+### Create votes model
+Use `validates_uniqueness_of` to enforce uniqueness of creator and the voteable object (i.e., each user can only have one vote per voteable object).
+```ruby
+# app/models/vote.rb 
+
+class Vote < ApplicationRecord
+  belongs_to :creator, class_name: 'User', foreign_key: 'user_id'
+  belongs_to :voteable, polymorphic: true
+
+  validates_uniqueness_of :creator, scope: :voteable
 end
 ```
 
-### Restrict user to one vote per object 
-- Add `validates_uniqueness_of :creator, scope: :voteable` to Vote model. 
-- Check your changes in `rails console`.
-  ```
-  # Create a new vote: user 1 upvoted on post 2.
-  Vote.create(user_id: 1, vote: true, voteable: Post.find(2))
-  # Run the above again. You should see `rollback transaction`.
-  
-  # Create a new vote: user 1 upvoted on comment 1.
-  Vote.create(user_id: 1, vote: true, voteable: Comment.find(1))
-  # Run the above again. You should see `rollback transaction`.
+### Set up polymorphic association
+Add `has_many :votes, as: :voteable` to `app/models/user.rb` `app/models/post.rb` and `app/models/comment.rb`.
 
-  # Create a new vote: user 2 downvoted on post 2.
-  Vote.create(user_id: 2, vote: false, voteable: Post.find(2))
-  # Run the above again. You should see `rollback transaction`.
-  
-  pp Post.find(2).votes # should print two votes
-  pp Comment.find(1).votes # should print one vote
-  pp User.find(1).votes # should print two votes 
-  pp User.find(2).votes # should print one vote 
-  ```
-- Check your changes in the UI.
-
-### Additional changes (not specified in course videos)
-I added these features because I thought it made for a better user experience.
-- Disable voting and gray out the arrow corresponding to the vote the user has made on the comment or post. 
-- Allow a user to change their vote on a comment or post. I update the appropriate row in the votes table when the user changes their vote (no additional rows are created).
-- Extract the voting functionality to a partial.
-- Do not sort by total votes created because it's disconcerting when you vote on a post and it moves. I sort the posts in decreasing order of when it was created (oldest posts first). `@posts = Post.all.sort_by{|x| x.created_at}`
-
+### Track the total votes per post and per comment
+Add the following methods to `app/models/post.rb` and `app/models/comment.rb`.
 ```ruby
-# app/views/shared/_vote.html.erb
+def total_votes
+  self.upvotes - self.downvotes  
+end
+
+def upvotes
+  self.votes.where(vote: true).size
+end
+
+def downvotes
+  self.votes.where(vote: false).size
+end
+```
+
+### Check your changes in `rails console`
+```
+# Create a new vote: user 1 upvoted on post 2.
+Vote.create(user_id: 1, vote: true, voteable: Post.find(2))
+
+# Run the above again. You should see a rollback.
+
+# Create a new vote: user 1 upvoted on comment 1.
+Vote.create(user_id: 1, vote: true, voteable: Comment.find(1))
+
+# Run the above again. You should see a rollback.
+
+# Create a new vote: user 2 downvoted on post 2.
+Vote.create(user_id: 2, vote: false, voteable: Post.find(2))
+
+# Run the above again. You should see a rollback.
+
+pp Post.find(2).votes # should print two votes
+pp Comment.find(1).votes # should print one vote
+pp User.find(1).votes # should print two votes 
+pp User.find(2).votes # should print one vote 
+```
+
+### Add voting feature to the UI 
+Add up arrows and down arrows that trigger the vote actions.
+```
+# app/views/shared/_vote.html.erb 
 
 <% if obj.class == Post %>
   <% url_true = vote_post_path(obj, vote: true) %>
@@ -737,27 +687,79 @@ I added these features because I thought it made for a better user experience.
 <% end %>
 ```
 
-```ruby
+Modify the posts partial.
+```
 # app/views/posts/_post.html.erb
-# only the relevant code is shown
 
-<aside class='col-md-2 votes text-center'>
-  <%= render 'shared/vote', obj: post %>
-</aside>
+<article class='card bg-light m-3 post'>
+  <div class='row no-gutters h-100'>
+    <aside class='col-md-2 votes text-center'>
+      <%= render 'shared/vote', obj: post %>
+    </aside>
+
+    <section class='col-md-10'>
+      <header class='card-header'>
+        <h5><%= truncate(post.title, length: 50) %></h5>
+      </header>
+  
+      <main class='card-body'>
+        <%= render 'posts/post_url', post: post, card: true %>
+        <p class='card-text'>
+          <%= simple_format(truncate(restrict_newlines(post.description, 5), length: 130)) %>
+        </p>
+      </main>
+  
+      <footer class='card-footer'>
+        <%= render 'shared/creator_details', obj: post %>
+        <nav class='btn-group mt-auto'>
+          <%= button_to 'View', post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary' %>
+          <% if current_user == post.creator %>
+            <%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>
+          <% end %>
+        </nav>
+      </footer>
+    </section>
+  </div>
+</article>
 ```
 
-```ruby
+Modify the comments partial.
+```
 # app/views/comments/_comment.html.erb
-# only the relevant code is shown
 
-<aside class='col-md-2 votes text-center'>
-  <%= render 'shared/vote', obj: comment %>
-</aside>
+<% show_post ||= false %>
+
+<article class="card bg-light mb-3" style="max-width: 18rem;">
+  <div class='row no-gutters h-100'>
+    <aside class='col-md-2 votes text-center'>
+      <%= render 'shared/vote', obj: comment %>
+    </aside>
+
+    <section class='col-md-10'>
+      <main class="card-body">
+        <p class="card-text"><%= comment.body %></p>
+      </main>
+
+        <footer class='card-footer'>
+        <small class='text-muted'>
+        <% if show_post %>
+          <%= link_to comment.post.title, post_path(comment.post) %>
+        <% end %>
+        </small>
+        <%= render 'shared/creator_details', obj: comment %>
+        </footer>
+  </div>
+</article>
 ```
+
+### Add vote actions to posts and comments controllers
+[NOTE](https://guides.rubyonrails.org/5_0_release_notes.html#action-pack-deprecations): `redirect_to :back`, which is used in the videos, was deprecated in Rails 5.0 in favor of `redirect_back`.
 
 ```ruby
 # app/controllers/posts_controller.rb
-# only the relevant code is shown
+  
+before_action :set_post, only: [:show, :edit, :update, :vote]
+  
 def vote
   existing_votes = @post.votes.where(user_id: current_user.id)
   if existing_votes.empty?
@@ -770,8 +772,8 @@ end
 ```
 
 ```ruby
-# app/controllers/posts_controller.rb
-# only the relevant code is shown
+# app/controllers/comments_controller.rb
+
 def vote
   @comment = Comment.find(params[:id])
   existing_votes = @comment.votes.where(user_id: current_user.id)
@@ -783,40 +785,3 @@ def vote
   redirect_back fallback_location: root_path
 end
 ```
-
-### Deployment Notes
-I did all of the following and my deployment was successful, but my app still crashes. I'll have to come back to this another time.
-
-#### How to migrate from sqlite to postgres 
-https://devcenter.heroku.com/articles/sqlite3#running-rails-on-postgres
-
-#### How to update your rbenv ruby version
-This is a condensed version of this [article](https://www.aloucaslabs.com/miniposts/how-to-update-your-rbenv-ruby-version).
-1. What is the latest stable release? [LINK](https://www.ruby-lang.org/en/downloads). At the time of writing this, it is 2.6.5.
-2. ` cd ~/.rbenv/plugins/ruby-build/ && git pull`
-3. Install it: `rbenv install 2.6.5`
-4. Set it to be the global ruby version of the system: `rbenv global 2.6.5`
-  - NOTE: I had this output when I ran `rbenv versions`, so I navigated to `/home/nancy/.ruby-version` and changed the contents of the file to `2.6.5`.
-  ```
-  system
-* 2.5.3 (set by /home/nancy/.ruby-version)
-  2.6.5
-  ```
-5. Rehash rbenv to install shims for all Ruby executables known to rbenv: `rbenv rehash`
-6. Check the ruby version. `ruby -v` It should be 2.6.5.
-
-#### How to update RubyGems
-`gem update --system`
-
-#### How to update bundler
-`gem install bundler`
-
-### How to update ruby version in the app
-- Change it in `Gemfile` and `.ruby-version`.
-- Run `bundle install`.
-
-### Deployment was successful but my app crashes
-Did you remember to migrate your database?
-`heroku run rake db:migrate`
-Are you still getting errors?
-`heroku run rails console` may give you more illuminating error messages.
