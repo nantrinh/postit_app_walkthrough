@@ -30,39 +30,17 @@
 - Edit the posts and comments controller to set the creator to the current user (instead of test user).
 #### Users
 - Add routes to support all user actions except `index` and `destroy`. Use the `'/register'` route for `users#new`.
-- Allow registration of a new user.
+- Add the following validations for a new user:
   - Require a username and password.
   - Username must be unique.
   - Password must be at least 5 characters long.
-- Display a user's posts and comments on the users `show` view.
-- Link to the `show` view for a user wherever you have the user name displayed.
-- Allow a logged-in user to edit their own profile.
 - Prevent users from editing other users' profiles.
+- Display a user's posts and comments in the users `show` view.
+- Add a link to edit the user's profile in the users `show` view. 
+- Link to the `show` view for a user wherever you have the user name displayed.
+- Update the user-related links in the navigation bar.
 
 ## Table of Contents
-* [Add password attribute to users](#add-password-attribute-to-users)
-* [Sessions](#sessions-1)
-   * [Add routes to log in and log out](#add-routes-to-log-in-and-log-out)
-   * [Add helper methods](#add-helper-methods)
-   * [Add session actions](#add-session-actions)
-   * [Add view to log in](#add-view-to-log-in)
-   * [Edit navigation bar](#edit-navigation-bar)
-   * [Prevent non-logged-in users from viewing certain elements](#prevent-non-logged-in-users-from-viewing-certain-elements)
-   * [Prevent non-logged-in users from performing certain actions](#prevent-non-logged-in-users-from-performing-certain-actions)
-   * [Set the creator of posts and comments to the current user (instead of test user)](#set-the-creator-of-posts-and-comments-to-the-current-user-instead-of-test-user)
-   * [Check your changes](#check-your-changes)
-   * [Deploy](#deploy)
-   * [Demo](#demo)
-   * [Allow a new user to register](#allow-a-new-user-to-register)
-   * [Add Bootstrap styling](#add-bootstrap-styling)
-   * [Allow a logged-in user to edit their profile](#allow-a-logged-in-user-to-edit-their-profile)
-   * [Prevent users from editing other users' profiles](#prevent-users-from-editing-other-users-profiles)
-   * [Display a user's posts and comments on the users show view](#display-a-users-posts-and-comments-on-the-users-show-view)
-   * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
-   * [Demo of user pages](#demo-of-user-pages)
-
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
-
 
 
 ## Add password attribute to users 
@@ -316,16 +294,6 @@ When the user is not logged in:
 When the user is logged in:
 ![](../gifs/logged_in.gif)
 
-- Add routes to support all user actions except `index` and `destroy`. Use the `'/register'` route for `users#new`.
-- Add the following validations for a new user:
-  - Require a username and password.
-  - Username must be unique.
-  - Password must be at least 5 characters long.
-- Prevent users from editing other users' profiles.
-- Display a user's posts and comments on the users `show` view.
-- Link to the `show` view for a user wherever you have the user name displayed.
-- Update the user-related links in the navigation bar.
-
 ## Users
 ### Add routes to support all user actions except `index` and `destroy`
 Use the `'/register'` route for `users#new`.
@@ -436,7 +404,8 @@ end
 ```
 
 ### Add users `show` view
-Display a user's posts and comments.
+- Display a user's posts and comments.
+- Add a link to edit the user's profile.
 ```
 # app/views/users/show.html.erb
 
@@ -475,6 +444,25 @@ Display a user's posts and comments.
 </section>
 ```
 
+```
+# app/views/shared/_header.html.erb
+
+<% post ||= nil %>
+<% user ||= nil %>
+
+<%= render 'shared/nav' %>
+<section class='jumbotron text-center'>
+  <h1 class='jumbotron-heading'><%= title %></h1>
+  <% if post %>
+    <%= render 'post_url', post: post %>
+    <%= render 'shared/creator_details', obj: post %>
+  <% elsif user %>
+    <%= link_to 'Edit', edit_user_path(current_user.id) %>
+  <% end %>
+</section>
+<%= render 'shared/flash' %>
+```
+
 ### Link to the `show` view for a user wherever you have the user name displayed
 ```
 # app/views/shared/_creator_details.html.erb
@@ -488,13 +476,20 @@ Update the profile and register links in `app/views/shared/_nav.html.erb` to the
 <%= link_to 'Register', register_path, class: 'nav-link' %>
 ```
 
-### Check your changes
+### Check your changes and deploy
 - Register a new user. Trigger the validations.
 - Verify that you are automatically logged in as the new user upon creation.
 - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 - Edit the username. Check that the new name shows up in posts and comments created by the user.
 - Edit the password. Log out, then check that you can log back in using the new username and password.
 - Log in as one user and attempt to access the edit page of another user.
+
+### Demos
+Demo of validations:
+![](../gifs/validations.gif)
+
+Demo of user actions:
+![](../gifs/lecture_5.gif)
 
 ## Lecture 6
 ### Instructions
