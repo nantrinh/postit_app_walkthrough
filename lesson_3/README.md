@@ -1,8 +1,4 @@
 # Lesson 3
-
-## Table of Contents
-[TODO]
-
 ## Course Instructions
 ### Lecture 5
 - Use `has_secure_password` to set up user authentication.
@@ -31,20 +27,43 @@
   - All `posts` actions except `show` and `index`
   - All `comments` actions
   - `categories` `new` and `create` actions
-###
 - Edit the posts and comments controller to set the creator to the current user (instead of test user).
+#### Users
+- Add routes to support all user actions except `index` and `destroy`. Use the `'/register'` route for `users#new`.
 - Allow registration of a new user.
   - Require a username and password.
   - Username must be unique.
   - Password must be at least 5 characters long.
-- Add routes to log in, log out, register a new user, and support all user actions except `index` and `destroy`. Use the following custom routes:
-  ```
-  get '/register', to: 'users#new'
-  ```
-- Allow a logged-in user to edit their own profile.
-- Prevent users from editing other users' profiles.
 - Display a user's posts and comments on the users `show` view.
 - Link to the `show` view for a user wherever you have the user name displayed.
+- Allow a logged-in user to edit their own profile.
+- Prevent users from editing other users' profiles.
+
+## Table of Contents
+* [Add password attribute to users](#add-password-attribute-to-users)
+* [Sessions](#sessions-1)
+   * [Add routes to log in and log out](#add-routes-to-log-in-and-log-out)
+   * [Add helper methods](#add-helper-methods)
+   * [Add session actions](#add-session-actions)
+   * [Add view to log in](#add-view-to-log-in)
+   * [Edit navigation bar](#edit-navigation-bar)
+   * [Prevent non-logged-in users from viewing certain elements](#prevent-non-logged-in-users-from-viewing-certain-elements)
+   * [Prevent non-logged-in users from performing certain actions](#prevent-non-logged-in-users-from-performing-certain-actions)
+   * [Set the creator of posts and comments to the current user (instead of test user)](#set-the-creator-of-posts-and-comments-to-the-current-user-instead-of-test-user)
+   * [Check your changes](#check-your-changes)
+   * [Deploy](#deploy)
+   * [Demo](#demo)
+   * [Allow a new user to register](#allow-a-new-user-to-register)
+   * [Add Bootstrap styling](#add-bootstrap-styling)
+   * [Allow a logged-in user to edit their profile](#allow-a-logged-in-user-to-edit-their-profile)
+   * [Prevent users from editing other users' profiles](#prevent-users-from-editing-other-users-profiles)
+   * [Display a user's posts and comments on the users show view](#display-a-users-posts-and-comments-on-the-users-show-view)
+   * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
+   * [Demo of user pages](#demo-of-user-pages)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
+
 
 ## Add password attribute to users 
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
@@ -297,237 +316,185 @@ When the user is not logged in:
 When the user is logged in:
 ![](../gifs/logged_in.gif)
 
-### Allow a new user to register
-- Add validations to `app/models/post.rb` 
-  ```ruby
-  validates :username, presence: true, uniqueness: true
-  validates :password, presence: true, on: create, length: {minimum: 5}
-  ```
-- Add actions to users controller.
-  ```ruby
-  class UsersController < ApplicationController
-    def new
-      @user = User.new
-    end
-    
-    def create
-      @user = User.new(user_params)
-    
-      if @user.save
-        session[:user_id] = @user.id
-        flash[:notice] = "You are registered."
-        redirect_to root_path
-      else
-        render :new
-      end
-    end
-    
-    private
-    
-    def user_params
-      params.require(:user).permit(:username, :password)  
+- Add routes to support all user actions except `index` and `destroy`. Use the `'/register'` route for `users#new`.
+- Add the following validations for a new user:
+  - Require a username and password.
+  - Username must be unique.
+  - Password must be at least 5 characters long.
+- Prevent users from editing other users' profiles.
+- Display a user's posts and comments on the users `show` view.
+- Link to the `show` view for a user wherever you have the user name displayed.
+- Update the user-related links in the navigation bar.
+
+## Users
+### Add routes to support all user actions except `index` and `destroy`
+Use the `'/register'` route for `users#new`.
+Add the following to `config/routes.rb`:
+```ruby
+resources :users, only: [:show, :create, :edit, :update]
+get '/register', to: 'users#new'
+```
+
+### Add validations for a new user
+- Require a username and password.
+- Username must be unique.
+- Password must be at least 5 characters long.
+Add the following to `app/models/user.rb` 
+```ruby
+validates :username, presence: true, uniqueness: true
+validates :password, presence: true, on: :create, length: {minimum: 5}
+```
+
+### Add users controller
+The `require_same_user` method is used by the `before_action` method to prevent users from editing other users' profiles.
+```ruby
+# app/controllers/users_controller.rb
+
+class UsersController < ApplicationController
+  before_action :set_user, only: [:show, :edit, :update]
+  before_action :require_same_user, only: [:edit, :update]
+
+  def new
+    @user = User.new
+  end
+  
+  def create
+    @user = User.new(user_params)
+  
+    if @user.save
+      session[:user_id] = @user.id
+      flash[:notice] = 'You are registered.'
+      redirect_to root_path
+    else
+      render :new
     end
   end
-  ```
-- Add `new` view.
-  ```
-  # app/views/users/new.html.erb
-  
-  <%= render 'shared/header', title: "Register" %>
-  
-  <%= form_with(model: @user, local: true) do |f| %>
-    <%= render 'shared/errors', obj: @user %>
-    <div>
-      <%= f.label :username %>
-      <%= f.text_field :username %>
-    </div>
-    <div>
-      <%= f.label :password %>
-      <%= f.password_field :password %>
-    </div>
-    <%= f.submit "Register" %>
-  <% end %>
-  ```
-- If user is not logged in, display link to register.
-  - Add `<%= link_to 'Register', register_path %>` to `app/views/shared/_nav.html.erb`.
-- Check your changes.
-  - Register a new user. Trigger the uniqueness validation first.
-  - Verify that you are automatically logged in as the new user upon creation.
-  - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
 
-### Add Bootstrap styling
-At this point, I give in and finally add styling using [Bootstrap](https://getbootstrap.com/) to my application. I style my app differently than the instructors do. I referred to [this article](https://medium.com/@biancapower/how-to-add-bootstrap-4-to-a-rails-5-app-650118459a1e) for help with installation. I could not get the dropdowns on the navigation bar to work correctly, though, so my configuration may be incorrect.
-
-After styling, my app looks like this:
-
-![](../gifs/postit_lecture_5_add_bootstrap_demo.gif)
-
-### Allow a logged-in user to edit their profile
-- Add the following to users controller.
-  ```ruby
-  before_action :set_user, only: [:show, :edit, :update]
-  
   def edit
   end
-  
+
   def update
     if @user.update(user_params)
-      flash[:notice] = "Your profile was updated."
+      flash[:notice] = 'Your profile was updated.'
       redirect_to user_path(@user)
     else
       render :edit
     end
   end
-  
+
   private
-  
+
+  def user_params
+    params.require(:user).permit(:username, :password)  
+  end
+
   def set_user
     @user = User.find(params[:id])
   end
-  ```
-- Add a `show` view with a link to the `edit` view.
-  ```
-  # app/views/users/show.html.erb
-  
-  <%= render 'shared/header', title: current_user.username, user: true %>
-  ```
 
-  ```
-  # app/views/shared/_header.html.erb
-  
-  <% post ||= nil %>
-  <% user ||= nil %>
-  
-  <%= render 'shared/nav' %>
-  <section class='jumbotron text-center'>
-    <h1 class='jumbotron-heading'><%= title %></h1>
-    <% if post %>
-      <%= render 'post_url', post: post %>
-      <%= render 'shared/creator_details', obj: post %>
-    <% elsif user %>
-      <%= link_to 'Edit', edit_user_path(current_user.id) %>
-    <% end %>
-  </section>
-  <%= render 'shared/flash' %>
-  ```
-- Extract the form for a new user to a partial; use the same form for the edit view. The submit button should display `"Update Profile"` in the `edit` view, and `"Register"` in the `new` view: `f.submit(@user.newrecord? ? "Register" : "Update Profile")`
-- Check your changes.
-  - Log in. Edit the username. Check that the new name shows up in posts and comments created by the user.
-  - Edit the password. Log out, then check that you can log back in using the new username and password.
-
-### Prevent users from editing other users' profiles
-- Add the following to `app/controllers/users_controller.rb`.
-  ```ruby
-  before_action :require_same_user, only: [:edit, :update]
-  
   def require_same_user
     if current_user != @user
       flash[:error] = 'You are not allowed to do that.'
       redirect_to root_path
     end
   end
-  ```
-- Check your changes: Log in as one user and attempt to access the edit page of another user.
+end
+```
 
-### Display a user's posts and comments on the users `show` view 
-- Edit `show` view.
-  ```
-  # app/views/users/show.html.erb
-  
-  <%= render 'shared/header', title: @user.username, user: @user == current_user %>
-  
-  <section class='container'>
-    <% number_of_posts = @user.posts.empty? ? 0 : @user.posts.size %>
-    <% number_of_comments = @user.comments.empty? ? 0 : @user.comments.size %>
-    
-    <ul class='nav nav-tabs'>
-      <li class='nav-item'>
-        <%= link_to "Posts (#{number_of_posts})", user_path(@user), class: 'nav-link' %>
-      </li>
-      <li class='nav-item'>
-        <%= link_to "Comments (#{number_of_comments})", user_path(@user, tab: 'comments'), class: 'nav-link' %>
-      </li>
-    </ul>
-    
-    <% if params[:tab].nil? %>
-      <% if @user.posts.empty? %>
-        <p class="text-muted">There aren't any posts for this user.</p>
-      <% else %>
-        <% @user.posts.each do |post| %>
-          <%= render 'posts/post', post: post %>
-        <% end %>
-      <% end %>
-    <% elsif params[:tab] == 'comments' %>
-      <% if @user.comments.empty? %>
-        <p class="text-muted">There aren't any comments for this user.</p>
-      <% else %>
-        <% @user.comments.each do |comment| %>
-          <%= render 'comments/comment', comment: comment, show_post: true %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </section>
-  ```
-- Extract and edit comment partial.
-  ```
-  # app/views/comments/_comment.html.erb
-  
-  <% show_post ||= false %>
-  
-  <article class="card bg-light mb-3" style="max-width: 18rem;">
-    <div class="card-body">
-      <p class="card-text"><%= comment.body %></p>
-      <small class='text-muted'>
-      <% if show_post %>
-        <%= link_to comment.post.title, post_path(comment.post) %>
-      <% end %>
-      </small>
-      <%= render 'shared/creator_details', obj: comment %>
+### Add user registration and `edit` view
+```
+# app/views/users/new.html.erb
+
+<%= render 'shared/header', title: "Register" %>
+<%= render 'form' %>
+```
+
+```
+# app/views/users/edit.html.erb
+
+<%= render 'shared/header', title: "Edit Profile" %>
+<%= render 'form' %>
+```
+
+```
+# app/views/users/_form.html.erb
+
+<div class='container'>
+  <%= form_with(model: @user, local: true) do |f| %>
+    <%= render 'shared/errors', obj: @user %>
+    <div class='form-group'>
+      <%= f.label :username %>
+      <%= f.text_field :username, class: 'form-control w-50' %>
     </div>
-  </article>
-  ```
-  ```
-  # app/views/posts/show.html.erb
+    <div class='form-group'>
+      <%= f.label :password %>
+      <%= f.password_field :password, class: 'form-control w-50' %>
+    </div>
+    <%= f.submit(@user.new_record? ? "Register" : "Update Profile", class: "btn btn-outline-primary mt-3")%>
+  <% end %>
+</div>
+```
+
+### Add users `show` view
+Display a user's posts and comments.
+```
+# app/views/users/show.html.erb
+
+<%= render 'shared/header', title: @user.username, user: @user == current_user %>
+
+<section class='container'>
+  <% number_of_posts = @user.posts.empty? ? 0 : @user.posts.size %>
+  <% number_of_comments = @user.comments.empty? ? 0 : @user.comments.size %>
   
-  <%= render 'shared/header', title: @post.title, post: @post %>
+  <ul class='nav nav-tabs'>
+    <li class='nav-item'>
+      <%= link_to "Posts (#{number_of_posts})", user_path(@user), class: 'nav-link' %>
+    </li>
+    <li class='nav-item'>
+      <%= link_to "Comments (#{number_of_comments})", user_path(@user, tab: 'comments'), class: 'nav-link' %>
+    </li>
+  </ul>
   
-  <section class='container justify-content-center'>
-    <p><%= simple_format(@post.description) %></p>
-    
-    <% if logged_in? %>
-      <section class='w-50 pt-5'>
-        <%= form_for [@post, @comment] do |f| %>
-          <%= render 'shared/errors', obj: @comment %>
-          <div class="form-group">
-            <%= f.label :body, "Leave a comment" %>
-            <%= f.text_area :body, rows: 3, class: "form-control" %>
-          </div>
-          <%= f.submit "Create comment", class: "btn btn-outline-primary btn-sm" %>
-        <% end %>
-      </section>
-    <% end %>
-    
-    <section class='py-5'>
-      <h5 class='pb-2'>Comments</h5>
-      <% if @post.comments.empty? %>
-        <p class="text-muted">There aren't any comments for this post.</p>
-      <% else %>
-        <% @post.comments.each do |comment| %>
-          <%= render 'comments/comment', comment: comment %>
-        <% end %>
+  <% if params[:tab].nil? %>
+    <% if @user.posts.empty? %>
+      <p class="text-muted">There aren't any posts for this user.</p>
+    <% else %>
+      <% @user.posts.each do |post| %>
+        <%= render 'posts/post', post: post %>
       <% end %>
-    </section>
-  </section>
-  ```
+    <% end %>
+  <% elsif params[:tab] == 'comments' %>
+    <% if @user.comments.empty? %>
+      <p class="text-muted">There aren't any comments for this user.</p>
+    <% else %>
+      <% @user.comments.each do |comment| %>
+        <%= render 'comments/comment', comment: comment, show_post: true %>
+      <% end %>
+    <% end %>
+  <% end %>
+</section>
+```
+
 ### Link to the `show` view for a user wherever you have the user name displayed
 ```
 # app/views/shared/_creator_details.html.erb
 
 <p><small class="text-muted"><%= link_to(obj.creator.username, user_path(obj.creator.id)) + " #{display_datetime(obj.created_at)}" %></small></p>
 ```
+### Update the user-related links in the navigation bar
+Update the profile and register links in `app/views/shared/_nav.html.erb` to the following:
+```
+<%= link_to 'Profile', user_path(current_user.id), class: 'nav-link text-right' %>
+<%= link_to 'Register', register_path, class: 'nav-link' %>
+```
 
-### Demo of user pages
-![](../gifs/postit_lecture_5_users_demo.gif)
+### Check your changes
+- Register a new user. Trigger the validations.
+- Verify that you are automatically logged in as the new user upon creation.
+- Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
+- Edit the username. Check that the new name shows up in posts and comments created by the user.
+- Edit the password. Log out, then check that you can log back in using the new username and password.
+- Log in as one user and attempt to access the edit page of another user.
 
 ## Lecture 6
 ### Instructions
