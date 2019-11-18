@@ -1,49 +1,52 @@
 # Lesson 3
 
 ## Table of Contents
-* [Lecture 5](#lecture-5)
-   * [Instructions](#instructions)
-   * [Add authentication](#add-authentication)
-   * [Add sessions](#add-sessions)
-   * [Allow a new user to register](#allow-a-new-user-to-register)
-   * [Add Bootstrap styling](#add-bootstrap-styling)
-   * [Allow a logged-in user to edit their profile](#allow-a-logged-in-user-to-edit-their-profile)
-   * [Prevent users from editing other users' profiles](#prevent-users-from-editing-other-users-profiles)
-   * [Display a user's posts and comments on the users show view](#display-a-users-posts-and-comments-on-the-users-show-view)
-   * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
-   * [Demo of user pages](#demo-of-user-pages)
+[TODO]
 
-## Lecture 5
-### Instructions
-- Add authentication
-  - Use `has_secure_password` to set up user authentication.
-  - Add manual routes to log in and log out.
-- Add sessions
-  - Add session capability (a user can be logged in or logged out).
-  - Add a navigation partial.
-    - Always show a link to posts#index and a link to categories#index.
-    - If a user is logged in, show a link to create a new post and a link to log out.
-    - If a user is not logged in, show a link to register and a link to log in.
-  - Prevent non-logged-in users from accessing:
-    - All `posts` actions except `show` and `index`
-    - All `comments` actions
-    - `categories` `new` and `create` actions
-  - Prevent non-logged-in users from viewing:
-    - The form to create a new comment
-    - Links to edit posts
-  - Display who created a post and when.
-  - Edit the posts and comments controller to set the creator to the current user (instead of test user).
+## Course Instructions
+### Lecture 5
+- Use `has_secure_password` to set up user authentication.
+#### Sessions
+- Allow a user to log in and log out. Use these custom routes:
+  ```
+  get '/login', to: 'sessions#new'
+  post '/login', to: 'sessions#create'
+  get '/logout', to: 'sessions#destroy'
+  ```
+- Add view to log in.
+- Edit navigation bar.
+  - Always show links to all posts and all categories.
+  - If a user is not logged in, show links to:
+    - Register
+    - Log in
+  - If a user is logged in, show links to:
+    - Create a new post
+    - Create a new category
+    - Log out
+    - View the user's own profile
+- Prevent non-logged-in users from viewing:
+  - The form to create a new comment
+  - Links to edit posts
+- Prevent non-logged-in users from accessing:
+  - All `posts` actions except `show` and `index`
+  - All `comments` actions
+  - `categories` `new` and `create` actions
+###
+- Edit the posts and comments controller to set the creator to the current user (instead of test user).
 - Allow registration of a new user.
   - Require a username and password.
   - Username must be unique.
   - Password must be at least 5 characters long.
+- Add routes to log in, log out, register a new user, and support all user actions except `index` and `destroy`. Use the following custom routes:
+  ```
+  get '/register', to: 'users#new'
+  ```
 - Allow a logged-in user to edit their own profile.
 - Prevent users from editing other users' profiles.
 - Display a user's posts and comments on the users `show` view.
 - Link to the `show` view for a user wherever you have the user name displayed.
-- Add Bootstrap styling.
 
-### Add authentication
+## Add password attribute to users 
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
   - `rails g migration add_password_digest_to_users`
   ```ruby
@@ -67,154 +70,193 @@
   user.authenticate('hello') # false
   user.authenticate('password') # the user object 
   ```
-- Add routes.
-  - We follow Rails convention in the naming of the routes.
-  - Add the following routes to `config/routes.rb`.
-    ```ruby
-    get '/login', to: 'sessions#new'
-    post '/login', to: 'sessions#create'
-    get '/logout', to: 'sessions#destroy'
-    ```
 
-- Add a SessionsController.
-  ```ruby
-  # app/controllers/sessions_controller.rb
+## Sessions
+### Add routes to log in and log out
+Use the custom routes specified in the course. We follow Rails convention in the naming of the routes.
 
-  class SessionsController < ApplicationController
-    def new
-    end
+Add the following routes to `config/routes.rb`.
+```ruby
+get '/login', to: 'sessions#new'
+post '/login', to: 'sessions#create'
+get '/logout', to: 'sessions#destroy'
+```
 
-    def create
-    end
+### Add helper methods
+- Note: `||=` is used to prevent multiple database queries from being made in one request. The rest of the statement is not executed if `@current_user` is truthy. This technique is known as memoization. 
+- Note: `helper_method` makes the methods available in all of the controllers and view templates.
+```ruby
+# app/controllers/application_controller.rb
 
-    def destroy
-    end
+class ApplicationController < ActionController::Base
+  helper_method :current_user, :logged_in?
+  
+  def current_user
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
   end
-  ```
-- Add a view.
-  - We are not using model-backed form helpers because sessions is not a resource.
-  ```ruby
-  # app/views/sessions/new.html.erb
+  
+  def logged_in?
+    !!current_user
+  end
 
-  <h5>Log In</h5>
-  <div>
-    <%= form_tag(url: '/login', local: true) do %>
-      <div>
-        <%= label_tag :username %>
-        <%= text_field_tag :username %>
-      </div>
-      <div>
-        <%= label_tag :password %>
-        <%= password_field_tag :password %>
-      </div>
-      <%= submit_tag 'Login' %>
-    <% end %>
-  </div>
-  ```
-  - Navigate to `localhost:3000/login` and verify that the form is displayed.
-
-### Add sessions
-- Edit sessions controller.
-  ```ruby
-  # app/controllers/sessions_controller.rb 
-
-  class SessionsController < ApplicationController
-    def new
-    end
-
-    def create
-      user = User.find_by(username: params[:username])
-      if user && user.authenticate(params[:password])
-        session[:user_id] = user.id
-        flash[:notice] = "Welcome, you've logged in."
-        redirect_to root_path
-      else
-        flash.now[:error] = "There is something wrong with your username or password."
-        render :new
-      end
-    end
-    
-    def destroy
-      session[:user_id] = nil
+  def require_user
+    if !logged_in?
+      flash[:error] = "You must be logged in to do that."
       redirect_to root_path
     end
   end
-  ```
-- Edit application controller.
-  - Note: `||=` is used to prevent multiple database queries from being made in one request. The rest of the statement is not executed if `@current_user` is truthy. This technique is known as memoization. 
-  - Note: `helper_method` makes the methods available in all of the controllers and view templates.
-  ```ruby
-  # app/controllers/application_controller.rb
+end
+```
 
-  class ApplicationController < ActionController::Base
-    helper_method :current_user, :logged_in?
-    
-    def current_user
-      @current_user ||= User.find(session[:user_id]) if session[:user_id]
-    end
-    
-    def logged_in?
-      !!current_user
+### Add session actions 
+```ruby
+# app/controllers/sessions_controller.rb
+
+class SessionsController < ApplicationController
+  def new
+  end
+
+  def create
+    user = User.find_by(username: params[:username])
+    if user && user.authenticate(params[:password])
+      session[:user_id] = user.id
+      flash[:notice] = "Welcome, you've logged in."
+      redirect_to root_path
+    else
+      flash.now[:error] = "There is something wrong with your username or password."
+      render :new
     end
   end
-  ```
-- Edit views.
-  - Add navigation partial.
-    ```
-    # app/views/shared/_nav.html.erb
+  
+  def destroy
+    session[:user_id] = nil
+    flash[:notice] = "You have successfully logged out."
+    redirect_to root_path
+  end
+end
+```
 
-    <nav>
-      <ul>
-        <li><%= link_to "Posts", posts_path %>
-        <li><%= link_to "Categories", categories_path %>
-    
-        <% if logged_in? %>
-          <li><%= link_to "New Post", new_post_path %>
-          <li><%= link_to "Log Out", logout_path %>
-        <% else %>
-          <li><%= link_to "Log In", login_path %>
-        <% end %>
-      </ul>
-    </nav>
-    ```
-  - Add header partial.
-    ```
-    # app/views/shared/_header.html.erb
+### Add view to log in
+```ruby
+# app/views/sessions/new.html.erb
 
-    <%= render 'shared/nav' %>
-    <h1><%= title %></h1>
-    ```
-  - Edit all views to use the header partial. For example, add `<%= render 'shared/header', title: "Log In" %>` to `app/views/sessions/new.html.erb`.
-- Restrict certain actions to logged-in users.
-  - Add a `require_user` method to `app/controllers/application_controller.rb`.
-    ```ruby
-    def require_user
-      if !logged_in?
-        flash[:error] = "Must be logged in to do that."
-        redirect_to root_path
-      end
-    end
-    ```
-  - Prevent non-logged-in users from accessing:
-    - All `posts` actions except `show` and `index`: Add `before_action :require_user, except [:show, :index]` to `app/controllers/posts_controller.rb`.
-    - All `comments` actions: Add `before_action :require_user` to `app/controllers/comments_controller.rb`.
-    - `categories` `new` and `create` actions: Add `before_action :require_user, only: [:new, :create]` to `app/controllers/categories_controller.rb`.
-  - Prevent non-logged-in users from viewing:
-    - The form to create a new comment: Wrap the form in `<% if logged_in? %>` and `<% end %>`.
-    - Links to edit posts: Wrap the links in `<% if logged_in? %>` and `<% end %>`.
-  - Display who created a post and when: Add `Created by: <%= @post.creator.username %> at <%= display_datetime(@post.created_at) %>` to `app/views/posts/show.html.erb`.
+<%= render 'shared/header', title: "Log In" %>
+<div class='container'>
+  <%= form_with(url: '/login', local: true, html: {autocomplete: 'off'}) do %>
+    <div class='form-group'>
+      <%= label_tag 'username' %>
+      <%= text_field_tag(name='username', value='', options={class: 'form-control w-50'}) %>
+    </div>
+    <div class='form-group'>
+      <%= label_tag :password %>
+      <%= password_field_tag(name='password', value='', options={class: 'form-control w-50'}) %>
+    </div>
+    <%= submit_tag(value='Login', options={class: "btn btn-outline-primary mt-3"})%>
+  <% end %>
+</div>
+```
+
+### Edit navigation bar
+- Always show links to all posts and all categories.
+- If a user is not logged in, show links to:
+  - Register (set url to '' for now)
+  - Log in
+- If a user is logged in, show links to:
+  - Create a new post
+  - Create a new category
+  - Log out
+  - View the user's own profile (set url to '' for now)
+
+Update the links section of `app/views/shared/_nav.html.erb` to the following:
+```
+<!-- Links -->
+<ul class='navbar-nav'>
+  <li class='nav-item'>
+    <%= link_to 'Posts', posts_path, class: 'nav-link' %>
+  </li>
+  <li class='nav-item'>
+    <%= link_to 'Categories', categories_path, class: 'nav-link' %>
+  </li>
+  <% if logged_in? %>
+    <li class='nav-item'>
+      <%= link_to 'New Post', new_post_path, class: 'nav-link' %>
+    </li>
+    <li class='nav-item'>
+      <%= link_to 'New Category', new_category_path, class: 'nav-link' %>
+    </li>
+  <% end %>
+</ul>
+
+<ul class='navbar-nav flex-row ml-md-auto d-none d-md-flex'>
+  <% if logged_in? %>
+    <li class='nav-item'>
+      <%= link_to 'Log Out', logout_path, class: 'nav-link' %>
+    </li>
+    <li>
+      <%= link_to 'Profile', '', class: 'nav-link text-right' %>
+    </li>
+  <% else %>
+    <li class='nav-item'>
+      <%= link_to 'Register', '', class: 'nav-link' %>
+    </li>
+    <li class='nav-item'>
+      <%= link_to 'Log In', login_path, class: 'nav-link' %>
+    </li>
+  <% end %>
+</ul>
+```
+
+### Prevent non-logged-in users from viewing certain elements
+- The form to create a new comment
+- Links to edit posts
+
+Wrap the pertinent code in `<% if logged_in %>; <% end %>` tags.
+```
+# app/views/posts/show.html.erb
+
+<% if logged_in? %>
+  <section class='w-50 pt-5'>
+    <%= form_for [@post, @comment] do |f| %>
+      <%= render 'shared/errors', obj: @comment %>
+      <div class="form-group">
+        <%= f.label :body, "Leave a comment" %>
+        <%= f.text_area :body, rows: 3, class: "form-control" %>
+      </div>
+      <%= f.submit "Create comment", class: "btn btn-outline-primary btn-sm" %>
+    <% end %>
+  </section>
+<% end %>
+```
+
+```
+# app/views/posts/_post.html.erb
+
+<% if current_user == post.creator %>
+  <%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>
+<% end %>
+```
+
+### Prevent non-logged-in users from performing certain actions
+- All `posts` actions except `show` and `index`
+- All `comments` actions
+- `categories` `new` and `create` actions
+
+Use `before_action :require_user` in the controllers.
+```
+```
+
+```
+```
 - Edit the posts and comments controller to set the creator to the current user (instead of test user): `@post.creator = current_user`
-- Check your changes.
-  - Verify that you can log in and log out.
-  - Verify that certain parts of the UI only show up if the user is logged in.
-  - Verify that users cannot access certain routes (e.g., `localhost:3000/posts/new`) unless they are logged in.
-  - Verify that the logged_in user's name is displayed when a new post is created.
-  - Verify that the logged_in user's name is displayed when a new comment is created.
+
+### Check your changes.
+- Verify that you can log in and log out.
+- Verify that certain parts of the UI only show up if the user is logged in.
+- Verify that users cannot access certain routes (e.g., `localhost:3000/posts/new`) unless they are logged in.
+- Verify that the logged_in user's name is displayed when a new post is created.
+- Verify that the logged_in user's name is displayed when a new comment is created.
 
 ### Allow a new user to register
-- Edit `config/routes.rb`.
-  - Add `resources :users, only: [:show, :create, :edit, :update]`.
-  - Add `get '/register', to: 'users#new'`.
 - Add validations to `app/models/post.rb` 
   ```ruby
   validates :username, presence: true, uniqueness: true
