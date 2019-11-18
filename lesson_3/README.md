@@ -242,19 +242,60 @@ Wrap the pertinent code in `<% if logged_in %>; <% end %>` tags.
 - `categories` `new` and `create` actions
 
 Use `before_action :require_user` in the controllers.
-```
+```ruby
+# app/controllers/posts_controller.rb
+
+before_action :require_user, except: [:show, :index]
 ```
 
-```
-```
-- Edit the posts and comments controller to set the creator to the current user (instead of test user): `@post.creator = current_user`
+```ruby
+# app/controllers/categories_controller.rb
 
-### Check your changes.
+before_action :require_user, only: [:new, :create]
+```
+
+```ruby
+# app/controllers/comments_controller.rb
+
+before_action :require_user
+```
+
+### Set the creator of posts and comments to the current user (instead of test user)
+Set the creator to current_user in the `create` actions.
+
+```ruby
+# app/controllers/posts_controller.rb
+
+@post.creator = current_user
+```
+
+```ruby
+# app/controllers/comments_controller.rb
+
+@comment.creator = current_user
+```
+
+### Check your changes
 - Verify that you can log in and log out.
-- Verify that certain parts of the UI only show up if the user is logged in.
-- Verify that users cannot access certain routes (e.g., `localhost:3000/posts/new`) unless they are logged in.
+- Verify that certain users cannot view these parts of the UI unless they are logged in:
+  - The form to create a new comment
+  - Links to edit posts
+- Verify that users cannot perform these actions unless they are logged in:
+  - All `posts` actions except `show` and `index`
+  - All `comments` actions
+  - `categories` `new` and `create` actions
 - Verify that the logged_in user's name is displayed when a new post is created.
 - Verify that the logged_in user's name is displayed when a new comment is created.
+
+### Deploy
+Remember to run `heroku run rake db:migrate` and manually set a user's password in the rails console in order to do the tests.
+
+### Demo
+When the user is not logged in:
+![](../gifs/not_logged_in.gif)
+
+When the user is logged in:
+![](../gifs/logged_in.gif)
 
 ### Allow a new user to register
 - Add validations to `app/models/post.rb` 
