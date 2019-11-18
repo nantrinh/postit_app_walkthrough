@@ -1,4 +1,37 @@
 # Lesson 3
+
+## Table of Contents
+* [Course Instructions](#course-instructions)
+   * [Lecture 5](#lecture-5)
+      * [Sessions](#sessions)
+      * [Users](#users)
+* [Lecture 5](#lecture-5-1)
+   * [Add password attribute to users](#add-password-attribute-to-users)
+   * [Sessions](#sessions-1)
+      * [Add routes to log in and log out](#add-routes-to-log-in-and-log-out)
+      * [Add helper methods](#add-helper-methods)
+      * [Add session actions](#add-session-actions)
+      * [Add view to log in](#add-view-to-log-in)
+      * [Edit navigation bar](#edit-navigation-bar)
+      * [Prevent non-logged-in users from viewing certain elements](#prevent-non-logged-in-users-from-viewing-certain-elements)
+      * [Prevent non-logged-in users from performing certain actions](#prevent-non-logged-in-users-from-performing-certain-actions)
+      * [Set the creator of posts and comments to the current user (instead of test user)](#set-the-creator-of-posts-and-comments-to-the-current-user-instead-of-test-user)
+      * [Check your changes](#check-your-changes)
+      * [Deploy](#deploy)
+      * [Demo](#demo)
+   * [Users](#users-1)
+      * [Add routes to support all user actions except index and destroy](#add-routes-to-support-all-user-actions-except-index-and-destroy)
+      * [Add validations for a new user](#add-validations-for-a-new-user)
+      * [Add users controller](#add-users-controller)
+      * [Add user registration and edit view](#add-user-registration-and-edit-view)
+      * [Add users show view](#add-users-show-view)
+      * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
+      * [Update the user-related links in the navigation bar](#update-the-user-related-links-in-the-navigation-bar)
+      * [Check your changes and deploy](#check-your-changes-and-deploy)
+      * [Demos](#demos)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Course Instructions
 ### Lecture 5
 - Use `has_secure_password` to set up user authentication.
@@ -40,10 +73,8 @@
 - Link to the `show` view for a user wherever you have the user name displayed.
 - Update the user-related links in the navigation bar.
 
-## Table of Contents
-
-
-## Add password attribute to users 
+## Lecture 5
+### Add password attribute to users 
 - Create a new column to store the password digest. It must be called `password_digest` to conform to Rails convention.
   - `rails g migration add_password_digest_to_users`
   ```ruby
@@ -68,8 +99,8 @@
   user.authenticate('password') # the user object 
   ```
 
-## Sessions
-### Add routes to log in and log out
+### Sessions
+#### Add routes to log in and log out
 Use the custom routes specified in the course. We follow Rails convention in the naming of the routes.
 
 Add the following routes to `config/routes.rb`.
@@ -79,7 +110,7 @@ post '/login', to: 'sessions#create'
 get '/logout', to: 'sessions#destroy'
 ```
 
-### Add helper methods
+#### Add helper methods
 - Note: `||=` is used to prevent multiple database queries from being made in one request. The rest of the statement is not executed if `@current_user` is truthy. This technique is known as memoization. 
 - Note: `helper_method` makes the methods available in all of the controllers and view templates.
 ```ruby
@@ -105,7 +136,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-### Add session actions 
+#### Add session actions 
 ```ruby
 # app/controllers/sessions_controller.rb
 
@@ -133,7 +164,7 @@ class SessionsController < ApplicationController
 end
 ```
 
-### Add view to log in
+#### Add view to log in
 ```ruby
 # app/views/sessions/new.html.erb
 
@@ -153,7 +184,7 @@ end
 </div>
 ```
 
-### Edit navigation bar
+#### Edit navigation bar
 - Always show links to all posts and all categories.
 - If a user is not logged in, show links to:
   - Register (set url to '' for now)
@@ -203,7 +234,7 @@ Update the links section of `app/views/shared/_nav.html.erb` to the following:
 </ul>
 ```
 
-### Prevent non-logged-in users from viewing certain elements
+#### Prevent non-logged-in users from viewing certain elements
 - The form to create a new comment
 - Links to edit posts
 
@@ -233,7 +264,7 @@ Wrap the pertinent code in `<% if logged_in %>; <% end %>` tags.
 <% end %>
 ```
 
-### Prevent non-logged-in users from performing certain actions
+#### Prevent non-logged-in users from performing certain actions
 - All `posts` actions except `show` and `index`
 - All `comments` actions
 - `categories` `new` and `create` actions
@@ -257,7 +288,7 @@ before_action :require_user, only: [:new, :create]
 before_action :require_user
 ```
 
-### Set the creator of posts and comments to the current user (instead of test user)
+#### Set the creator of posts and comments to the current user (instead of test user)
 Set the creator to current_user in the `create` actions.
 
 ```ruby
@@ -272,7 +303,7 @@ Set the creator to current_user in the `create` actions.
 @comment.creator = current_user
 ```
 
-### Check your changes
+#### Check your changes
 - Verify that you can log in and log out.
 - Verify that certain users cannot view these parts of the UI unless they are logged in:
   - The form to create a new comment
@@ -284,18 +315,18 @@ Set the creator to current_user in the `create` actions.
 - Verify that the logged_in user's name is displayed when a new post is created.
 - Verify that the logged_in user's name is displayed when a new comment is created.
 
-### Deploy
+#### Deploy
 Remember to run `heroku run rake db:migrate` and manually set a user's password in the rails console in order to do the tests.
 
-### Demo
+#### Demo
 When the user is not logged in:
 ![](../gifs/not_logged_in.gif)
 
 When the user is logged in:
 ![](../gifs/logged_in.gif)
 
-## Users
-### Add routes to support all user actions except `index` and `destroy`
+### Users
+#### Add routes to support all user actions except `index` and `destroy`
 Use the `'/register'` route for `users#new`.
 Add the following to `config/routes.rb`:
 ```ruby
@@ -303,7 +334,7 @@ resources :users, only: [:show, :create, :edit, :update]
 get '/register', to: 'users#new'
 ```
 
-### Add validations for a new user
+#### Add validations for a new user
 - Require a username and password.
 - Username must be unique.
 - Password must be at least 5 characters long.
@@ -313,7 +344,7 @@ validates :username, presence: true, uniqueness: true
 validates :password, presence: true, on: :create, length: {minimum: 5}
 ```
 
-### Add users controller
+#### Add users controller
 The `require_same_user` method is used by the `before_action` method to prevent users from editing other users' profiles.
 ```ruby
 # app/controllers/users_controller.rb
@@ -369,7 +400,7 @@ class UsersController < ApplicationController
 end
 ```
 
-### Add user registration and `edit` view
+#### Add user registration and `edit` view
 ```
 # app/views/users/new.html.erb
 
@@ -403,7 +434,7 @@ end
 </div>
 ```
 
-### Add users `show` view
+#### Add users `show` view
 - Display a user's posts and comments.
 - Add a link to edit the user's profile.
 ```
@@ -463,20 +494,20 @@ end
 <%= render 'shared/flash' %>
 ```
 
-### Link to the `show` view for a user wherever you have the user name displayed
+#### Link to the `show` view for a user wherever you have the user name displayed
 ```
 # app/views/shared/_creator_details.html.erb
 
 <p><small class="text-muted"><%= link_to(obj.creator.username, user_path(obj.creator.id)) + " #{display_datetime(obj.created_at)}" %></small></p>
 ```
-### Update the user-related links in the navigation bar
+#### Update the user-related links in the navigation bar
 Update the profile and register links in `app/views/shared/_nav.html.erb` to the following:
 ```
 <%= link_to 'Profile', user_path(current_user.id), class: 'nav-link text-right' %>
 <%= link_to 'Register', register_path, class: 'nav-link' %>
 ```
 
-### Check your changes and deploy
+#### Check your changes and deploy
 - Register a new user. Trigger the validations.
 - Verify that you are automatically logged in as the new user upon creation.
 - Create a new post and a new comment as the new user. Check that the creator is displayed correctly. 
@@ -484,7 +515,7 @@ Update the profile and register links in `app/views/shared/_nav.html.erb` to the
 - Edit the password. Log out, then check that you can log back in using the new username and password.
 - Log in as one user and attempt to access the edit page of another user.
 
-### Demos
+#### Demos
 Demo of validations:
 ![](../gifs/validations.gif)
 
