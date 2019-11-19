@@ -7,46 +7,14 @@ Demo of creating a new post, creating a new category, and updating a post:
 Demo of commenting on a post:
 ![](../gifs/new_comment.gif)
 
-### Course Instructions
-#### Lecture 3
-##### Posts
-- Allow a user to create a new post. Use a model-backed form.
-- Add the following validations for a new post. Display validation errors in the `new` view.
-  - Require `title`, `url`, and `description`.
-  - `title` must be at least 5 characters.
-  - `url` must be unique.
-- Allow a user to update a post. Use a model-backed form.
-- Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
-- Extract common code used in the `new` and `edit` views to partials.
-##### Categories
-- Allow a user to create a new category. Use a model-backed form.
-- Add the following validations for a new post. Display validation errors in the `new` view.
-  - Require `name`.
-  - `name` must be unique.
-- Extract the part of the category and post forms that displays validation errors to a partial.
-
-#### Lecture 4 
-- Change the association name between comments and user to comments and creator.
-- Allow a user to create a new comment on a post.
-  - The form for a new comment should be displayed on the posts `show` view.
-  - The form should be submitted via a POST request to `/posts/:post_id/comments`.
-- Add the following validations for a new comment. Display validation errors in the posts `show` view.
-  - Require `body`.
-- Display all comments related to a post on the posts `show` view.
-- Allow a user to associate a post with categories when creating a new post and when editing a post.
-- Allow a user to click on post URLs and navigate to those URLs.
-- Display timestamps in a format like "11/01/2019 7:01pm UTC".
-- Add a link to edit the post on the post `show` view.
-
-### What I Changed
-- I only show the code with partials, for brevity's sake, since this is the third time I'm returning to this lesson. The course videos show the step-by-step approach, with commentary.
-- Sort posts in descending order of `created_at`.
-
-### What I Added
-- Display newlines in the post description.
-- Truncate post title, url, and description to fit in the fixed size post partials.
-
 ## Table of Contents
+* [Course Instructions](#course-instructions)
+   * [Lecture 3](#lecture-3)
+      * [Posts](#posts)
+      * [Categories](#categories)
+   * [Lecture 4](#lecture-4)
+   * [What I Changed](#what-i-changed)
+   * [What I Added](#what-i-added)
 * [Lecture 3](#lecture-3-1)
    * [Create a test user](#create-a-test-user)
    * [Add new and create actions for posts and categories](#add-new-and-create-actions-for-posts-and-categories)
@@ -76,8 +44,46 @@ Demo of commenting on a post:
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-## Lecture 3 
+## Course Instructions
+### Lecture 3
+#### Posts
+- Allow a user to create a new post. Use a model-backed form.
+- Add the following validations for a new post. Display validation errors in the `new` view.
+  - Require `title`, `url`, and `description`.
+  - `title` must be at least 5 characters.
+  - `url` must be unique.
+- Allow a user to update a post. Use a model-backed form.
+- Use `before_action` to set up an instance variable needed for the `show`, `edit`, and `update` methods of the posts controller.
+- Extract common code used in the `new` and `edit` views to partials.
+#### Categories
+- Allow a user to create a new category. Use a model-backed form.
+- Add the following validations for a new post. Display validation errors in the `new` view.
+  - Require `name`.
+  - `name` must be unique.
+- Extract the part of the category and post forms that displays validation errors to a partial.
 
+### Lecture 4 
+- Change the association name between comments and user to comments and creator.
+- Allow a user to create a new comment on a post.
+  - The form for a new comment should be displayed on the posts `show` view.
+  - The form should be submitted via a POST request to `/posts/:post_id/comments`.
+- Add the following validations for a new comment. Display validation errors in the posts `show` view.
+  - Require `body`.
+- Display all comments related to a post on the posts `show` view.
+- Allow a user to associate a post with categories when creating a new post and when editing a post.
+- Allow a user to click on post URLs and navigate to those URLs.
+- Display timestamps in a format like "11/01/2019 7:01pm UTC".
+- Add a link to edit the post on the post `show` view.
+
+### What I Changed
+- I only show the code with partials, for brevity's sake, since this is the third time I'm returning to this lesson. The course videos show the step-by-step approach, with commentary.
+- Sort posts in descending order of `created_at`.
+
+### What I Added
+- Display newlines in the post description.
+- Truncate post title, url, and description to fit in the fixed size post partials.
+
+## Lecture 3 
 ### Create a test user
 Run `User.create(username: "Test")` in rails console.
 
