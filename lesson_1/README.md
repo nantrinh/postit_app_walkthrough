@@ -7,27 +7,10 @@ The app would have the appropriate models and associations set up according to t
 
 ![ERD](https://github.com/nantrinh/ls_rails_notes/blob/master/images/ls/ERD_part1.jpg)
 
-## Course Instructions
-- Create new application.
-- Create tables.
-- Create routes for posts and categories. Prevent the delete route from being accessed.
-- Create controllers and views to view:
-  - all posts
-  - a specific post and its associated categories
-  - all categories
-  - a specific category and its associated posts
-- Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
-
-## What I Changed 
-- Use PostgreSQL instead of SQLite3 to make deployment easier.
-- Deploy early on Heroku instead of waiting until the end of Lesson 3.
-- I style the app differently.
-
-## What I Added
-- How to install Bootstrap.
-- Fixed width and height of post partials.
-
 ## Table of Contents
+* [Course Instructions](#course-instructions)
+* [What I Changed](#what-i-changed)
+* [What I Added](#what-i-added)
 * [Create new application](#create-new-application)
 * [Create tables](#create-tables)
    * [Users](#users)
@@ -60,6 +43,26 @@ The app would have the appropriate models and associations set up according to t
 * [Commit and deploy again](#commit-and-deploy-again)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
+## Course Instructions
+- Create new application.
+- Create tables.
+- Create routes for posts and categories. Prevent the delete route from being accessed.
+- Create controllers and views to view:
+  - all posts
+  - a specific post and its associated categories
+  - all categories
+  - a specific category and its associated posts
+- Change the association name between posts and user to posts and creator, so we have a better idea of the relationship of the association.
+
+## What I Changed 
+- Use PostgreSQL instead of SQLite3 to make deployment easier.
+- Deploy early on Heroku instead of waiting until the end of Lesson 3.
+- I style the app differently.
+
+## What I Added
+- How to install Bootstrap.
+- Fixed width and height of post partials.
 
 ## Create new application
 I use PostgreSQL instead of SQLite3.
