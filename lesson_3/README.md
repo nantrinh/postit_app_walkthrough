@@ -1,4 +1,8 @@
 # Lesson 3
+At the end of the lesson, the app will allow a user to register with a username and password, log in, log out, and vote on posts and comments. Certain actions and parts of the UI will be restricted to logged-in users. Logged-in users will be restricted from editing other users' profiles and posts that other users have created. 
+
+Demo:
+![](../gifs/lesson_3.gif)
 
 ## Table of Contents
 * [Course Instructions](#course-instructions)
@@ -26,6 +30,7 @@
       * [Add routes to support all user actions except index and destroy](#add-routes-to-support-all-user-actions-except-index-and-destroy)
       * [Add validations for a new user](#add-validations-for-a-new-user)
       * [Add users controller](#add-users-controller)
+   * [Prevent users from editing other users' posts](#prevent-users-from-editing-other-users-posts)
       * [Add user registration and edit view](#add-user-registration-and-edit-view)
       * [Add users show view](#add-users-show-view)
       * [Link to the show view for a user wherever you have the user name displayed](#link-to-the-show-view-for-a-user-wherever-you-have-the-user-name-displayed)
@@ -41,6 +46,7 @@
    * [Check your changes in rails console](#check-your-changes-in-rails-console)
    * [Add voting feature to the UI](#add-voting-feature-to-the-ui)
    * [Add vote actions to posts and comments controllers](#add-vote-actions-to-posts-and-comments-controllers)
+   * [Deploy](#deploy-1)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -79,7 +85,7 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
   - Require a username and password.
   - Username must be unique.
   - Password must be at least 5 characters long.
-- Prevent users from editing other users' profiles.
+- Prevent users from editing other users' profiles and other users' posts.
 - Display a user's posts and comments in the users `show` view.
 - Add a link to edit the user's profile in the users `show` view. 
 - Link to the `show` view for a user wherever you have the user name displayed.
@@ -371,7 +377,7 @@ validates :password, presence: true, on: :create, length: {minimum: 5}
 ```
 
 #### Add users controller
-The `require_same_user` method is used by the `before_action` method to prevent users from editing other users' profiles.
+The `require_same_user` method is used to prevent users from editing other users' profiles.
 ```ruby
 # app/controllers/users_controller.rb
 
@@ -422,6 +428,19 @@ class UsersController < ApplicationController
       flash[:error] = 'You are not allowed to do that.'
       redirect_to root_path
     end
+  end
+end
+```
+
+### Prevent users from editing other users' posts
+Add the following to `app/controllers/posts_controller.rb`:
+```
+before_action :require_same_user, only: [:edit, :update]
+
+def require_same_user
+  if current_user != @post.creator
+    flash[:error] = 'You are not allowed to do that.'
+    redirect_to root_path
   end
 end
 ```
@@ -785,3 +804,9 @@ def vote
   redirect_back fallback_location: root_path
 end
 ```
+
+### Deploy
+Remember to run `heroku run rake db:migrate`.
+
+Demo of voting:
+![](../gifs/voting.gif)
