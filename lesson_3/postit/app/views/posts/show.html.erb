@@ -1,0 +1,29 @@
+<%= render 'shared/header', title: @post.title, post: @post %>
+
+<section class='container justify-content-center'>
+  <p><%= simple_format(@post.description) %></p>
+  
+  <% if logged_in? %>
+    <section class='w-50 pt-5'>
+      <%= form_for [@post, @comment] do |f| %>
+        <%= render 'shared/errors', obj: @comment %>
+        <div class="form-group">
+          <%= f.label :body, "Leave a comment" %>
+          <%= f.text_area :body, rows: 3, class: "form-control" %>
+        </div>
+        <%= f.submit "Create comment", class: "btn btn-outline-primary btn-sm" %>
+      <% end %>
+    </section>
+  <% end %>
+  
+  <section class='py-5'>
+    <h5 class='pb-2'>Comments</h5>
+    <% if @post.comments.empty? %>
+      <p class="text-muted">There aren't any comments for this post.</p>
+    <% else %>
+      <% @post.comments.each do |comment| %>
+        <%= render 'comments/comment', comment: comment %>
+      <% end %>
+    <% end %>
+  </section>
+</section>

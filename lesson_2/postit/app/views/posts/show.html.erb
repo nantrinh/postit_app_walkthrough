@@ -1,0 +1,33 @@
+<h1><%= @post.title %></h1>
+
+<%= render 'shared/flash' %>
+
+<p> Tags: 
+<% @post.categories.each do |category| %>
+  <%= link_to category.name, category_path(category.id) %>
+<% end %>
+</p>
+
+<p>URL: <%= link_to(body=fix_url(@post.url), url=fix_url(@post.url)) %></p>
+<p>Description: <%= @post.description %></p>
+
+<%= form_for [@post, @comment] do |f| %>
+  <%= render 'shared/errors', obj: @comment %>
+  <div>
+    <%= f.label :body, "Leave a comment" %>
+    <br/>
+    <%= f.text_area :body, rows: 3 %>
+  </div>
+  <%= f.submit "Create comment" %>
+<% end %>
+
+<h5>Comments</h5>
+<% @post.comments.each do |comment| %>
+  <article>
+    <p><%= comment.body %></p>
+    <p><%= comment.creator.username %>, <%= display_datetime(comment.created_at) %></p>
+  </article>
+<% end %>
+
+<p><%= link_to "Edit Post", edit_post_path %></p>
+<p><%= link_to "All Posts", posts_path %></p>

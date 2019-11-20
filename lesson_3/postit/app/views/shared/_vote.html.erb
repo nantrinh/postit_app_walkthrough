@@ -1,0 +1,25 @@
+<% if obj.class == Post %>
+  <% url_true = vote_post_path(obj, vote: true) %>
+  <% url_false = vote_post_path(obj, vote: false) %>
+<% elsif obj.class == Comment %>
+  <% url_true = vote_post_comment_path(obj.post, obj, vote: true) %>
+  <% url_false = vote_post_comment_path(obj.post, obj, vote: false) %>
+<% end %>
+
+<% if !current_user || obj.votes.where(user_id: current_user.id, vote: true).empty? %>
+  <%= link_to url_true, method: 'post' do %>
+    <%= fa_icon 'arrow-up' %>
+  <% end %>
+<% else %>
+  <%= fa_icon 'arrow-up', class: 'disabled' %>
+<% end %>
+</br>
+<%= obj.total_votes %>
+</br>
+<% if !current_user || obj.votes.where(user_id: current_user.id, vote: false).empty? %>
+  <%= link_to url_false, method: 'post' do %>
+    <%= fa_icon 'arrow-down' %>
+  <% end %>
+<% else %>
+  <%= fa_icon 'arrow-down', class: 'disabled' %>
+<% end %>

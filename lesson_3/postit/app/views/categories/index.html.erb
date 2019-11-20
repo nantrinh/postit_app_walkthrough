@@ -1,0 +1,7 @@
+<%= render 'shared/header', title: "Categories" %>
+
+<ul>
+<% @categories.each do |category| %>
+  <li><%= link_to(category.name.capitalize + " (#{pluralize(category.posts.size, 'post')})", category) %></li>
+<% end %>
+</ul>

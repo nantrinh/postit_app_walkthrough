@@ -1,0 +1,30 @@
+<article class='card bg-light m-3 post'>
+  <div class='row no-gutters h-100'>
+    <aside class='col-md-2 votes text-center'>
+      <%= render 'shared/vote', obj: post %>
+    </aside>
+
+    <section class='col-md-10'>
+      <header class='card-header'>
+        <h5><%= truncate(post.title, length: 50) %></h5>
+      </header>
+  
+      <main class='card-body'>
+        <%= render 'posts/post_url', post: post, card: true %>
+        <p class='card-text'>
+          <%= simple_format(truncate(restrict_newlines(post.description, 5), length: 130)) %>
+        </p>
+      </main>
+  
+      <footer class='card-footer'>
+        <%= render 'shared/creator_details', obj: post %>
+        <nav class='btn-group mt-auto'>
+          <%= button_to 'View', post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary' %>
+          <% if current_user == post.creator %>
+            <%= button_to 'Edit', edit_post_path(post), method: 'get', class: 'btn btn-sm btn-outline-secondary border-left-0' %>
+          <% end %>
+        </nav>
+      </footer>
+    </section>
+  </div>
+</article>
