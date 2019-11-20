@@ -1,5 +1,0 @@
-<% card ||= false %>
-
-<% url_display = card ? truncate(fix_url(post.url), length: 28) : fix_url(post.url) %>
-
-<p><%= link_to(body=url_display, url=fix_url(post.url)) %></p>
