@@ -346,4 +346,50 @@ end
 - 1:15: in the ids identifying a post's total votes, change `post.id` to `post.slug`. do the same for comments.
 
 ### Solution: User and Category Slugs
+- 5:00: create `generate_slug` method in category model, and add before_save callback
+```
+before_save :generate_slug
 
+def generate_slug
+  self.slug = self.name.gsub(" ", "-").downcase
+end
+```
+- 3:55: iterate through each category and save it
+- 3:20: override `to_param` instance method in the category model
+- 2:44: `@category = Category.find_by slug: params[:id]` in categories#show action 
+- 1:45: define `generate_slug` (use username) and add `before_save` callback to user model, iterate through each user and save it
+- 0:50: override `to_param` in user model
+- 0:17: `User.find_by slug: params[:id]` in `set_user` method in UsersController
+
+### Solution: Better Slugs
+- 25:00: the current solution does not handle special characters, only spaces
+- 24:10: replace all non-alphanumeric characters with a dash, and with multiple dashes in a row with a single dash
+```
+def generate_slug
+  str = self.title
+  str = str.strip
+  str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
+  str.gsub! /-+/, '-'
+  self.slug = str.downcase
+end
+```
+- 18:45: the current solution would create identical slugs for two posts that have an identical title. we want to make them unique by appending a number.
+```
+def generate_slug
+  the_slug = to_slug(self.title)
+  post = Post.find_by slug: the_slug
+  self.slug = str.downcase
+end
+
+def to_slug(name)
+  str = str.strip
+  str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
+  str.gsub! /-+/, '-'
+  str.downcase
+end
+```
+- 11:35: getting hacky to deal with a particular case
+- 4:55: finished with slug methods; copy & pasting to other models that use slugging
+- 3:10: debugging
+- 0:45: lots of redundant code, but we will fix it later
+- 0:10: add a bang to `generate_slug` to make it `generate_slug!` to signify a destructive action
