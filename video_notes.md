@@ -465,3 +465,103 @@ e.g.,`validates :title, presence: true`
     end
   end
   ```
+
+### Solution: Sluggable Module
+- 12:15: `config/lib/sluggable.rb`
+  ```ruby
+  # this is the code shown at -11:19 
+
+  module Sluggable
+    extend ActiveSupport::Concern
+
+    included do
+      before_save :generate_slug!
+    end
+
+    def to_param
+      # code
+    end
+
+    def generate_slug!
+      # code
+    end
+
+    def append_suffix(str, count)
+      # code
+    end
+
+    def to_slug(name)
+      # code
+    end
+  end
+  ```
+- 11:19: methods need to be modified to work with different models; use metaprogramming
+  ```ruby
+  # this is the code shown at -5:26 
+
+  module Sluggable
+    extend ActiveSupport::Concern
+
+    included do
+      before_save :generate_slug!
+      # expose a class attribute that we can set per class that we include Sluggable in
+      class_attribute :slug_column
+    end
+
+    def to_param
+      # code
+    end
+
+    def generate_slug!
+      the_slug = to_slug(self.send(self.class.slug_column.to_sym))
+      obj = self.class.find_by slug: the_slug
+      # more code
+    end
+
+    def append_suffix(str, count)
+      # code
+    end
+
+    def to_slug(name)
+      # code
+    end
+
+    module ClassMethods
+      def sluggable_column(col_name)
+        self.slug_column = col_name
+      end
+    end
+  end
+  ```
+
+  ```
+  # app/models/post.rb
+
+  include Sluggable
+  sluggable_column :title
+  ```
+- 5:17: doing the same for category, user
+- 4:30: demo, debug
+- 1:30: checking in the browser 
+
+### Solution: Voteable Gem
+- 14:52: register at rubygems.org
+- 14:30: need gemcutter gem
+- 13:30: create new folder `voteable-gem`
+- 12:45: create a gem specification file 
+  ```
+  # voteable_ntrinh.gemspec
+  Gem::Specification.new do |s|
+    s.name = 'voteable_ntrinh'
+    s.version = '0.0.0'
+    s.date = '2019-11-22'
+    s.summary = 'A voting gem'
+    s.description = 'My voting gem.'
+    s.authors = ['N Trinh']
+    s.email = ['ntrinh@ls.com']
+    s.files = ['lib/voteable_ntrinh.rb']
+    # normally you would want your code in a git repo and you would put the link here
+    s.homepage = 'http://github.com' 
+  end
+  ```
+- 10:02:  
