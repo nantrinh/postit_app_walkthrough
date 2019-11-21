@@ -151,11 +151,11 @@ e.g.,`validates :title, presence: true`
 - 46:00: subject: user_id. object: post_id, photo_id, or video_id. the comment can be for either a post, photo, or video.
 - 45:00: this way of doing it is not great because there are too many empty cells.
 - 43:30: have a column for id, and one column to identify the thing you are tracking (e.g., is it a post, photo, or video?)
-- 42:45: id, body, user_id, commentable_type, commentable_id (rails convention is *able_type and *able_id). commentable_type is a string (e.g., "Image", "Post").
+- 42:45: id, body, user_id, commentable_type, commentable_id (rails convention is `*able_type` and `*able_id`). commentable_type is a string (e.g., "Image", "Post").
 - 41:33: composite foreign key: commentable_type and commentable_id together form a foreign key.
 - 39:08: ERD with votes 
 - 36:20: create votes table migration 
-    ```
+    ```ruby
     def change
       create_table :votes do |t|
         t.boolean :vote
@@ -167,13 +167,13 @@ e.g.,`validates :title, presence: true`
     end
     ```
 - 34:10: create vote model 
-    ```
+    ```ruby
     class Vote < ActiveRecord::Base
       belongs_to :creator, class_name: 'User', foreign_key: 'user_id'
     end
     ```
 - 31:13: set up polymorphic association in vote model (the M side of 1:M)
-    ```
+    ```ruby
     belongs_to :voteable, polymorphic: true
     ```
 - 29:32: set up polymorphic association on the 1 side (of 1:M)
@@ -192,7 +192,7 @@ e.g.,`validates :title, presence: true`
 - 16:00: alternatively, could route to POST /posts/3/vote => 'PostsController#vote' and same for comments
 - 14:00: the second way will be demonstrated, partly for teaching reasons. if you're going to have votes for many types of things, the first way would be better.
 - 12:30: using `member`. the created route would be `POST /posts/:id/vote posts#vote`. you use this if you will be working with members of the class.
-    ```
+    ```ruby
     resources :posts, except: [:destroy] do
       member do
         post :vote
@@ -217,7 +217,7 @@ e.g.,`validates :title, presence: true`
 - 33:55: how to pass in params using link_to  
   `<% link_to vote_post_path(post, vote: true), method: 'post' do %>`
 - 30:00: define vote action in posts controller
-  ```
+  ```ruby
   # add :vote to before_action 
 
   def vote
@@ -233,7 +233,7 @@ e.g.,`validates :title, presence: true`
   end
   ```
 - 22:30: display (number of upvotes - number of downvotes). since this is business logic, put it in the post model.
-  ```
+  ```ruby
   def total_votes
     up_votes - down_votes
   end
@@ -247,7 +247,7 @@ e.g.,`validates :title, presence: true`
   end
   ```
 - 16:40: sort posts in index view to display posts in decreasing order of (number of upvotes - number of downvotes).
-  ```
+  ```ruby
   def index
     # NOTE/TODO: it would be safer to retrieve a subset because
     # you might have a very large number of Post records
@@ -268,23 +268,23 @@ e.g.,`validates :title, presence: true`
 - 14:20: you will have an attribute `data-remote="true"`
 - 13:45: javascript that comes with rails sees `data-remote="true"` and will submit the request as an ajax request
 - 10:40: modifying the vote action in the postscontroller
-```
-respond_to do |format|
-  format.html do
-    if vote.valid?
-      flash[:notice] = 'Your vote was counted.'
-    else
-      flash[:error] = 'You can only vote on a post once.'
+  ```ruby
+  respond_to do |format|
+    format.html do
+      if vote.valid?
+        flash[:notice] = 'Your vote was counted.'
+      else
+        flash[:error] = 'You can only vote on a post once.'
+      end
+      redirect_to :back # this line was moved up here at 8:30 
     end
-    redirect_to :back # this line was moved up here at 8:30 
+    format.js
+    # you could have `format.js do; render json: @post.to_json`
+    # but since we are using the rails-flavored ajax, we can leave it blank.
+    # when we leave this blank, rails will try to render a template of
+    # the same name as the action (`vote.js.erb`).
   end
-  format.js
-  # you could have `format.js do; render json: @post.to_json`
-  # but since we are using the rails-flavored ajax, we can leave it blank.
-  # when we leave this blank, rails will try to render a template of
-  # the same name as the action (`vote.js.erb`).
-end
-```
+  ```
 - 9:30: the template would be `app/views/posts/vote.js.erb`
 - 8:43: if you put `redirect_to :back` at the end of the `respond_to do; end` block, you get an error because you would be trying to render a template (the js one), and redirecting. you can do either but not both.
 - 7:35: the templates have access to any instance variables you set up in the action
@@ -293,13 +293,13 @@ end
 - 4:00: Add `remote: true` to the downvote link_to options to ajax-ify downvote action.
 - 1:50: Make `vote` an instance variable `@vote` so you can reference it in the template.
 - 1:45:
-```
-<% if @vote.valid? %>
-  $('#post_<%= @post.id %>_votes').html('<% @post.total_votes %> votes')
-<% else %>
-  alert('You can only vote on a post once.');
-<% end %>
-```
+  ```javascript
+  <% if @vote.valid? %>
+    $('#post_<%= @post.id %>_votes').html('<% @post.total_votes %> votes')
+  <% else %>
+    alert('You can only vote on a post once.');
+  <% end %>
+  ```
 
 ### Solution: Ajax for Comment voting 
 - 6:45: setting `remote: true`
@@ -313,33 +313,33 @@ end
 - 17:50: we don't want to expose the ids of our data or how many of them we have (e.g., 4 categories)
 - 17:45: we want our urls to be SEO friendly and informative to the user (e.g., categories/sports instead of categories/1
 - 16:00: add column `slug` to users, posts, and categories tables
-```
-rails g migration add_slugs
-
-def change
-  add_column :users, :slug, :string
-  add_column :posts, :slug, :string
-  add_column :categories, :slug, :string
-end
-```
+  ```ruby
+  rails g migration add_slugs
+  
+  def change
+    add_column :users, :slug, :string
+    add_column :posts, :slug, :string
+    add_column :categories, :slug, :string
+  end
+  ```
 - 13:30: add method to post model
-```
-def generate_slug
-  self.slug = self.title.gsub(" ", "-").downcase
-end
-```
+  ```ruby
+  def generate_slug
+    self.slug = self.title.gsub(" ", "-").downcase
+  end
+  ```
 - 12:40: active record callbacks
 - 11:00: `before_save :generate_slug`
 - 10:10: difference between before_save and before_create: before_create only fires once in the lifecycle of the object. before_save fires every time you save the object. if you want the slug to remain the same when the title is updated, use before_create. if you want to change the slug when the title changes, use before_save. note that if you have bookmarked the url with a previous title, the link would not work anymore.
 - 8:30: `Post.all.each {|post| post.save}` in rails console to generate slugs for each post in your database. note that if you have any posts that don't pass validations, they won't be saved, and the slugs won't be generated. check for rollbacks to see if there were any posts that didn't pass validations.
 - 6:00: override the `to_param` method to return the slug, so that post_path(post) would use the slug column to build the url
-```
-# app/models/post.rb
-
-def to_param
-  self.slug
-end
-```
+  ```ruby
+  # app/models/post.rb
+  
+  def to_param
+    self.slug
+  end
+  ```
 - 4:30: update `set_post` in PostsController: `@post = Post.find_by slug: params[:id]`
 - 3:12: update `create` action in CommentsController: `@post = Post.find_by slug: params[:id]`
 - 2:24: update `@post.comments.each` to `@post.reload.comments.each` in posts#show view, because when you have a validation error, you want to reload hte post and then grab the comments associated with it
@@ -347,13 +347,13 @@ end
 
 ### Solution: User and Category Slugs
 - 5:00: create `generate_slug` method in category model, and add before_save callback
-```
-before_save :generate_slug
-
-def generate_slug
-  self.slug = self.name.gsub(" ", "-").downcase
-end
-```
+  ```ruby
+  before_save :generate_slug
+  
+  def generate_slug
+    self.slug = self.name.gsub(" ", "-").downcase
+  end
+  ```
 - 3:55: iterate through each category and save it
 - 3:20: override `to_param` instance method in the category model
 - 2:44: `@category = Category.find_by slug: params[:id]` in categories#show action 
@@ -364,32 +364,104 @@ end
 ### Solution: Better Slugs
 - 25:00: the current solution does not handle special characters, only spaces
 - 24:10: replace all non-alphanumeric characters with a dash, and with multiple dashes in a row with a single dash
-```
-def generate_slug
-  str = self.title
-  str = str.strip
-  str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
-  str.gsub! /-+/, '-'
-  self.slug = str.downcase
-end
-```
+  ```ruby
+  def generate_slug
+    str = self.title
+    str = str.strip
+    str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
+    str.gsub! /-+/, '-'
+    self.slug = str.downcase
+  end
+  ```
 - 18:45: the current solution would create identical slugs for two posts that have an identical title. we want to make them unique by appending a number.
-```
-def generate_slug
-  the_slug = to_slug(self.title)
-  post = Post.find_by slug: the_slug
-  self.slug = str.downcase
-end
-
-def to_slug(name)
-  str = str.strip
-  str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
-  str.gsub! /-+/, '-'
-  str.downcase
-end
-```
+  ```ruby
+  def generate_slug
+    the_slug = to_slug(self.title)
+    post = Post.find_by slug: the_slug
+    self.slug = str.downcase
+  end
+  
+  def to_slug(name)
+    str = str.strip
+    str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
+    str.gsub! /-+/, '-'
+    str.downcase
+  end
+  ```
 - 11:35: getting hacky to deal with a particular case
 - 4:55: finished with slug methods; copy & pasting to other models that use slugging
 - 3:10: debugging
 - 0:45: lots of redundant code, but we will fix it later
 - 0:10: add a bang to `generate_slug` to make it `generate_slug!` to signify a destructive action
+
+## Lecture 8 
+### Solution: Voteable Module 
+- 13:10: could put the module in config/initializers, or create a lib directory and tell rails to load the files there: `config.autoload_paths += %W(#{config.root}/lib)`
+- 11:50: `config/lib/voteable.rb`
+
+  ```ruby
+  # traditional ruby meta-programming way
+  # this is the code that we see at -2:38
+  
+  module Voteable
+    def self.included(base)
+      # include the methods in InstanceMethods in the base class (the class that will be including the Voteable module)
+      base.send(:include, InstanceMethods)
+      # include the methods in ClassMethods as class methods
+      base.extend ClassMethods
+      # call the class method `my_class_method`
+      base.class_eval do
+        my_class_method
+      end
+    end
+  
+    module InstanceMethods
+      def total_votes
+        self.upvotes - self.downvotes  
+      end
+    
+      def upvotes
+        self.votes.where(vote: true).size
+      end
+    
+      def downvotes
+        self.votes.where(vote: false).size
+      end
+    end
+  
+    module ClassMethods
+      def my_class_method
+        has_many :votes, as: :voteable
+      end
+    end
+  end
+  ```
+- 11:06: meta-programming
+- 8:00: demo. `include Voteable` in Post module
+- 5:45: demo of what happens when you remove `has_many :votes, as :voteable` from the Post model
+- 5:13: move `has_many :votes, as: :voteable` to `my_class_method`
+- 4:50: demo
+- 3:56: modifying Comment model to include Voteable
+- 2:30: rewriting the module using Rails Concerns 
+  ```ruby
+  module Voteable
+    extend ActiveSupport::Concern
+  
+    included do
+      # run this at inclusion time
+      has_many :votes, as: :voteable
+    end
+  
+    def total_votes
+      self.upvotes - self.downvotes  
+    end
+  
+    def upvotes
+      self.votes.where(vote: true).size
+    end
+  
+    def downvotes
+      self.votes.where(vote: false).size
+    end
+  end
+  ```
