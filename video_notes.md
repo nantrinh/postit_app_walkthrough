@@ -19,6 +19,8 @@ The timestamps are in `length_of_video - where_you_are_in_the_video` format, bec
    * [Lecture 6](#lecture-6)
       * [Part 1](#part-1-2)
       * [Part 2](#part-2-2)
+* [Lesson 4](#lesson-4)
+   * [Lecture 7](#lecture-7)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -256,3 +258,92 @@ e.g.,`validates :title, presence: true`
   `validates_uniqueness_of :creator, scope: :voteable`
 - 9:00: rails escapes all tags by default
 - 7:10: you can use `html_safe` to tell rails you don't want to escape the tags. `flash[:error] = "some string".html_safe`
+
+# Lesson 4
+## Lecture 7
+### Solution: Ajax for Post voting
+- 17:15: we want to use AJAX when we vote so we don't have to hit the database again many times to display all of the posts and the votes. we want to update only the post that was voted on.
+- 16:20: unobtrusive javascript way example. modify application.js. add event listener.  
+- 14:55: rails way. add `remote: true` so you will have `<% link_to vote_post_path(post, vote: true), method: 'post', remote: true do %>` 
+- 14:20: you will have an attribute `data-remote="true"`
+- 13:45: javascript that comes with rails sees `data-remote="true"` and will submit the request as an ajax request
+- 10:40: modifying the vote action in the postscontroller
+```
+respond_to do |format|
+  format.html do
+    if vote.valid?
+      flash[:notice] = 'Your vote was counted.'
+    else
+      flash[:error] = 'You can only vote on a post once.'
+    end
+    redirect_to :back # this line was moved up here at 8:30 
+  end
+  format.js
+  # you could have `format.js do; render json: @post.to_json`
+  # but since we are using the rails-flavored ajax, we can leave it blank.
+  # when we leave this blank, rails will try to render a template of
+  # the same name as the action (`vote.js.erb`).
+end
+```
+- 9:30: the template would be `app/views/posts/vote.js.erb`
+- 8:43: if you put `redirect_to :back` at the end of the `respond_to do; end` block, you get an error because you would be trying to render a template (the js one), and redirecting. you can do either but not both.
+- 7:35: the templates have access to any instance variables you set up in the action
+- 6:22: dynamically create ids for the element that you want to affect with javascript: `<span id='post_<%=post.id%>_votes'><%= post.total_votes %> votes</span>`
+- 5:00: `$('#post_<%= @post.id %>_votes').html('<% @post.total_votes %> votes')`
+- 4:00: Add `remote: true` to the downvote link_to options to ajax-ify downvote action.
+- 1:50: Make `vote` an instance variable `@vote` so you can reference it in the template.
+- 1:45:
+```
+<% if @vote.valid? %>
+  $('#post_<%= @post.id %>_votes').html('<% @post.total_votes %> votes')
+<% else %>
+  alert('You can only vote on a post once.');
+<% end %>
+```
+
+### Solution: Ajax for Comment voting 
+- 6:45: setting `remote: true`
+- 5:50: setting up `respond_to` block
+- 4:00: dynamic ids for total votes
+- 2:25: making `comment` and instance variable in the action
+- 2:00: add code to the template (similar to what was added for the post.js template)
+- 1:00: show validation error 
+
+### Solution: Post Slugs
+- 17:50: we don't want to expose the ids of our data or how many of them we have (e.g., 4 categories)
+- 17:45: we want our urls to be SEO friendly and informative to the user (e.g., categories/sports instead of categories/1
+- 16:00: add column `slug` to users, posts, and categories tables
+```
+rails g migration add_slugs
+
+def change
+  add_column :users, :slug, :string
+  add_column :posts, :slug, :string
+  add_column :categories, :slug, :string
+end
+```
+- 13:30: add method to post model
+```
+def generate_slug
+  self.slug = self.title.gsub(" ", "-").downcase
+end
+```
+- 12:40: active record callbacks
+- 11:00: `before_save :generate_slug`
+- 10:10: difference between before_save and before_create: before_create only fires once in the lifecycle of the object. before_save fires every time you save the object. if you want the slug to remain the same when the title is updated, use before_create. if you want to change the slug when the title changes, use before_save. note that if you have bookmarked the url with a previous title, the link would not work anymore.
+- 8:30: `Post.all.each {|post| post.save}` in rails console to generate slugs for each post in your database. note that if you have any posts that don't pass validations, they won't be saved, and the slugs won't be generated. check for rollbacks to see if there were any posts that didn't pass validations.
+- 6:00: override the `to_param` method to return the slug, so that post_path(post) would use the slug column to build the url
+```
+# app/models/post.rb
+
+def to_param
+  self.slug
+end
+```
+- 4:30: update `set_post` in PostsController: `@post = Post.find_by slug: params[:id]`
+- 3:12: update `create` action in CommentsController: `@post = Post.find_by slug: params[:id]`
+- 2:24: update `@post.comments.each` to `@post.reload.comments.each` in posts#show view, because when you have a validation error, you want to reload hte post and then grab the comments associated with it
+- 1:15: in the ids identifying a post's total votes, change `post.id` to `post.slug`. do the same for comments.
+
+### Solution: User and Category Slugs
+
