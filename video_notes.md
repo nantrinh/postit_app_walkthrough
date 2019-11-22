@@ -550,18 +550,68 @@ e.g.,`validates :title, presence: true`
 - 13:30: create new folder `voteable-gem`
 - 12:45: create a gem specification file 
   ```
-  # voteable_ntrinh.gemspec
+  # replace "chris" with your name, or some other word
+
+  # voteable_chris.gemspec
   Gem::Specification.new do |s|
-    s.name = 'voteable_ntrinh'
+    s.name = 'voteable_chris'
     s.version = '0.0.0'
     s.date = '2019-11-22'
     s.summary = 'A voting gem'
     s.description = 'My voting gem.'
-    s.authors = ['N Trinh']
-    s.email = ['ntrinh@ls.com']
-    s.files = ['lib/voteable_ntrinh.rb']
+    s.authors = ['Chris Lee']
+    s.email = ['chris@ls.com']
+    s.files = ['lib/voteable_chris.rb']
     # normally you would want your code in a git repo and you would put the link here
     s.homepage = 'http://github.com' 
   end
   ```
-- 10:02:  
+- 10:02: create `voteable-gem/lib/voteable_chris.rb` 
+    ```
+    module Voteable
+      # code from the module
+    end
+    ```
+- 9:00: `gem build voteable_chris.gemspec` produces a `.gemfile`. Do gem push vote.
+- 7:25: `gem list -r voteable_chris` should show that your gem is found
+- 6:55: proving that the code is broken with the module removed and the gem not yet included
+- 6:20: specify `gem voteable_chris` and `bundle_install`
+- 5:15: what if you notice a bug in your gem?  you can modify the code, go to gem spec file, modify the version, `gem build voteable_chris.gemspec`, `gem push voteable_chris-0.0.1`. now both will be on the ruby gem list but different version. change line in gemfile to `gem 'voteable_chris', '= 0.0.1'`, and run `bundle install` again.
+- 2:40: you could work on the gem locally and specify that the gem is local in your Gemfile: `gem 'voteable_chris', '= 0.0.1', path: '/Users/chris/tealeaf_code/postit-solutions/voteable-gem'`. You still have to `gem build voteable_chris.gemspec` every time you update the gem and change the version number though
+
+### Solution: Simple Roles
+- 7:24: add these methods to the user model
+  ```
+  def admin?
+    self.role == 'admin'
+  end
+  
+  def moderator?
+    self.role == 'moderator'
+  end
+  ```
+- 7:04: `rails g migration add_role_to_users`
+  ```
+  def change
+    add_column :users, :role, :string
+  end
+  ```
+- 5:45: restrict creation of categories to admin role. Add `before_action :require_admin, only: [:new, :create]` to CategoriesController.
+- 4:30: add `require_admin` method to ApplicationController
+  ```
+  def require_admin
+    access_denied unless logged_in? && current_user.admin?
+  end
+
+  def access_denied
+    flash[:error] = 'You do not have permission to do that.'
+    redirect_to root_path
+  end
+  ```
+- 2:08: hide new category link unless the current user is an admin
+```
+# navigation template
+
+<% if logged_in? && current_user.admin? %>
+<% end %>
+```
