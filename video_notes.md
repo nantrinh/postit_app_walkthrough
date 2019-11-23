@@ -615,3 +615,45 @@ e.g.,`validates :title, presence: true`
 <% if logged_in? && current_user.admin? %>
 <% end %>
 ```
+
+### Solution: Require Creator or Admin
+- 4:01:  add method to PostsController 
+  ```
+  # code from  -0:34
+
+  def require_creator
+    access_denied unless logged_in? && (current_user == @post.creator || current_user.admin?)
+  end
+  ```
+
+### Solution: Time Zones
+- 17:40: set default time zone in `config/locales/application.rb`: `config.time_zone = 'Central Time (US & Canada)'`
+- 17:00: `rake -T | grep time` lists all rake tasks related to time
+- 16:25: `rake time:zones:all` lists all time zones
+- 16:05: `rake time:zones:all | grep US` lists all time zones in US
+- 15:30: changed default time zone to Eastern Time 
+- 13:55: `rails g migration add_time_zone_to_users` 
+```
+add_column :users, :time_zone, :string
+```
+- 11:40: adding dropdown field for timezone to user form `_form.html.erb` template. (Added code to set the default to the app default, from -3:35).
+  ```
+  <div class='control-group'>
+    <%= f.label :time_zone %>
+    <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, default: Time.zone.name %>
+  </div>
+  ```
+- 8:30: modify strong params to allow timezone through: `permit(:username, :password, :time_zone)`
+- 6:00: modify display_datetime in ApplicationHelper
+```
+def display_datetime(dt)
+  if logged_in? && !current_user.time_zone.blank?
+    dt = dt.in_time_zone(current_user.time_zone)
+  end
+  dt.strftime("%m/%d/%Y %l:%M%P %Z")
+end
+```
+- 1:35: display timezone on user's profile page
+```
+Time Zone: <%= @user.time_zone %>
+```
