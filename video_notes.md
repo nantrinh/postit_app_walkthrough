@@ -437,7 +437,7 @@ e.g.,`validates :title, presence: true`
   end
   ```
 - 11:06: meta-programming
-- 8:00: demo. `include Voteable` in Post module
+- 8:00: demo. `include Voteable` in Post model 
 - 5:45: demo of what happens when you remove `has_many :votes, as :voteable` from the Post model
 - 5:13: move `has_many :votes, as: :voteable` to `my_class_method`
 - 4:50: demo
@@ -572,7 +572,7 @@ e.g.,`validates :title, presence: true`
       # code from the module
     end
     ```
-- 9:00: `gem build voteable_chris.gemspec` produces a `.gemfile`. Do gem push vote.
+- 9:00: `gem build voteable_chris.gemspec` produces a `.gemfile`. Then run `gem push vote`.
 - 7:25: `gem list -r voteable_chris` should show that your gem is found
 - 6:55: proving that the code is broken with the module removed and the gem not yet included
 - 6:20: specify `gem voteable_chris` and `bundle_install`
