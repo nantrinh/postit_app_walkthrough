@@ -133,5 +133,54 @@ if (<%= @upvote %>) {
 }
 ```
 
-## Lecture 8
+### Extract voting code to a Gem 
+- Register at rubygems.org.
+- `gem install gemcutter`
+- Create new folder `voteable_gem` (NOT in the same folder as the app; it should have its own git repo).
+- Create a gem specification file in the folder.
+```
+# voteable-gem/voteable_nancy.gemspec
 
+Gem::Specification.new do |s|
+  s.name = 'voteable_nancy'
+  s.version = '0.0.0'
+  s.date = '2019-11-22'
+  s.summary = 'A voting gem'
+  s.description = 'My voting gem.'
+  s.authors = ['Nancy Trinh']
+  s.email = ['nancy@ls.com']
+  s.files = ['lib/voteable_nancy.rb']
+  # normally you would want your code in a git repo and you would put the link here
+  s.homepage = 'http://github.com' 
+end
+```
+- Create `voteable-gem/lib/voteable_nancy.rb`
+```ruby
+module Voteable
+  extend ActiveSupport::Concern
+
+  included do
+    # run this at inclusion time
+    has_many :votes, as: :voteable
+  end
+
+  def total_votes
+    self.upvotes - self.downvotes  
+  end
+
+  def upvotes
+    self.votes.where(vote: true).size
+  end
+
+  def downvotes
+    self.votes.where(vote: false).size
+  end
+end
+```
+- Remove the code you copied to voteable_nancy.rb from the Post and Comment models. Replace with `include Voteable`.
+- `gem build voteable_nancy.gemspec`
+- `gem push voteable_nancy-0.0.0.gem`
+- Add `include Voteable` to Post model and Comment model 
+- Add `gem 'voteable_nancy', '~> 0.0.0'` in Gemfile. (Change the version number every time you update the version, rebuild, and push).
+- `bundle install`
+- If you want to work on the gem locally as you develop your application, you can specify the path in the Gemfile: `gem 'voteable_nancy', '~> 0.0.0', path: '/home/nancy/Documents/voteable_gem'`. You would still have to `gem build voteable_nancy.gemspec` every time you change the version number.
