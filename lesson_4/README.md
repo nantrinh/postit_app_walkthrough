@@ -5,17 +5,13 @@ Demo:
 ![](../gifs/lesson_4.gif)
 
 ## Course Instructions
-### Ajax-ify Voting
-When an object is voted on, refresh the total votes shown for the object, not the entire page.
-
-### Use Slugs
+### Ajax-ify voting and extract code to a Gem
+- When an object is voted on, refresh the total votes shown for the object, not the entire page.
+- Extract the voting code in the models to a Gem. 
+### Use slugs
 - URLs should contain the title of posts, usernames of users, and names of categories, instead of ids.
 - Replace all non-alphanumeric characters with a dash, and with multiple dashes in a row with a single dash
 - Append a number to a new slug if it is identical to an existing one.
-
-### Voteable gem
-- Make it a gem
-### Sluggable gem 
 ### Roles
 - Restrict creation of categories to admin role.
 - Only show the link to create a new category to admins.
@@ -33,8 +29,7 @@ In the previous lesson, I added code to handle the following scenarios:
 Because of these changes, my code deviates from that in the course videos.
 
 ### Use Slugs
-I do not add the extra functionality from -11:35 in the Better Slugs solution video. 
-
+- I wrote my own function to handle duplicate slugs. 
 
 ## What I Added
 
@@ -184,3 +179,105 @@ end
 - Add `gem 'voteable_nancy', '~> 0.0.0'` in Gemfile. (Change the version number every time you update the version, rebuild, and push).
 - `bundle install`
 - If you want to work on the gem locally as you develop your application, you can specify the path in the Gemfile: `gem 'voteable_nancy', '~> 0.0.0', path: '/home/nancy/Documents/voteable_gem'`. You would still have to `gem build voteable_nancy.gemspec` every time you change the version number.
+
+### Use slugs
+- Add a `slug` column to the `users`, `posts`, and `categories` tables.
+  `rails g migration add_slugs`
+  ```
+  def change
+    add_column :users, :slug, :string
+    add_column :posts, :slug, :string
+    add_column :categories, :slug, :string
+  end
+  ```
+  `rails db:migrate`
+- Add a new file `config/initializers/sluggable.rb`. 
+  ```
+  module Sluggable
+    extend ActiveSupport::Concern
+  
+    included do
+      before_save :generate_slug!
+      # expose a class attribute that we can set per class that we include Sluggable in
+      class_attribute :slug_column
+    end
+  
+    # overrides the to_param method so the path helpers
+    # (e.g., post_path(post)) would use the slug column to build the url
+    def to_param
+      self.slug 
+    end
+  
+    def generate_slug!
+      slug = to_slug(self.send(self.class.slug_column.to_sym))
+      obj = self.class.find_by slug: slug
+      if obj && obj != self
+        self.slug = next_slug(slug)
+      else
+        self.slug = slug
+      end
+    end
+    
+    def to_slug(str)
+      str = str.strip
+      str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
+      str.gsub! /-+/, '-'
+      str.downcase
+    end
+  
+    def next_slug(slug)
+      number = 1
+      new_slug = ''
+      loop do
+        new_slug = "#{slug}-#{number}"
+        obj = self.class.find_by slug: new_slug 
+        break if obj.nil?
+        number += 1
+      end
+      new_slug 
+    end
+  
+    module ClassMethods
+      def sluggable_column(col_name)
+        self.slug_column = col_name
+      end
+    end
+  end
+  ```
+- Update models:
+  - Add `include Sluggable` to user, post, and category models 
+  - Set `sluggable_column :username` in the user model.
+  - Set `sluggable_column :title` in the post model.
+  - Set `sluggable_column :name` in the category model.
+- Update controllers:
+  - Update `set_post` in PostsController to use `@post = Post.find_by slug: params[:id]`
+  - Update `create` in CommentsController to use `@post = Post.find_by slug: params[:post_id]`
+  - Update `set_user` in UsersController to use `User.find_by slug: params[:id]`.
+  - Update `show` action in CategoriesController to use `Category.find_by slug: params[:id]`
+- Update views:
+  - Change `@post.comments.each` to `@post.reload.comments.each` in posts#show view, because when you have a validation error, you want to reload the post  and then grab the comments associated with it.
+  - Change `post.id` to `post.slug` in `app/views/posts/vote.js.erb`
+  - Change `current_user.id` to `current_user.slug` in
+    - `app/views/shared/_nav.html.erb`
+    - `app/views/shared/_header.html.erb`
+  - Change `obj.creator.id` to `obj.creator.slug` in `app/views/shared/_creator_details.html.erb`
+  - Change `obj.id` to `obj.slug` in `app/views/shared/_vote.html.erb`, only if the object being voted on is a post.
+    ```
+    <% if obj.class == Post %>
+      <div id='<%= obj.class %>_<%= obj.slug %>_votes'><%= obj.total_votes %></div>
+    <% else %>
+      <div id='<%= obj.class %>_<%= obj.slug %>_votes'><%= obj.total_votes %></div>
+    <% end %>
+    ```
+- Run the following commands in rails console to generate slugs for each user, post, and category. If there are any rollbacks, this means some rows do not pass validations, and you will have to fix them first.
+  ```
+  User.all.each {|x| x.save}
+  Post.all.each {|x| x.save}
+  Category.all.each {|x| x.save}
+  ```
+
+###
+
+### Additional Changes
+- Add edit link for a post on the post show page
+- Add right border for the voting aside
