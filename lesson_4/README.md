@@ -4,6 +4,35 @@ At the end of the lesson, the app will [TODO]
 Demo:
 ![](../gifs/lesson_4.gif)
 
+## Table of Contents
+* [Course Instructions](#course-instructions)
+   * [Ajax-ify voting and extract code to a Gem](#ajax-ify-voting-and-extract-code-to-a-gem)
+   * [Use slugs](#use-slugs)
+   * [Add roles](#add-roles)
+   * [Let users set time zones](#let-users-set-time-zones)
+* [What I Changed](#what-i-changed)
+   * [Ajax-ify Voting](#ajax-ify-voting)
+   * [Use Slugs](#use-slugs-1)
+* [What I Added](#what-i-added)
+* [Ajax-ify Voting](#ajax-ify-voting-1)
+   * [Modify the vote actions to serve the Ajax request](#modify-the-vote-actions-to-serve-the-ajax-request)
+   * [Enable usage of jQuery](#enable-usage-of-jquery)
+   * [Modify vote partial](#modify-vote-partial)
+   * [Create javascript templates](#create-javascript-templates)
+* [Extract voting code to a Gem](#extract-voting-code-to-a-gem)
+* [Use slugs](#use-slugs-2)
+   * [Add a slug column to the users, posts, and categories tables](#add-a-slug-column-to-the-users-posts-and-categories-tables)
+   * [Create module](#create-module)
+   * [Update models](#update-models)
+   * [Update controllers](#update-controllers)
+   * [Update views](#update-views)
+   * [Fill in slugs for existing rows](#fill-in-slugs-for-existing-rows)
+* [Add roles](#add-roles-1)
+* [Let users set time zones](#let-users-set-time-zones-1)
+* [Additional Changes](#additional-changes)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Course Instructions
 ### Ajax-ify voting and extract code to a Gem
 - When an object is voted on, refresh the total votes shown for the object, not the entire page.
@@ -12,11 +41,11 @@ Demo:
 - URLs should contain the title of posts, usernames of users, and names of categories, instead of ids.
 - Replace all non-alphanumeric characters with a dash, and with multiple dashes in a row with a single dash
 - Append a number to a new slug if it is identical to an existing one.
-### Roles
+### Add roles
 - Restrict creation of categories to admin role.
 - Only show the link to create a new category to admins.
 - Restrict editing of posts to their creator and admins.
-### Time Zones
+### Let users set time zones
 - Add a drop-down of time zones to the user form (new and edit).
 - Make the default time zone Eastern US time.
 - Allow each user to select their time zone.
@@ -33,9 +62,8 @@ Because of these changes, my code deviates from that in the course videos.
 
 ## What I Added
 
-## Lecture 7
-### Ajax-ify Voting
-#### Modify the `vote` actions to serve the Ajax request
+## Ajax-ify Voting
+### Modify the `vote` actions to serve the Ajax request
 Replace the `redirect_back` line with this snippet in PostsController and CommentsController. This will render `app/views/posts/vote.js.erb` for posts and `app/views/comments/vote.js.erb` for comments when the request is sent using Ajax. [(Docs)](https://guides.rubyonrails.org/working_with_javascript_in_rails.html#a-simple-example)
 ```ruby
 @upvote = params[:vote]
@@ -48,14 +76,14 @@ respond_to do |format|
 end
 ```
 
-#### Enable usage of jQuery 
+### Enable usage of jQuery 
 Add the following lines to `app/javascript/packs/application.js`:
 ```
 window.jQuery = $;
 window.$ = $;
 ```
 
-#### Modify `vote` partial 
+### Modify `vote` partial 
 - Set the `:remote` option of `link_to` to `true` to set the `data-remote` attribute of the resulting anchor tag to `true`. JavaScript code that comes with Rails will see this and send the request using Ajax. [(Docs)](https://guides.rubyonrails.org/working_with_javascript_in_rails.html#link-to)
 - Wrap the total votes display in a `span` element and dynamically generate ids for the element so we can reference them easily in the DOM.
 - Add classes to the `upvote` and `downvote` parts so we can reference them easily in the DOM.
@@ -92,7 +120,7 @@ window.$ = $;
 </span>
 ```
 
-#### Create javascript templates
+### Create javascript templates
 I don't know how to DRY this up yet.
 ```
 // app/views/posts/vote.js.erb
@@ -128,7 +156,7 @@ if (<%= @upvote %>) {
 }
 ```
 
-### Extract voting code to a Gem 
+## Extract voting code to a Gem 
 - Register at rubygems.org.
 - `gem install gemcutter`
 - Create new folder `voteable_gem` (NOT in the same folder as the app; it should have its own git repo).
@@ -180,88 +208,93 @@ end
 - `bundle install`
 - If you want to work on the gem locally as you develop your application, you can specify the path in the Gemfile: `gem 'voteable_nancy', '~> 0.0.0', path: '/home/nancy/Documents/voteable_gem'`. You would still have to `gem build voteable_nancy.gemspec` every time you change the version number.
 
-### Use slugs
-- Add a `slug` column to the `users`, `posts`, and `categories` tables.
-  `rails g migration add_slugs`
-  ```
-  def change
-    add_column :users, :slug, :string
-    add_column :posts, :slug, :string
-    add_column :categories, :slug, :string
+## Use slugs
+### Add a `slug` column to the `users`, `posts`, and `categories` tables
+`rails g migration add_slugs`
+```
+def change
+  add_column :users, :slug, :string
+  add_column :posts, :slug, :string
+  add_column :categories, :slug, :string
+end
+```
+`rails db:migrate`
+
+### Create module 
+```
+# config/initializers/sluggable.rb
+module Sluggable
+  extend ActiveSupport::Concern
+
+  included do
+    before_save :generate_slug!
+    # expose a class attribute that we can set per class that we include Sluggable in
+    class_attribute :slug_column
   end
-  ```
-  `rails db:migrate`
-- Add a new file `config/initializers/sluggable.rb`. 
-  ```
-  module Sluggable
-    extend ActiveSupport::Concern
-  
-    included do
-      before_save :generate_slug!
-      # expose a class attribute that we can set per class that we include Sluggable in
-      class_attribute :slug_column
-    end
-  
-    # overrides the to_param method so the path helpers
-    # (e.g., post_path(post)) would use the slug column to build the url
-    def to_param
-      self.slug 
-    end
-  
-    def generate_slug!
-      slug = to_slug(self.send(self.class.slug_column.to_sym))
-      obj = self.class.find_by slug: slug
-      if obj && obj != self
-        self.slug = next_slug(slug)
-      else
-        self.slug = slug
-      end
-    end
-    
-    def to_slug(str)
-      str = str.strip
-      str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
-      str.gsub! /-+/, '-'
-      str.downcase
-    end
-  
-    def next_slug(slug)
-      number = 1
-      new_slug = ''
-      loop do
-        new_slug = "#{slug}-#{number}"
-        obj = self.class.find_by slug: new_slug 
-        break if obj.nil?
-        number += 1
-      end
-      new_slug 
-    end
-  
-    module ClassMethods
-      def sluggable_column(col_name)
-        self.slug_column = col_name
-      end
+
+  # overrides the to_param method so the path helpers
+  # (e.g., post_path(post)) would use the slug column to build the url
+  def to_param
+    self.slug 
+  end
+
+  def generate_slug!
+    slug = to_slug(self.send(self.class.slug_column.to_sym))
+    obj = self.class.find_by slug: slug
+    if obj && obj != self
+      self.slug = next_slug(slug)
+    else
+      self.slug = slug
     end
   end
-  ```
-- Update models:
-  - Add `include Sluggable` to user, post, and category models 
-  - Set `sluggable_column :username` in the user model.
-  - Set `sluggable_column :title` in the post model.
-  - Set `sluggable_column :name` in the category model.
-- Update controllers:
-  - Update `set_post` in PostsController to use `@post = Post.find_by slug: params[:id]`
-  - Update `create` in CommentsController to use `@post = Post.find_by slug: params[:post_id]`
-  - Update `set_user` in UsersController to use `User.find_by slug: params[:id]`.
-  - Update `show` action in CategoriesController to use `Category.find_by slug: params[:id]`
-- Update views:
-  - Change `@post.comments.each` to `@post.reload.comments.each` in posts#show view, because when you have a validation error, you want to reload the post  and then grab the comments associated with it.
-  - Change `post.id` to `post.slug` in `app/views/posts/vote.js.erb`
-  - Change `current_user.id` to `current_user.slug` in
-    - `app/views/shared/_nav.html.erb`
-    - `app/views/shared/_header.html.erb`
-  - Change `obj.creator.id` to `obj.creator.slug` in `app/views/shared/_creator_details.html.erb`
-  - Change `obj.id` to `obj.slug` in `app/views/shared/_vote.html.erb`, only if the object being voted on is a post.
+  
+  def to_slug(str)
+    str = str.strip
+    str.gsub! /\s*[^A-Za-z0-9]\s*/, '-'
+    str.gsub! /-+/, '-'
+    str.downcase
+  end
+
+  def next_slug(slug)
+    number = 1
+    new_slug = ''
+    loop do
+      new_slug = "#{slug}-#{number}"
+      obj = self.class.find_by slug: new_slug 
+      break if obj.nil?
+      number += 1
+    end
+    new_slug 
+  end
+
+  module ClassMethods
+    def sluggable_column(col_name)
+      self.slug_column = col_name
+    end
+  end
+end
+```
+
+### Update models
+- Add `include Sluggable` to user, post, and category models 
+- Set `sluggable_column :username` in the user model.
+- Set `sluggable_column :title` in the post model.
+- Set `sluggable_column :name` in the category model.
+
+### Update controllers
+- Update `set_post` in PostsController to use `@post = Post.find_by slug: params[:id]`
+- Update `create` in CommentsController to use `@post = Post.find_by slug: params[:post_id]`
+- Update `set_user` in UsersController to use `User.find_by slug: params[:id]`.
+- Update `show` action in CategoriesController to use `Category.find_by slug: params[:id]`
+
+### Update views
+- Change `@post.comments.each` to `@post.reload.comments.each` in posts#show view, because when you have a validation error, you want to reload the post  and then grab the comments associated with it.
+- Change `post.id` to `post.slug` in `app/views/posts/vote.js.erb`
+- Change `current_user.id` to `current_user.slug` in
+  - `app/views/shared/_nav.html.erb`
+  - `app/views/shared/_header.html.erb`
+- Change `obj.creator.id` to `obj.creator.slug` in `app/views/shared/_creator_details.html.erb`
+- Change `obj.id` to `obj.slug` in `app/views/shared/_vote.html.erb`, only if the object being voted on is a post.
     ```
     <% if obj.class == Post %>
       <div id='<%= obj.class %>_<%= obj.slug %>_votes'><%= obj.total_votes %></div>
@@ -269,15 +302,38 @@ end
       <div id='<%= obj.class %>_<%= obj.slug %>_votes'><%= obj.total_votes %></div>
     <% end %>
     ```
-- Run the following commands in rails console to generate slugs for each user, post, and category. If there are any rollbacks, this means some rows do not pass validations, and you will have to fix them first.
-  ```
-  User.all.each {|x| x.save}
-  Post.all.each {|x| x.save}
-  Category.all.each {|x| x.save}
-  ```
 
-###
+### Fill in slugs for existing rows 
+Run the following commands in rails console to generate slugs for each user, post, and category. If there are any rollbacks, this means some rows do not pass validations, and you will have to fix them first.
+```
+User.all.each {|x| x.save}
+Post.all.each {|x| x.save}
+Category.all.each {|x| x.save}
+```
 
-### Additional Changes
+## Add roles
+- Add `role` column to `users` table.
+  `rails g migration add_role_to_users`
+  ```
+  def change
+    add_column :users, :role, :string
+  end
+  ```
+  `rails db:migrate`
+- Add the methods below to the User model. 
+  ```
+  def admin?
+    self.role == 'admin'
+  end
+  
+  def moderator?
+    self.role == 'moderator'
+  end
+  ```
+- 
+
+## Let users set time zones
+
+## Additional Changes
 - Add edit link for a post on the post show page
 - Add right border for the voting aside
