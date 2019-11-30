@@ -301,7 +301,7 @@ end
 ```
 # app/views/posts/vote.js.erb
 
-# `post.id` => `post.slug`
+# post.id => post.slug
 ```
 
 ```
@@ -325,9 +325,23 @@ Right now they show up as:
 ```
 
 ## Users
-- Change `current_user.id` to `current_user.slug` in
-  - `app/views/shared/_nav.html.erb`
-  - `app/views/shared/_header.html.erb`
+```
+# app/views/shared/_nav.html.erb
+
+# current_user.id => current_user.slug
+```
+
+```
+# app/views/shared/_header.html.erb
+
+# obj.id => obj.slug for edit_user_path
+```
+
+```
+# app/views/shared/_creator_details.html.erb
+
+# obj.creator.id => obj.creator.slug for user_path
+```
 
 ### Fill in slugs for existing rows 
 Run the following commands in rails console to generate slugs for each user, post, and category. If there are any rollbacks, this means some rows do not pass validations, and you will have to fix them first.
@@ -384,21 +398,40 @@ end
 `before_action :require_admin, only: [:new, :create]`
 
 ### PostsController
+Replace `require_same_user` and the `before_action` associated with it, with the following:
 ```
+before_action :require_creator_or_admin, only: [:edit, :update] 
+
 def require_creator_or_admin
   access_denied unless logged_in? && (current_user == @post.creator || current_user.admin?)
 end
 ``` 
- 
+
+### UsersController
+Remove `require_same_user` method since it has been moved to ApplicationController.
+
 ### Update views
 Hide new category link unless the current user is an admin.
 ```
 # app/views/shared/_nav.html.erb
 
-<% if logged_in? && current_user.admin? %>
+<% if current_user.admin? %>
 <% end %>
 ```
 Hide link to edit a post unless the current user is an admin or the creator of the post.
+```
+# app/views/posts/_post.html.erb 
+
+<% if logged_in? && (current_user.admin? || (current_user == post.creator)) %>
+<% end %>
+```
+
+```
+# app/views/shared/_header.html.erb
+
+# when the obj passed in is a post 
+<% can_edit = (current_user.admin? || (current_user == obj.creator)) %>
+```
 
 ## Let users set time zones
 
