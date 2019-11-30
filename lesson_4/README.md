@@ -209,13 +209,14 @@ end
 - If you want to work on the gem locally as you develop your application, you can specify the path in the Gemfile: `gem 'voteable_nancy', '~> 0.0.0', path: '/home/nancy/Documents/voteable_gem'`. You would still have to `gem build voteable_nancy.gemspec` every time you change the version number.
 
 ## Use slugs
-### Add a `slug` column to the `users`, `posts`, and `categories` tables
+I suggest adding slug functionality to `posts`, `categories`, and `users` one at a time, checking in the UI and deploying as you go, to make it easier to catch any bugs as they are introduced.
+### Add `slug` column to `posts`, `categories`, and `users` tables
 `rails g migration add_slugs`
 ```
 def change
-  add_column :users, :slug, :string
   add_column :posts, :slug, :string
   add_column :categories, :slug, :string
+  add_column :users, :slug, :string
 end
 ```
 `rails db:migrate`
@@ -276,32 +277,57 @@ end
 ```
 
 ### Update models
-- Add `include Sluggable` to user, post, and category models 
-- Set `sluggable_column :username` in the user model.
+- Add `include Sluggable` to post, category, and user models 
 - Set `sluggable_column :title` in the post model.
 - Set `sluggable_column :name` in the category model.
+- Set `sluggable_column :username` in the user model.
 
 ### Update controllers
 - Update `set_post` in PostsController to use `@post = Post.find_by slug: params[:id]`
 - Update `create` in CommentsController to use `@post = Post.find_by slug: params[:post_id]`
-- Update `set_user` in UsersController to use `User.find_by slug: params[:id]`.
 - Update `show` action in CategoriesController to use `Category.find_by slug: params[:id]`
+- Update `set_user` in UsersController to use `User.find_by slug: params[:id]`.
 
 ### Update views
-- Change `@post.comments.each` to `@post.reload.comments.each` in posts#show view, because when you have a validation error, you want to reload the post  and then grab the comments associated with it.
-- Change `post.id` to `post.slug` in `app/views/posts/vote.js.erb`
+#### Posts
+```
+# app/views/posts/show.html.erb
+
+# @post.comments.each => @post.reload.comments.each
+# because when you have a validation error, you want to reload
+# the post and then grab the comments associated with it.
+```
+
+```
+# app/views/posts/vote.js.erb
+
+# `post.id` => `post.slug`
+```
+
+```
+# app/views/shared/_vote.html.erb
+
+# obj.id => obj.slug only if the object being voted on is a post.
+
+<% obj_identifier = (obj.class == Post ? obj.slug : obj.id) %>
+
+<div id='<%= obj.class %>_<%= obj_identifier %>_votes'><%= obj.total_votes %></div>
+```
+
+## Categories
+```
+# posts/_form.html.erb
+
+TODO: use slugs for categories
+Right now they show up as:
+
+<label class="checkbox inline mx-2" for="post_category_ids_7"><input class="checkbox mr-1" type="checkbox" value="7" name="post[category_ids][]" id="post_category_ids_7">Recipes</label>
+```
+
+## Users
 - Change `current_user.id` to `current_user.slug` in
   - `app/views/shared/_nav.html.erb`
   - `app/views/shared/_header.html.erb`
-- Change `obj.creator.id` to `obj.creator.slug` in `app/views/shared/_creator_details.html.erb`
-- Change `obj.id` to `obj.slug` in `app/views/shared/_vote.html.erb`, only if the object being voted on is a post.
-    ```
-    <% if obj.class == Post %>
-      <div id='<%= obj.class %>_<%= obj.slug %>_votes'><%= obj.total_votes %></div>
-    <% else %>
-      <div id='<%= obj.class %>_<%= obj.slug %>_votes'><%= obj.total_votes %></div>
-    <% end %>
-    ```
 
 ### Fill in slugs for existing rows 
 Run the following commands in rails console to generate slugs for each user, post, and category. If there are any rollbacks, this means some rows do not pass validations, and you will have to fix them first.
@@ -311,26 +337,68 @@ Post.all.each {|x| x.save}
 Category.all.each {|x| x.save}
 ```
 
+### Deploy
+`heroku rake db:migrate`
+`heroku run rails console`
+```
+User.all.each {|x| x.save}
+Post.all.each {|x| x.save}
+Category.all.each {|x| x.save}
+```
+
 ## Add roles
-- Add `role` column to `users` table.
-  `rails g migration add_role_to_users`
-  ```
-  def change
-    add_column :users, :role, :string
-  end
-  ```
-  `rails db:migrate`
-- Add the methods below to the User model. 
-  ```
-  def admin?
-    self.role == 'admin'
-  end
-  
-  def moderator?
-    self.role == 'moderator'
-  end
-  ```
-- 
+### Add a `role` column to the `users` table
+`rails g migration add_role_to_users`
+```
+def change
+  add_column :users, :role, :string
+end
+```
+`rails db:migrate`
+
+### Add methods to the User model
+```
+def admin?
+  self.role == 'admin'
+end
+
+def moderator?
+  self.role == 'moderator'
+end
+```
+
+### Add restrictions to controllers
+#### ApplicationController
+```
+def require_admin
+  access_denied unless logged_in? && current_user.admin?
+end
+
+def access_denied
+  flash[:error] = 'You do not have permission to do that.'
+  redirect_to root_path
+end
+```
+
+#### CategoriesController
+`before_action :require_admin, only: [:new, :create]`
+
+### PostsController
+```
+def require_creator_or_admin
+  access_denied unless logged_in? && (current_user == @post.creator || current_user.admin?)
+end
+``` 
+ 
+### Update views
+Hide new category link unless the current user is an admin.
+```
+# app/views/shared/_nav.html.erb
+
+<% if logged_in? && current_user.admin? %>
+<% end %>
+```
+Hide link to edit a post unless the current user is an admin or the creator of the post.
 
 ## Let users set time zones
 
