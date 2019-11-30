@@ -434,7 +434,54 @@ Hide link to edit a post unless the current user is an admin or the creator of t
 ```
 
 ## Let users set time zones
+### Set default time zone to Eastern time
+```
+# config/locales/application.rb
+
+config.time_zone = 'Eastern Time (US & Canada)'
+```
+
+### Add a `time_zone` column to the `users` table
+`rails g migration add_time_zone_to_users` 
+```
+def change
+  add_column :users, :time_zone, :string
+end
+```
+`rails db:migrate`
+
+### Add a dropdown field for time zone to new user form
+```
+# app/views/users/_form.html.erb
+
+<div class='form-group'>
+  <%= f.label :time_zone %>
+  <div>
+  <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, default: Time.zone.name %>
+  </div>
+</div>
+```
+
+### Modify strong params to allow `time_zone` through
+`params.require(:user).permit(:username, :password, :time_zone)`
+
+### Modify `display_datetime` in ApplicationHelper
+```
+# helpers/application_helper.rb
+
+def display_datetime(dt)
+  if logged_in? && !current_user.time_zone.blank?
+    dt = dt.in_time_zone(current_user.time_zone)
+  end
+  dt.strftime("%m/%d/%Y %l:%M%P %Z")
+end
+```
+- 1:35: display timezone on user's profile page
+```
+Time Zone: <%= @user.time_zone %>
+```
 
 ## Additional Changes
-- Add edit link for a post on the post show page
+TODO:
 - Add right border for the voting aside
+- Fix formatting of creator_details so if the username is long the display still looks nice 
