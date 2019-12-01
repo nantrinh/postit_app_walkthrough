@@ -1,10 +1,11 @@
 # Lesson 4
-At the end of the lesson, the app will [TODO]
+At the end of the lesson, the app will use Ajax to submit votes and refresh the vote count for the object that was voted on, extract the voting code from the models to a Ruby gem, add slugging and roles, use Eastern US time as the default time, and let users choose which time zone to use.  
 
 Demo:
 ![](../gifs/lesson_4.gif)
 
 ## Table of Contents
+
 * [Course Instructions](#course-instructions)
    * [Ajax-ify voting and extract code to a Gem](#ajax-ify-voting-and-extract-code-to-a-gem)
    * [Use slugs](#use-slugs)
@@ -21,17 +22,35 @@ Demo:
    * [Create javascript templates](#create-javascript-templates)
 * [Extract voting code to a Gem](#extract-voting-code-to-a-gem)
 * [Use slugs](#use-slugs-2)
-   * [Add a slug column to the users, posts, and categories tables](#add-a-slug-column-to-the-users-posts-and-categories-tables)
+   * [Add slug column to posts, categories, and users tables](#add-slug-column-to-posts-categories-and-users-tables)
    * [Create module](#create-module)
    * [Update models](#update-models)
    * [Update controllers](#update-controllers)
    * [Update views](#update-views)
+      * [Posts](#posts)
+* [Categories](#categories)
+* [Users](#users)
    * [Fill in slugs for existing rows](#fill-in-slugs-for-existing-rows)
+   * [Deploy](#deploy)
 * [Add roles](#add-roles-1)
+   * [Add a role column to the users table](#add-a-role-column-to-the-users-table)
+   * [Add methods to the User model](#add-methods-to-the-user-model)
+   * [Add restrictions to controllers](#add-restrictions-to-controllers)
+      * [ApplicationController](#applicationcontroller)
+      * [CategoriesController](#categoriescontroller)
+   * [PostsController](#postscontroller)
+   * [UsersController](#userscontroller)
+   * [Update views](#update-views-1)
 * [Let users set time zones](#let-users-set-time-zones-1)
+   * [Set default time zone to Eastern time](#set-default-time-zone-to-eastern-time)
+   * [Add a time_zone column to the users table](#add-a-time_zone-column-to-the-users-table)
+   * [Add a dropdown field for time zone to new user form](#add-a-dropdown-field-for-time-zone-to-new-user-form)
+   * [Modify strong params to allow time_zone through](#modify-strong-params-to-allow-time_zone-through)
+   * [Modify display_datetime in ApplicationHelper](#modify-display_datetime-in-applicationhelper)
 * [Additional Changes](#additional-changes)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 
 ## Course Instructions
 ### Ajax-ify voting and extract code to a Gem
@@ -478,10 +497,53 @@ end
 ```
 - 1:35: display timezone on user's profile page
 ```
-Time Zone: <%= @user.time_zone %>
+# app/views/shared/_header.html.erb
+
+<% if obj.class == User %>
+  <p><%= obj.time_zone || Time.zone.name %></p> 
+<% end %>
 ```
 
 ## Additional Changes
-TODO:
-- Add right border for the voting aside
-- Fix formatting of creator_details so if the username is long the display still looks nice 
+- Add right border for the voting aside.
+  ```
+  # app/javascript/stylesheets/_custom.scss
+  
+  .votes {
+    border-right: 1px solid rgba(0, 0, 0, 0.125);
+  }
+  ```
+- Fix formatting of creator_details so if the username is long the display still looks nice.
+```
+# app/views/shared/_creator_details.html.erb
+
+<% user_url = user_path(obj.creator.slug) %>
+<% created_at = " #{display_datetime(obj.created_at)}" %>
+
+<p><small class="text-muted"><%= link_to(obj.creator.username, user_url)%></small></p>
+<p><small class="text-muted"><%= created_at %></small></p>
+```
+
+```
+# app/javascript/stylesheets/_custom.scss
+
+.post {
+  .card-footer {
+  height: 6rem;
+  padding-top: 0.3rem;
+  p {
+      margin-bottom: 0;
+    }
+  nav {
+      padding-top: 0.2rem; 
+    }
+  }
+}
+```
+- Restrict lengths of username and password to 50 characters.
+```
+# app/models/user.rb
+
+validates :username, presence: true, uniqueness: true, length: {maximum: 50}
+validates :password, presence: true, on: :create, length: {minimum: 5, maximum: 50}
+```
