@@ -7,11 +7,14 @@ The biggest differences are:
 - I use PostgreSQL instead of SQLite3.
 - I start deploying in lesson 1 instead of in lesson 3.
 
+The finished app is live [here](https://still-crag-40731.herokuapp.com). 
+
 ## Contents
 - `lesson_x/` directories contain relevant material for each lesson.
     - [`lesson_1/`](https://github.com/nantrinh/ls_rails_notes/tree/master/lesson_1)
     - [`lesson 2/`](https://github.com/nantrinh/ls_rails_notes/tree/master/lesson_2)
     - [`lesson 3/`](https://github.com/nantrinh/ls_rails_notes/tree/master/lesson_3)
+    - [`lesson 4/`](https://github.com/nantrinh/ls_rails_notes/tree/master/lesson_4)
 - [`flashcards/`](https://github.com/nantrinh/ls_rails_notes/tree/master/flashcards) contains notes that I intend to format in a quiz-friendly manner.
 - [`video_notes.md`](https://github.com/nantrinh/ls_rails_notes/blob/master/video_notes.md) contains timestamped notes for select videos.
 - [`images/`](https://github.com/nantrinh/ls_rails_notes/tree/master/images) contains images I use in the READMEs.
