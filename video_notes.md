@@ -21,6 +21,18 @@ The timestamps are in `length_of_video - where_you_are_in_the_video` format, bec
       * [Part 2](#part-2-2)
 * [Lesson 4](#lesson-4)
    * [Lecture 7](#lecture-7)
+      * [Solution: Ajax for Post voting](#solution-ajax-for-post-voting)
+      * [Solution: Ajax for Comment voting](#solution-ajax-for-comment-voting)
+      * [Solution: Post Slugs](#solution-post-slugs)
+      * [Solution: User and Category Slugs](#solution-user-and-category-slugs)
+      * [Solution: Better Slugs](#solution-better-slugs)
+   * [Lecture 8](#lecture-8)
+      * [Solution: Voteable Module](#solution-voteable-module)
+      * [Solution: Sluggable Module](#solution-sluggable-module)
+      * [Solution: Voteable Gem](#solution-voteable-gem)
+      * [Solution: Simple Roles](#solution-simple-roles)
+      * [Solution: Require Creator or Admin](#solution-require-creator-or-admin)
+      * [Solution: Time Zones](#solution-time-zones)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -609,12 +621,12 @@ e.g.,`validates :title, presence: true`
   end
   ```
 - 2:08: hide new category link unless the current user is an admin
-```
-# navigation template
-
-<% if logged_in? && current_user.admin? %>
-<% end %>
-```
+  ```
+  # navigation template
+  
+  <% if logged_in? && current_user.admin? %>
+  <% end %>
+  ```
 
 ### Solution: Require Creator or Admin
 - 4:01:  add method to PostsController 
@@ -633,9 +645,9 @@ e.g.,`validates :title, presence: true`
 - 16:05: `rake time:zones:all | grep US` lists all time zones in US
 - 15:30: changed default time zone to Eastern Time 
 - 13:55: `rails g migration add_time_zone_to_users` 
-```
-add_column :users, :time_zone, :string
-```
+  ```
+  add_column :users, :time_zone, :string
+  ```
 - 11:40: adding dropdown field for timezone to user form `_form.html.erb` template. (Added code to set the default to the app default, from -3:35).
   ```
   <div class='control-group'>
@@ -645,15 +657,15 @@ add_column :users, :time_zone, :string
   ```
 - 8:30: modify strong params to allow timezone through: `permit(:username, :password, :time_zone)`
 - 6:00: modify display_datetime in ApplicationHelper
-```
-def display_datetime(dt)
-  if logged_in? && !current_user.time_zone.blank?
-    dt = dt.in_time_zone(current_user.time_zone)
+  ```
+  def display_datetime(dt)
+    if logged_in? && !current_user.time_zone.blank?
+      dt = dt.in_time_zone(current_user.time_zone)
+    end
+    dt.strftime("%m/%d/%Y %l:%M%P %Z")
   end
-  dt.strftime("%m/%d/%Y %l:%M%P %Z")
-end
-```
+  ```
 - 1:35: display timezone on user's profile page
-```
-Time Zone: <%= @user.time_zone %>
-```
+  ```
+  Time Zone: <%= @user.time_zone %>
+  ```
