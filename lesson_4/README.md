@@ -514,36 +514,36 @@ end
   }
   ```
 - Fix formatting of creator_details so if the username is long the display still looks nice.
-```
-# app/views/shared/_creator_details.html.erb
-
-<% user_url = user_path(obj.creator.slug) %>
-<% created_at = " #{display_datetime(obj.created_at)}" %>
-
-<p><small class="text-muted"><%= link_to(obj.creator.username, user_url)%></small></p>
-<p><small class="text-muted"><%= created_at %></small></p>
-```
-
-```
-# app/javascript/stylesheets/_custom.scss
-
-.post {
-  .card-footer {
-  height: 6rem;
-  padding-top: 0.3rem;
-  p {
-      margin-bottom: 0;
-    }
-  nav {
-      padding-top: 0.2rem; 
+  ```
+  # app/views/shared/_creator_details.html.erb
+  
+  <% user_url = user_path(obj.creator.slug) %>
+  <% created_at = " #{display_datetime(obj.created_at)}" %>
+  
+  <p><small class="text-muted"><%= link_to(obj.creator.username, user_url)%></small></p>
+  <p><small class="text-muted"><%= created_at %></small></p>
+  ```
+  
+  ```
+  # app/javascript/stylesheets/_custom.scss
+  
+  .post {
+    .card-footer {
+    height: 6rem;
+    padding-top: 0.3rem;
+    p {
+        margin-bottom: 0;
+      }
+    nav {
+        padding-top: 0.2rem; 
+      }
     }
   }
-}
-```
+  ```
 - Restrict lengths of username and password to 50 characters.
-```
-# app/models/user.rb
-
-validates :username, presence: true, uniqueness: true, length: {maximum: 50}
-validates :password, presence: true, on: :create, length: {minimum: 5, maximum: 50}
-```
+  ```
+  # app/models/user.rb
+  
+  validates :username, presence: true, uniqueness: true, length: {maximum: 50}
+  validates :password, presence: true, on: :create, length: {minimum: 5, maximum: 50}
+  ```
