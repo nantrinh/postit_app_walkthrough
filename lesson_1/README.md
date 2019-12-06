@@ -71,8 +71,8 @@ Helpful articles: [1](https://launchschool.com/blog/how-to-install-postgres-for-
 Make sure you are not in an existing git repo. It would be easier to deploy if the app is in its own repo and not nested within another one.
 - `rails new postit --database=postgresql`
 - `cd postit`
-- `rails db:migrate`
 - `rake db:setup`
+- `rails db:migrate`
 - `rails server`
 - Navigate to `http://localhost:3000` in browser and verify that a welcome page is shown. 
 
