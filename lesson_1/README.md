@@ -293,7 +293,7 @@ pp bok_choy.categories # ["food", "cat"]
  
 ## Create controllers
 ```ruby
-# app/controllers/posts.rb
+# app/controllers/posts_controller.rb
 
 class PostsController < ApplicationController
   def index
@@ -307,7 +307,7 @@ end
 ```
 
 ```ruby
-# app/controllers/categories.rb
+# app/controllers/categories_controller.rb
 
 class CategoriesController < ApplicationController
   def index
