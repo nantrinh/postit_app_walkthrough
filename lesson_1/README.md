@@ -321,9 +321,9 @@ end
 ```
 
 ## Install Bootstrap 4
-I followed the instructions in this [article](https://hackernoon.com/integrate-bootstrap-4-and-font-awesome-5-in-rails-6-u87u32zd).
+I wrote down step-by-step instructions [here](https://github.com/nantrinh/things_i_tend_to_forget/blob/master/how_to_set_up_bootstrap_and_font_awesome_5_in_rails_6.md).
 
-[NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome. The article linked to above includes instructions on how to integrate it in your app.
+[NOTE](https://v4-alpha.getbootstrap.com/migration/#components): Bootstrap 4 does not support the Glyphicons icon font used in the videos. I use Font Awesome.
 
 [NOTE](https://v4-alpha.getbootstrap.com/migration/#components): The `well` class is frequently used in the videos. This class was dropped in Bootstrap v4. I use the [`cards`](https://getbootstrap.com/docs/4.0/components/card/) component in my code, which provides similar functionality.
 
