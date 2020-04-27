@@ -4,7 +4,7 @@ This repo contains my notes for each lesson of the Launch School 5301 Rapid Prot
 
 The biggest differences are:
 - I use Rails 6 and Ruby 2.6.5. The course uses Rails 4 and Ruby 2.
-- I use Bootstrap 4. The course uses an earlier version of Bootstrap.
+- I use Bootstrap 4. The course uses Bootstrap 3.
 - I use PostgreSQL instead of SQLite3.
 - I start deploying in lesson 1 instead of in lesson 3.
 
