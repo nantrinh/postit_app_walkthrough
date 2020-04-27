@@ -1,4 +1,4 @@
-# Postit App Walkthrough
+# Blogging App Walkthrough
 ![](gifs/lesson_4.gif)
 This repo contains my notes for each lesson of the Launch School 5301 Rapid Prototyping with Ruby on Rails course. There are some differences in my implementations vs. those in the course videos, but the main ideas are the same.
 
